@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Edit User</title>
+</head>
+<body>
+<h1>Edit User</h1>
+
+<form th:action="@{'/admin/update/' + ${user.userID}}" th:object="${user}" method="post">
+    <label>Email: </label>
+    <input type="text" th:field="*{email}" readonly/><br/><br/>
+
+    <label>First Name: </label>
+    <input type="text" th:field="*{firstName}"/><br/><br/>
+
+    <label>Last Name: </label>
+    <input type="text" th:field="*{lastName}"/><br/><br/>
+
+    <label>Phone Number: </label>
+    <input type="text" th:field="*{phoneNumber}"/><br/><br/>
+
+    <label>Role: </label>
+    <select th:field="*{role}">
+        <option value="ADMIN">ADMIN</option>
+        <option value="CUSTOMER">CUSTOMER</option>
+        <option value="PARKING_SLOT_MANAGER">PARKING_SLOT_MANAGER</option>
+        <option value="FINANCE_EXECUTIVE">FINANCE_EXECUTIVE</option>
+        <option value="CUSTOMER_SUPPORT_OFFICER">CUSTOMER_SUPPORT_OFFICER</option>
+        <option value="SECURITY_OFFICER">SECURITY_OFFICER</option>
+    </select><br/><br/>
+
+    <label>Status: </label>
+    <select th:field="*{status}">
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="INACTIVE">INACTIVE</option>
+    </select><br/><br/>
+
+    <button type="submit">Update</button>
+</form>
+
+<a href="/admin/dashboard">Back</a>
+</body>
+</html>
