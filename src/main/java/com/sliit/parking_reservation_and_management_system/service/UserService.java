@@ -4,6 +4,9 @@ import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -74,5 +77,10 @@ public class UserService {
     private boolean isBcrypt(String value) {
         // Typical BCrypt hashes start with $2a$, $2b$, or $2y$
         return value.startsWith("$2a$") || value.startsWith("$2b$") || value.startsWith("$2y$");
+    }
+
+    public Page<User> getPaginatedUsers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable);
     }
 }

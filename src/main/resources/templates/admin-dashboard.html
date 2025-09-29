@@ -2,6 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Admin Dashboard</title>
+    <style>
+        .pagination a { margin: 0 4px; text-decoration: none; }
+        .pagination .active { font-weight: bold; text-decoration: underline; }
+        .disabled { color: #999; pointer-events: none; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 6px; }
+        th { background: #f3f3f3; }
+    </style>
 </head>
 <body>
 <h1>Admin Dashboard</h1>
@@ -10,8 +18,10 @@
     <a href="/admin/register">Register New Staff</a> |
     <a href="/logout">Logout</a>
 </div>
+
 <br/>
-<table border="1">
+
+<table>
     <thead>
     <tr>
         <th>UserID</th>
@@ -25,25 +35,60 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.userID}"></td>
-        <td th:text="${user.email}"></td>
-        <td th:text="${user.role}"></td>
-        <td th:text="${user.firstName}"></td>
-        <td th:text="${user.lastName}"></td>
-        <td th:text="${user.phoneNumber}"></td>
-        <td th:text="${user.status}"></td>
+    <!-- Use the Page content -->
+    <tr th:each="user : ${userPage.content}">
+        <td th:text="${user.userID}">1</td>
+        <td th:text="${user.email}">email@example.com</td>
+        <td th:text="${user.role}">ROLE</td>
+        <td th:text="${user.firstName}">First</td>
+        <td th:text="${user.lastName}">Last</td>
+        <td th:text="${user.phoneNumber}">0123456789</td>
+        <td th:text="${user.status}">ACTIVE</td>
         <td>
             <a th:href="@{'/admin/edit/' + ${user.userID}}">Edit</a> |
-            <a th:href="@{'/admin/delete/' + ${user.userID}}">Delete</a> |
-            <a th:href="@{'/admin/deactivate/' + ${user.userID}}"
-               th:if="${user.status == 'ACTIVE'}">Deactivate</a>
-            <a th:href="@{'/admin/activate/' + ${user.userID}}"
-               th:if="${user.status == 'INACTIVE'}">Activate</a>
+            <a th:href="@{'/admin/delete/' + ${user.userID}}"
+               onclick="return confirm('Delete this user?');">Delete</a> |
+            <a th:if="${user.status == 'ACTIVE'}"
+               th:href="@{'/admin/deactivate/' + ${user.userID}}"
+               onclick="return confirm('Deactivate this account?');">Deactivate</a>
+            <a th:if="${user.status == 'INACTIVE'}"
+               th:href="@{'/admin/activate/' + ${user.userID}}">Activate</a>
         </td>
+    </tr>
+
+    <!-- Show an empty state if no users on this page -->
+    <tr th:if="${#lists.isEmpty(userPage.content)}">
+        <td colspan="8" style="text-align:center;">No users to show.</td>
     </tr>
     </tbody>
 </table>
+
+<!-- Pagination Controls -->
+<div class="pagination" th:with="lastPage=${totalPages - 1}">
+    <div style="margin-top:10px;">
+        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}">Page 1 of 1</span>
+    </div>
+
+    <div style="margin-top:6px;">
+        <!-- Previous -->
+        <a th:if="${currentPage > 0}"
+           th:href="@{/admin/dashboard(page=${currentPage - 1})}">Previous</a>
+        <span th:unless="${currentPage > 0}" class="disabled">Previous</span>
+
+        <!-- Page numbers -->
+        <span th:if="${totalPages > 0}">
+            <a th:each="i : ${#numbers.sequence(0, lastPage)}"
+               th:href="@{/admin/dashboard(page=${i})}"
+               th:text="${i + 1}"
+               th:classappend="${i == currentPage} ? ' active' : ''">1</a>
+        </span>
+
+        <!-- Next -->
+        <a th:if="${currentPage < totalPages - 1}"
+           th:href="@{/admin/dashboard(page=${currentPage + 1})}">Next</a>
+        <span th:unless="${currentPage < totalPages - 1}" class="disabled">Next</span>
+    </div>
+</div>
 
 </body>
 </html>

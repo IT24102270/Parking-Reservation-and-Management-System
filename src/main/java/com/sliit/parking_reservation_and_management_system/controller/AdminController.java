@@ -5,6 +5,7 @@ import com.sliit.parking_reservation_and_management_system.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
 
 @Controller
 @RequestMapping("/admin")
@@ -16,10 +17,17 @@ public class AdminController {
         this.userService = userService;
     }
 
-    // Admin Dashboard: list all users
+    // Dashboard with pagination
     @GetMapping("/dashboard")
-    public String viewDashboard(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String viewDashboard(@RequestParam(defaultValue = "0") int page,
+                                Model model) {
+        int pageSize = 15; // 15 users per page
+        Page<User> userPage = userService.getPaginatedUsers(page, pageSize);
+
+        model.addAttribute("userPage", userPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+
         return "admin-dashboard";
     }
 
