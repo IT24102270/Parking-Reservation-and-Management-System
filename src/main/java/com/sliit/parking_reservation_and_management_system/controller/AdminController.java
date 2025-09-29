@@ -66,14 +66,15 @@ public class AdminController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User());
-        return "staff-register";
+        return "user-register";
     }
 
     // Handle staff registration
     @PostMapping("/register")
-    public String registerStaff(@ModelAttribute("user") User user) {
+    public String registerUser(@ModelAttribute("user") User user) {
         // Password hashing, role normalization, and default status
         // are handled inside userService.saveUser(...)
+        user.setStatus("ACTIVE");
         userService.saveUser(user);
         return "redirect:/admin/dashboard";
     }

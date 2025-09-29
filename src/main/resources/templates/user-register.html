@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Staff Registration</title>
+    <title>User Registration</title>
 </head>
 <body>
-<h2>Register New Staff Member</h2>
+<h2>Register New User</h2>
 <form th:action="@{/admin/register}" method="post" th:object="${user}">
     <label>First Name:</label>
-    <input type="text" th:field="*{firstName}" required /><br/>
+    <input type="text" th:field="*{firstName}" required/><br/>
 
     <label>Last Name:</label>
-    <input type="text" th:field="*{lastName}" required /><br/>
+    <input type="text" th:field="*{lastName}" required/><br/>
 
     <label>Email:</label>
-    <input type="email" th:field="*{email}" required /><br/>
+    <input type="email" th:field="*{email}" required/><br/>
 
     <label>Password:</label>
-    <input type="password" th:field="*{passwordHash}" required /><br/>
+    <input type="password" th:field="*{passwordHash}" required/><br/>
 
     <label>Phone Number:</label>
-    <input type="text" th:field="*{phoneNumber}" /><br/>
+    <input type="text" th:field="*{phoneNumber}"/><br/>
 
     <label>Role:</label>
-    <select th:field="*{role}">
+    <select th:field="*{role}" required>
+        <option value="CUSTOMER">Customer</option>
         <option value="ADMIN">Admin</option>
         <option value="PARKING_SLOT_MANAGER">Parking Slot Manager</option>
         <option value="FINANCE_EXECUTIVE">Finance Executive</option>
@@ -30,7 +31,9 @@
         <option value="CUSTOMER_SUPPORT_OFFICER">Customer Support Officer</option>
     </select><br/>
 
-    <button type="submit">Register Staff</button>
+    <button type="submit">Register User</button>
 </form>
+
+<a href="/admin/dashboard">Back</a>
 </body>
 </html>
