@@ -7,6 +7,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -17,16 +19,41 @@ public class AdminController {
         this.userService = userService;
     }
 
-    // Dashboard with pagination
+    // static role list for dropdown
+    private static final List<String> ROLE_OPTIONS = List.of(
+            "ADMIN",
+            "CUSTOMER",
+            "PARKING_SLOT_MANAGER",
+            "FINANCE_EXECUTIVE",
+            "SECURITY_OFFICER",
+            "CUSTOMER_SUPPORT_OFFICER"
+    );
+    // ---------------------------
+    // Dashboard with pagination + filters
+    // ---------------------------
     @GetMapping("/dashboard")
-    public String viewDashboard(@RequestParam(defaultValue = "0") int page,
-                                Model model) {
-        int pageSize = 15; // 15 users per page
-        Page<User> userPage = userService.getPaginatedUsers(page, pageSize);
+    public String viewDashboard(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String email,
+            Model model
+    ) {
+        int pageSize = 15;
+
+        Page<User> userPage = userService.searchUsers(role, status, email, page, pageSize);
 
         model.addAttribute("userPage", userPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", userPage.getTotalPages());
+
+        // keep current filter values
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
+        model.addAttribute("email", email);
+
+        // provide dropdown role options
+        model.addAttribute("roleOptions", ROLE_OPTIONS);
 
         return "admin-dashboard";
     }

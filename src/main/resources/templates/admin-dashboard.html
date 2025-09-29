@@ -9,6 +9,9 @@
         table { border-collapse: collapse; width: 100%; }
         th, td { border: 1px solid #ddd; padding: 6px; }
         th { background: #f3f3f3; }
+        form.filters { margin: 15px 0; }
+        form.filters label { margin-right: 6px; }
+        form.filters input, form.filters select { margin-right: 12px; }
     </style>
 </head>
 <body>
@@ -19,8 +22,33 @@
     <a href="/logout">Logout</a>
 </div>
 
-<br/>
+<!-- Search & Filter Form -->
+<form class="filters" th:action="@{/admin/dashboard}" method="get">
+    <label>Role:</label>
+    <select name="role">
+        <option value="" th:selected="${role == null or role == ''}">--Any--</option>
+        <option th:each="r : ${roleOptions}"
+                th:value="${r}"
+                th:text="${r}"
+                th:selected="${role == r}">
+        </option>
+    </select>
 
+    <label>Status:</label>
+    <select name="status">
+        <option value="" th:selected="${status == null or status == ''}">--Any--</option>
+        <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">ACTIVE</option>
+        <option value="INACTIVE" th:selected="${status == 'INACTIVE'}">INACTIVE</option>
+    </select>
+
+    <label>Email:</label>
+    <input type="text" name="email" th:value="${email}" placeholder="example@mail.com"/>
+
+    <button type="submit">Search</button>
+    <a href="/admin/dashboard">Reset</a>
+</form>
+
+<!-- User Table -->
 <table>
     <thead>
     <tr>
@@ -35,7 +63,12 @@
     </tr>
     </thead>
     <tbody>
-    <!-- Use the Page content -->
+    <!-- Show empty state -->
+    <tr th:if="${#lists.isEmpty(userPage.content)}">
+        <td colspan="8" style="text-align:center;">No users found.</td>
+    </tr>
+
+    <!-- Rows -->
     <tr th:each="user : ${userPage.content}">
         <td th:text="${user.userID}">1</td>
         <td th:text="${user.email}">email@example.com</td>
@@ -55,11 +88,6 @@
                th:href="@{'/admin/activate/' + ${user.userID}}">Activate</a>
         </td>
     </tr>
-
-    <!-- Show an empty state if no users on this page -->
-    <tr th:if="${#lists.isEmpty(userPage.content)}">
-        <td colspan="8" style="text-align:center;">No users to show.</td>
-    </tr>
     </tbody>
 </table>
 
@@ -72,20 +100,20 @@
     <div style="margin-top:6px;">
         <!-- Previous -->
         <a th:if="${currentPage > 0}"
-           th:href="@{/admin/dashboard(page=${currentPage - 1})}">Previous</a>
+           th:href="@{/admin/dashboard(page=${currentPage - 1}, role=${role}, status=${status}, email=${email})}">Previous</a>
         <span th:unless="${currentPage > 0}" class="disabled">Previous</span>
 
         <!-- Page numbers -->
         <span th:if="${totalPages > 0}">
             <a th:each="i : ${#numbers.sequence(0, lastPage)}"
-               th:href="@{/admin/dashboard(page=${i})}"
+               th:href="@{/admin/dashboard(page=${i}, role=${role}, status=${status}, email=${email})}"
                th:text="${i + 1}"
                th:classappend="${i == currentPage} ? ' active' : ''">1</a>
         </span>
 
         <!-- Next -->
         <a th:if="${currentPage < totalPages - 1}"
-           th:href="@{/admin/dashboard(page=${currentPage + 1})}">Next</a>
+           th:href="@{/admin/dashboard(page=${currentPage + 1}, role=${role}, status=${status}, email=${email})}">Next</a>
         <span th:unless="${currentPage < totalPages - 1}" class="disabled">Next</span>
     </div>
 </div>

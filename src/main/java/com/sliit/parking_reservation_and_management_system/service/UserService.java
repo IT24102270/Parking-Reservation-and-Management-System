@@ -83,4 +83,19 @@ public class UserService {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable);
     }
+
+    public Page<User> searchUsers(String role, String status, String email, int page, int size) {
+        return userRepository.search(
+                normalize(role),
+                normalize(status),
+                normalize(email),
+                PageRequest.of(page, size)
+        );
+    }
+
+    private String normalize(String s) {
+        if (s == null) return null;
+        s = s.trim();
+        return s.isEmpty() ? null : s;
+    }
 }
