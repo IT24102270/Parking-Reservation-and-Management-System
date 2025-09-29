@@ -5,6 +5,12 @@
 </head>
 <body>
 <h2>Register New User</h2>
+
+<!-- Show error if email already exists -->
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
+</div>
+
 <form th:action="@{/admin/register}" method="post" th:object="${user}">
     <label>First Name:</label>
     <input type="text" th:field="*{firstName}" required/><br/>

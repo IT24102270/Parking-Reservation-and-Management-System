@@ -71,9 +71,14 @@ public class AdminController {
 
     // Handle staff registration
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user) {
+    public String registerUser(@ModelAttribute("user") User user, Model model) {
         // Password hashing, role normalization, and default status
         // are handled inside userService.saveUser(...)
+        if (userService.emailExists(user.getEmail())) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Email already exists. Please use another one.");
+            return "user-register"; // show form again with error
+        }
         user.setStatus("ACTIVE");
         userService.saveUser(user);
         return "redirect:/admin/dashboard";

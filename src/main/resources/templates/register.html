@@ -3,10 +3,26 @@
 <head>
     <title>Register - Parking System</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        function validatePasswords() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
 <h2>Register</h2>
-<form th:action="@{/register}" method="post" th:object="${user}">
+
+<div th:if="${error}" style="color:red;">
+    <p th:text="${error}"></p>
+</div>
+
+<form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return validatePasswords()">
     <div>
         <label>First Name:</label>
         <input type="text" th:field="*{firstName}" required>
@@ -20,12 +36,20 @@
         <input type="email" th:field="*{email}" required>
     </div>
     <div>
-        <label>Phone:</label>
-        <input type="text" th:field="*{phoneNumber}">
+        <label>Password:</label>
+        <input type="password" th:field="*{passwordHash}" id="password"
+               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$"
+               title="Password must be 8-12 characters, include uppercase, lowercase, number, and special symbol."
+               required>
     </div>
     <div>
-        <label>Password:</label>
-        <input type="password" th:field="*{passwordHash}" required>
+        <label>Confirm Password:</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required>
+    </div>
+
+    <div>
+        <label>Phone:</label>
+        <input type="text" th:field="*{phoneNumber}">
     </div>
     <div>
         <button type="submit">Register</button>

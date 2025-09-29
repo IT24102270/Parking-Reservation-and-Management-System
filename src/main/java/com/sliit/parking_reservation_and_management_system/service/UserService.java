@@ -98,4 +98,8 @@ public class UserService {
         s = s.trim();
         return s.isEmpty() ? null : s;
     }
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
 }
