@@ -71,18 +71,47 @@ public class AdminController {
 
     // Handle staff registration
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user, Model model) {
-        // Password hashing, role normalization, and default status
-        // are handled inside userService.saveUser(...)
+    public String registerUser(
+            @ModelAttribute("user") User user,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model
+    ) {
+        // 1. Check duplicate email
         if (userService.emailExists(user.getEmail())) {
             model.addAttribute("user", user);
             model.addAttribute("error", "Email already exists. Please use another one.");
-            return "user-register"; // show form again with error
+            return "user-register";
         }
+
+        // 2. Validate password strength
+        String rawPassword = user.getPasswordHash();
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,12}$";
+        if (!rawPassword.matches(regex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error",
+                    "Password must be 8–12 characters, include uppercase, lowercase, number, and special character.");
+            return "user-register";
+        }
+
+        // 3. Confirm password match
+        if (!rawPassword.equals(confirmPassword)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Passwords do not match.");
+            return "user-register";
+        }
+
+        // 4. Hash password
+        user.setPasswordHash(userService.encodePassword(rawPassword));
+
+        // 5. Default status = ACTIVE
         user.setStatus("ACTIVE");
+
+        // 6. Save user
         userService.saveUser(user);
+
         return "redirect:/admin/dashboard";
     }
+
 
     // ---------------------------
     // User Management

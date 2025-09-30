@@ -102,4 +102,8 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
 }

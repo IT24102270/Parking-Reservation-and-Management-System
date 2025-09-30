@@ -6,7 +6,7 @@
 <body>
 <h2>Register New User</h2>
 
-<!-- Show error if email already exists -->
+<!-- Show error if any -->
 <div th:if="${error}" style="color:red;">
     <p th:text="${error}"></p>
 </div>
@@ -23,6 +23,9 @@
 
     <label>Password:</label>
     <input type="password" th:field="*{passwordHash}" required/><br/>
+
+    <label>Confirm Password:</label>
+    <input type="password" id="confirmPassword" name="confirmPassword" required/><br/>
 
     <label>Phone Number:</label>
     <input type="text" th:field="*{phoneNumber}"/><br/>
