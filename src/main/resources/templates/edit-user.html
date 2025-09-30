@@ -8,7 +8,10 @@
 
 <form th:action="@{'/admin/update/' + ${user.userID}}" th:object="${user}" method="post">
     <label>Email: </label>
-    <input type="text" th:field="*{email}" readonly/><br/><br/>
+    <input type="email" th:field="*{email}"
+           pattern="^[^@]+@[^@]+\.[^@]+$"
+           title="Must be a valid email with @ and ."
+           readonly/><br/><br/>
 
     <label>First Name: </label>
     <input type="text" th:field="*{firstName}"/><br/><br/>
@@ -17,7 +20,9 @@
     <input type="text" th:field="*{lastName}"/><br/><br/>
 
     <label>Phone Number: </label>
-    <input type="text" th:field="*{phoneNumber}"/><br/><br/>
+    <input type="text" th:field="*{phoneNumber}"
+           pattern="^0\d{9}$"
+           title="Phone must be 10 digits and start with 0"/><br/><br/>
 
     <label>Role: </label>
     <select th:field="*{role}">

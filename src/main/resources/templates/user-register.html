@@ -19,7 +19,10 @@
     <input type="text" th:field="*{lastName}" required/><br/>
 
     <label>Email:</label>
-    <input type="email" th:field="*{email}" required/><br/>
+    <input type="email" th:field="*{email}"
+           pattern="^[^@]+@[^@]+\.[^@]+$"
+           title="Must be a valid email with @ and ."
+           required/><br/>
 
     <label>Password:</label>
     <input type="password" th:field="*{passwordHash}" required/><br/>
@@ -28,7 +31,10 @@
     <input type="password" id="confirmPassword" name="confirmPassword" required/><br/>
 
     <label>Phone Number:</label>
-    <input type="text" th:field="*{phoneNumber}"/><br/>
+    <input type="text" th:field="*{phoneNumber}"
+           pattern="^0\d{9}$"
+           title="Phone must be 10 digits and start with 0"
+           required/><br/>
 
     <label>Role:</label>
     <select th:field="*{role}" required>

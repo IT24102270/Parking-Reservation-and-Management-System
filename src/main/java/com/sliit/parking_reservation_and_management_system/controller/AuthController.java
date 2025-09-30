@@ -66,6 +66,23 @@ public class AuthController {
             return "register";
         }
 
+        // Email regex: must contain @ and .
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!user.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "user-register"; // or "register" for customer
+        }
+
+// Phone regex: must be 10 digits starting with 0
+        String phoneRegex = "^0\\d{9}$";
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
+                !user.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "user-register";
+        }
+
         // 4. Encrypt password
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
 

@@ -33,7 +33,10 @@
     </div>
     <div>
         <label>Email:</label>
-        <input type="email" th:field="*{email}" required>
+        <input type="email" th:field="*{email}"
+               pattern="^[^@]+@[^@]+\.[^@]+$"
+               title="Must be a valid email with @ and ."
+               required/><br/>
     </div>
     <div>
         <label>Password:</label>
@@ -48,8 +51,11 @@
     </div>
 
     <div>
-        <label>Phone:</label>
-        <input type="text" th:field="*{phoneNumber}">
+        <label>Phone Number:</label>
+        <input type="text" th:field="*{phoneNumber}"
+               pattern="^0\d{9}$"
+               title="Phone must be 10 digits and start with 0"
+               required/><br/>
     </div>
     <div>
         <button type="submit">Register</button>

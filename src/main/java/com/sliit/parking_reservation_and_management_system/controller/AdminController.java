@@ -100,6 +100,24 @@ public class AdminController {
             return "user-register";
         }
 
+        // Email regex: must contain @ and .
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!user.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "user-register"; // or "register" for customer
+        }
+
+// Phone regex: must be 10 digits starting with 0
+        String phoneRegex = "^0\\d{9}$";
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
+                !user.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "user-register";
+        }
+
+
         // 4. Hash password
         user.setPasswordHash(userService.encodePassword(rawPassword));
 
@@ -128,23 +146,40 @@ public class AdminController {
 
     // Update user
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") int id, @ModelAttribute("user") User updatedUser) {
+    public String updateUser(@PathVariable("id") int id,
+                             @ModelAttribute("user") User updatedUser,
+                             Model model) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
+        // --- Email validation ---
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!updatedUser.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "edit-user";
+        }
+
+        // --- Phone validation ---
+        String phoneRegex = "^0\\d{9}$";
+        if (updatedUser.getPhoneNumber() != null && !updatedUser.getPhoneNumber().isBlank() &&
+                !updatedUser.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "edit-user";
+        }
+
+        // --- Apply updates ---
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         user.setRole(updatedUser.getRole());
         user.setStatus(updatedUser.getStatus());
 
-        // Do NOT overwrite password here (no password field in the form).
-        // If you later add a password reset field, call user.setPasswordHash(...)
-        // and userService.saveUser(...) will hash it.
-
         userService.saveUser(user);
         return "redirect:/admin/dashboard";
     }
+
 
     // Delete user
     @GetMapping("/delete/{id}")
