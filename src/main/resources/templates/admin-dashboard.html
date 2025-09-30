@@ -21,6 +21,15 @@
     <a href="/admin/register">Register New User</a> |
     <a href="/logout">Logout</a>
 </div>
+<!-- Success Message -->
+<div th:if="${success}" style="color:green; font-weight:bold; margin:10px 0;">
+    <p th:text="${success}"></p>
+</div>
+
+<!-- Error Message (if you want general errors here too) -->
+<div th:if="${error}" style="color:red; font-weight:bold; margin:10px 0;">
+    <p th:text="${error}"></p>
+</div>
 
 
 

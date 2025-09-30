@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -148,7 +149,7 @@ public class AdminController {
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") int id,
                              @ModelAttribute("user") User updatedUser,
-                             Model model) {
+                             Model model , RedirectAttributes redirectAttributes) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
@@ -177,6 +178,9 @@ public class AdminController {
         user.setStatus(updatedUser.getStatus());
 
         userService.saveUser(user);
+
+        // Add success message for redirect
+        redirectAttributes.addFlashAttribute("success", "User updated successfully!");
         return "redirect:/admin/dashboard";
     }
 
