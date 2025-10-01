@@ -36,7 +36,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             }
         }, () -> request.getSession().setAttribute("error", errorMessage));
 
-        // 👇 Redirect without "?error" so only our message shows
+        // Redirect without "?error" so only our message shows
         response.sendRedirect("/login");
     }
 
