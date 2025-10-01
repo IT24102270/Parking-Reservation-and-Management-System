@@ -31,7 +31,6 @@ public class SecurityConfig {
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
     }
 
-
     // Success handler: redirects users based on their role
     @Bean
     public AuthenticationSuccessHandler customSuccessHandler() {
@@ -61,30 +60,40 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // ❗ disable only for development/testing
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Role-based access (prefix "ROLE_" is added automatically by Spring)
+                        // Public pages
+                        .requestMatchers("/", "/index", "/login", "/register", "/css/**", "/js/**").permitAll()
+
+                        // Protected dashboards
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasRole("CUSTOMER")
                         .requestMatchers("/security/**").hasRole("SECURITY_OFFICER")
                         .requestMatchers("/finance/**").hasRole("FINANCE_EXECUTIVE")
                         .requestMatchers("/support/**").hasRole("CUSTOMER_SUPPORT_OFFICER")
                         .requestMatchers("/slotmanager/**").hasRole("PARKING_SLOT_MANAGER")
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll() // public pages
+
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
-                        .loginPage("/login")     // custom login page
-                        .successHandler(customSuccessHandler()) // redirect by role
-                        .failureHandler(customAuthenticationFailureHandler) // 👈 use our handler
+                        .loginPage("/login")
+                        .successHandler(customSuccessHandler())
+                        .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/") // back to index
                         .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendRedirect("/")) // 👈 key line
                 );
 
         return http.build();
     }
+
+
+
 }

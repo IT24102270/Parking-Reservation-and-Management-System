@@ -5,6 +5,10 @@ import com.sliit.parking_reservation_and_management_system.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
@@ -16,10 +20,42 @@ public class AdminController {
         this.userService = userService;
     }
 
-    // Admin Dashboard: list all users
+    // static role list for dropdown
+    private static final List<String> ROLE_OPTIONS = List.of(
+            "ADMIN",
+            "CUSTOMER",
+            "PARKING_SLOT_MANAGER",
+            "FINANCE_EXECUTIVE",
+            "SECURITY_OFFICER",
+            "CUSTOMER_SUPPORT_OFFICER"
+    );
+    // ---------------------------
+    // Dashboard with pagination + filters
+    // ---------------------------
     @GetMapping("/dashboard")
-    public String viewDashboard(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
+    public String viewDashboard(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String email,
+            Model model
+    ) {
+        int pageSize = 15;
+
+        Page<User> userPage = userService.searchUsers(role, status, email, page, pageSize);
+
+        model.addAttribute("userPage", userPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+
+        // keep current filter values
+        model.addAttribute("role", role);
+        model.addAttribute("status", status);
+        model.addAttribute("email", email);
+
+        // provide dropdown role options
+        model.addAttribute("roleOptions", ROLE_OPTIONS);
+
         return "admin-dashboard";
     }
 
@@ -31,17 +67,70 @@ public class AdminController {
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User());
-        return "staff-register";
+        return "user-register";
     }
 
     // Handle staff registration
     @PostMapping("/register")
-    public String registerStaff(@ModelAttribute("user") User user) {
-        // Password hashing, role normalization, and default status
-        // are handled inside userService.saveUser(...)
+    public String registerUser(
+            @ModelAttribute("user") User user,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model , RedirectAttributes redirectAttributes
+    ) {
+        // 1. Check duplicate email
+        if (userService.emailExists(user.getEmail())) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Email already exists. Please use another one.");
+            return "user-register";
+        }
+
+        // 2. Validate password strength
+        String rawPassword = user.getPasswordHash();
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,12}$";
+        if (!rawPassword.matches(regex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error",
+                    "Password must be 8–12 characters, include uppercase, lowercase, number, and special character.");
+            return "user-register";
+        }
+
+        // 3. Confirm password match
+        if (!rawPassword.equals(confirmPassword)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Passwords do not match.");
+            return "user-register";
+        }
+
+        // Email regex: must contain @ and .
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!user.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "user-register"; // or "register" for customer
+        }
+
+// Phone regex: must be 10 digits starting with 0
+        String phoneRegex = "^0\\d{9}$";
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
+                !user.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "user-register";
+        }
+
+
+        // 4. Hash password
+        user.setPasswordHash(userService.encodePassword(rawPassword));
+
+        // 5. Default status = ACTIVE
+        user.setStatus("ACTIVE");
+
+        // 6. Save user
         userService.saveUser(user);
+        redirectAttributes.addFlashAttribute("success", "User registered successfully!");
         return "redirect:/admin/dashboard";
     }
+
 
     // ---------------------------
     // User Management
@@ -58,41 +147,64 @@ public class AdminController {
 
     // Update user
     @PostMapping("/update/{id}")
-    public String updateUser(@PathVariable("id") int id, @ModelAttribute("user") User updatedUser) {
+    public String updateUser(@PathVariable("id") int id,
+                             @ModelAttribute("user") User updatedUser,
+                             Model model , RedirectAttributes redirectAttributes) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
+        // --- Email validation ---
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!updatedUser.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "edit-user";
+        }
+
+        // --- Phone validation ---
+        String phoneRegex = "^0\\d{9}$";
+        if (updatedUser.getPhoneNumber() != null && !updatedUser.getPhoneNumber().isBlank() &&
+                !updatedUser.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", updatedUser);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "edit-user";
+        }
+
+        // --- Apply updates ---
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setPhoneNumber(updatedUser.getPhoneNumber());
         user.setRole(updatedUser.getRole());
         user.setStatus(updatedUser.getStatus());
 
-        // Do NOT overwrite password here (no password field in the form).
-        // If you later add a password reset field, call user.setPasswordHash(...)
-        // and userService.saveUser(...) will hash it.
-
         userService.saveUser(user);
+
+        // Add success message for redirect
+        redirectAttributes.addFlashAttribute("success", "User updated successfully!");
         return "redirect:/admin/dashboard";
     }
 
+
     // Delete user
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
+    public String deleteUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         userService.deleteUser(id);
+        redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
         return "redirect:/admin/dashboard";
     }
 
     // Deactivate user
     @GetMapping("/deactivate/{id}")
-    public String deactivateUser(@PathVariable("id") int id) {
+    public String deactivateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "User deactivated successfully!");
         userService.deactivateUser(id);
         return "redirect:/admin/dashboard";
     }
 
     // Activate user
     @GetMapping("/activate/{id}")
-    public String activateUser(@PathVariable("id") int id) {
+    public String activateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         userService.activateUser(id);
         return "redirect:/admin/dashboard";
     }

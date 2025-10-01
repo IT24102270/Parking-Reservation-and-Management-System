@@ -1,43 +1,98 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Edit User</title>
+    <meta charset="UTF-8">
+    <title>Edit User - Parking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .edit-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
-<h1>Edit User</h1>
 
-<form th:action="@{'/admin/update/' + ${user.userID}}" th:object="${user}" method="post">
-    <label>Email: </label>
-    <input type="text" th:field="*{email}" readonly/><br/><br/>
+<div class="edit-container">
+    <div class="card p-4 bg-light">
+        <h2 class="text-center mb-4">✏ Edit User</h2>
 
-    <label>First Name: </label>
-    <input type="text" th:field="*{firstName}"/><br/><br/>
+        <!-- Success Message -->
+        <div th:if="${success}" class="alert alert-success text-center fw-bold" th:text="${success}"></div>
 
-    <label>Last Name: </label>
-    <input type="text" th:field="*{lastName}"/><br/><br/>
+        <!-- Error Message -->
+        <div th:if="${error}" class="alert alert-danger text-center fw-bold" th:text="${error}"></div>
 
-    <label>Phone Number: </label>
-    <input type="text" th:field="*{phoneNumber}"/><br/><br/>
+        <!-- Form -->
+        <form th:action="@{'/admin/update/' + ${user.userID}}" th:object="${user}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" th:field="*{email}" class="form-control"
+                       pattern="^[^@]+@[^@]+\.[^@]+$"
+                       title="Must be a valid email with @ and ."
+                       readonly>
+            </div>
 
-    <label>Role: </label>
-    <select th:field="*{role}">
-        <option value="ADMIN">ADMIN</option>
-        <option value="CUSTOMER">CUSTOMER</option>
-        <option value="PARKING_SLOT_MANAGER">PARKING_SLOT_MANAGER</option>
-        <option value="FINANCE_EXECUTIVE">FINANCE_EXECUTIVE</option>
-        <option value="CUSTOMER_SUPPORT_OFFICER">CUSTOMER_SUPPORT_OFFICER</option>
-        <option value="SECURITY_OFFICER">SECURITY_OFFICER</option>
-    </select><br/><br/>
+            <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input type="text" th:field="*{firstName}" class="form-control" required>
+            </div>
 
-    <label>Status: </label>
-    <select th:field="*{status}">
-        <option value="ACTIVE">ACTIVE</option>
-        <option value="INACTIVE">INACTIVE</option>
-    </select><br/><br/>
+            <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" th:field="*{lastName}" class="form-control" required>
+            </div>
 
-    <button type="submit">Update</button>
-</form>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="text" th:field="*{phoneNumber}" class="form-control"
+                       pattern="^0\d{9}$"
+                       title="Phone must be 10 digits and start with 0" required>
+            </div>
 
-<a href="/admin/dashboard">Back</a>
+            <div class="mb-3">
+                <label class="form-label">Role</label>
+                <select th:field="*{role}" class="form-select">
+                    <option value="ADMIN">ADMIN</option>
+                    <option value="CUSTOMER">CUSTOMER</option>
+                    <option value="PARKING_SLOT_MANAGER">PARKING_SLOT_MANAGER</option>
+                    <option value="FINANCE_EXECUTIVE">FINANCE_EXECUTIVE</option>
+                    <option value="CUSTOMER_SUPPORT_OFFICER">CUSTOMER_SUPPORT_OFFICER</option>
+                    <option value="SECURITY_OFFICER">SECURITY_OFFICER</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select th:field="*{status}" class="form-select">
+                    <option value="ACTIVE">ACTIVE</option>
+                    <option value="INACTIVE">INACTIVE</option>
+                </select>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+
+        <p class="text-center mt-3">
+            <a href="/admin/dashboard" class="btn btn-link">⬅ Back to Dashboard</a>
+        </p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.regex.Pattern;
+
 @Controller
 public class AuthController {
 
@@ -18,10 +20,14 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Password strength regex (8–12 chars, upper, lower, digit, special char)
+    private static final Pattern PASSWORD_PATTERN =
+            Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,12}$");
+
     // Show login page
     @GetMapping("/login")
     public String login() {
-        return "login"; // maps to login.html (Thymeleaf)
+        return "login"; // maps to login.html
     }
 
     // Show registration page
@@ -33,17 +39,62 @@ public class AuthController {
 
     // Handle registration form submission
     @PostMapping("/register")
-    public String processRegister(@ModelAttribute("user") User user) {
-        // Encrypt password before saving
+    public String processRegister(
+            @ModelAttribute("user") User user,
+            @RequestParam("confirmPassword") String confirmPassword,
+            Model model
+    ) {
+        // 1. Check duplicate email
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Email already exists. Please use another one.");
+            return "register";
+        }
+
+        // 2. Validate password strength
+        if (!PASSWORD_PATTERN.matcher(user.getPasswordHash()).matches()) {
+            model.addAttribute("user", user);
+            model.addAttribute("error",
+                    "Password must be 8–12 characters, include uppercase, lowercase, number, and a special character.");
+            return "register";
+        }
+
+        // 3. Confirm password match
+        if (!user.getPasswordHash().equals(confirmPassword)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Passwords do not match.");
+            return "register";
+        }
+
+        // 4. Validate email format
+        String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
+        if (!user.getEmail().matches(emailRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
+            return "register";
+        }
+
+        // 5. Validate phone format (10 digits, starts with 0)
+        String phoneRegex = "^0\\d{9}$";
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
+                !user.getPhoneNumber().matches(phoneRegex)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Phone must be 10 digits and start with 0");
+            return "register";
+        }
+
+        // 6. Encrypt password
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
 
-        // Default role is CUSTOMER for self-registration
+        // 7. Default role = CUSTOMER
         if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("CUSTOMER");
         }
 
+        // 8. Save to DB
         userRepository.save(user);
 
-        return "redirect:/login?success"; // redirect to login page
+        // ✅ Redirect back to index with a success flag
+        return "redirect:/?success";
     }
 }

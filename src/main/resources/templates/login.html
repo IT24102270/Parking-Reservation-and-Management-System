@@ -1,40 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Login - Parking System</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
-<h2>Login</h2>
-<form th:action="@{/login}" method="post">
-    <div>
-        <label>Email:</label>
-        <input type="text" name="username" required>
+
+<div class="login-container">
+    <div class="card p-4 bg-light">
+        <h2 class="text-center mb-4">🔑 Login</h2>
+
+        <!-- Alerts -->
+        <div th:if="${param.error}" class="alert alert-danger text-center">
+            Invalid email or password
+        </div>
+        <div th:if="${param.logout}" class="alert alert-info text-center">
+            You have been logged out
+        </div>
+        <div th:if="${param.success}" class="alert alert-success text-center">
+            Registration successful! Please log in
+        </div>
+        <div th:if="${session.error}" class="alert alert-danger text-center" th:text="${session.error}"></div>
+
+        <!-- Login Form -->
+        <form th:action="@{/login}" method="post">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="text" id="email" name="username" class="form-control" placeholder="Enter your email" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </form>
+
+        <p class="text-center mt-3">
+            Don't have an account?
+            <a th:href="@{/register}" class="text-success fw-bold">Register here</a>
+        </p>
     </div>
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password" required>
-    </div>
-    <div>
-        <button type="submit">Login</button>
-    </div>
-</form>
-
-<p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
-
-<div th:if="${session.error}">
-    <p style="color:red;" th:text="${session.error}"></p>
 </div>
 
-
-<div th:if="${param.error}">
-    <p style="color:red;">Invalid email or password</p>
-</div>
-<div th:if="${param.logout}">
-    <p style="color:green;">You have been logged out</p>
-</div>
-<div th:if="${param.success}">
-    <p style="color:green;">Registration successful! Please log in</p>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
