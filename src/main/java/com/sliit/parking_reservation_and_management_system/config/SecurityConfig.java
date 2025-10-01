@@ -66,12 +66,13 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index", "/login", "/register", "/css/**", "/js/**").permitAll()
 
                         // Protected dashboards
+                        // ✅ Admin has access to everything
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/customer/**").hasRole("CUSTOMER")
-                        .requestMatchers("/security/**").hasRole("SECURITY_OFFICER")
-                        .requestMatchers("/finance/**").hasRole("FINANCE_EXECUTIVE")
-                        .requestMatchers("/support/**").hasRole("CUSTOMER_SUPPORT_OFFICER")
-                        .requestMatchers("/slotmanager/**").hasRole("PARKING_SLOT_MANAGER")
+                        .requestMatchers("/customer/**").hasAnyRole("CUSTOMER", "ADMIN")
+                        .requestMatchers("/security/**").hasAnyRole("SECURITY_OFFICER", "ADMIN")
+                        .requestMatchers("/finance/**").hasAnyRole("FINANCE_EXECUTIVE", "ADMIN")
+                        .requestMatchers("/support/**").hasAnyRole("CUSTOMER_SUPPORT_OFFICER", "ADMIN")
+                        .requestMatchers("/slotmanager/**").hasAnyRole("PARKING_SLOT_MANAGER", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
