@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome - Parking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+        }
+        .btn-custom {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Success message after registration -->
+<div th:if="${param.success}" class="alert alert-success text-center m-3">
+    Registration successful! Please login.
+</div>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="card p-5 bg-light text-dark">
+        <h1 class="mb-4">🚗 Parking Reservation & Management System</h1>
+        <p class="mb-4">Please login to access your dashboard or register if you are new.</p>
+
+        <div class="d-flex justify-content-center gap-3">
+            <a th:href="@{/login}" class="btn btn-primary btn-custom">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+            <a th:href="@{/register}" class="btn btn-success btn-custom">
+                <i class="bi bi-person-plus"></i> Register
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

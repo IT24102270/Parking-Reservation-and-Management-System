@@ -27,14 +27,14 @@ public class AuthController {
     // Show login page
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "login"; // maps to login.html
     }
 
     // Show registration page
     @GetMapping("/register")
     public String showRegisterForm(Model model) {
         model.addAttribute("user", new User());
-        return "register";
+        return "register"; // maps to register.html
     }
 
     // Handle registration form submission
@@ -55,7 +55,7 @@ public class AuthController {
         if (!PASSWORD_PATTERN.matcher(user.getPasswordHash()).matches()) {
             model.addAttribute("user", user);
             model.addAttribute("error",
-                    "Password must be 8-12 characters, include uppercase, lowercase, number, and a special character.");
+                    "Password must be 8–12 characters, include uppercase, lowercase, number, and a special character.");
             return "register";
         }
 
@@ -66,32 +66,35 @@ public class AuthController {
             return "register";
         }
 
-        // Email regex: must contain @ and .
+        // 4. Validate email format
         String emailRegex = "^[^@]+@[^@]+\\.[^@]+$";
         if (!user.getEmail().matches(emailRegex)) {
             model.addAttribute("user", user);
             model.addAttribute("error", "Invalid email format. Must contain '@' and '.'");
-            return "user-register"; // or "register" for customer
+            return "register";
         }
 
-// Phone regex: must be 10 digits starting with 0
+        // 5. Validate phone format (10 digits, starts with 0)
         String phoneRegex = "^0\\d{9}$";
         if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
                 !user.getPhoneNumber().matches(phoneRegex)) {
             model.addAttribute("user", user);
             model.addAttribute("error", "Phone must be 10 digits and start with 0");
-            return "user-register";
+            return "register";
         }
 
-        // 4. Encrypt password
+        // 6. Encrypt password
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
 
-        // 5. Default role = CUSTOMER
+        // 7. Default role = CUSTOMER
         if (user.getRole() == null || user.getRole().isBlank()) {
             user.setRole("CUSTOMER");
         }
 
+        // 8. Save to DB
         userRepository.save(user);
-        return "redirect:/login?success";
+
+        // ✅ Redirect back to index with a success flag
+        return "redirect:/?success";
     }
 }

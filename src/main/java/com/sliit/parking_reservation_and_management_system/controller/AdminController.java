@@ -75,7 +75,7 @@ public class AdminController {
     public String registerUser(
             @ModelAttribute("user") User user,
             @RequestParam("confirmPassword") String confirmPassword,
-            Model model
+            Model model , RedirectAttributes redirectAttributes
     ) {
         // 1. Check duplicate email
         if (userService.emailExists(user.getEmail())) {
@@ -127,7 +127,7 @@ public class AdminController {
 
         // 6. Save user
         userService.saveUser(user);
-
+        redirectAttributes.addFlashAttribute("success", "User registered successfully!");
         return "redirect:/admin/dashboard";
     }
 
@@ -187,21 +187,24 @@ public class AdminController {
 
     // Delete user
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") int id) {
+    public String deleteUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         userService.deleteUser(id);
+        redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
         return "redirect:/admin/dashboard";
     }
 
     // Deactivate user
     @GetMapping("/deactivate/{id}")
-    public String deactivateUser(@PathVariable("id") int id) {
+    public String deactivateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "User deactivated successfully!");
         userService.deactivateUser(id);
         return "redirect:/admin/dashboard";
     }
 
     // Activate user
     @GetMapping("/activate/{id}")
-    public String activateUser(@PathVariable("id") int id) {
+    public String activateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         userService.activateUser(id);
         return "redirect:/admin/dashboard";
     }

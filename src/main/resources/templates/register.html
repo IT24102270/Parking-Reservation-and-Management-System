@@ -1,8 +1,27 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Register - Parking System</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8">
+    <title>Customer Registration - Parking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .register-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+        }
+    </style>
     <script>
         function validatePasswords() {
             const password = document.getElementById("password").value;
@@ -16,52 +35,57 @@
     </script>
 </head>
 <body>
-<h2>Register</h2>
 
-<div th:if="${error}" style="color:red;">
-    <p th:text="${error}"></p>
+<div class="register-container">
+    <div class="card p-4 bg-light">
+        <h2 class="text-center mb-4">📝 Customer Registration</h2>
+
+        <!-- Error Alert -->
+        <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+
+        <!-- Register Form -->
+        <form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return validatePasswords()">
+            <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input type="text" th:field="*{firstName}" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input type="text" th:field="*{lastName}" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" th:field="*{email}" class="form-control"
+                       pattern="^[^@]+@[^@]+\.[^@]+$"
+                       title="Must be a valid email with @ and ." required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" th:field="*{passwordHash}" id="password" class="form-control"
+                       pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$"
+                       title="8-12 chars, include upper, lower, number & symbol." required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input type="text" th:field="*{phoneNumber}" class="form-control"
+                       pattern="^0\d{9}$" title="Phone must be 10 digits starting with 0" required>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success">Register</button>
+            </div>
+        </form>
+
+        <p class="text-center mt-3">
+            Already have an account?
+            <a th:href="@{/login}" class="text-primary fw-bold">Login here</a>
+        </p>
+    </div>
 </div>
 
-<form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return validatePasswords()">
-    <div>
-        <label>First Name:</label>
-        <input type="text" th:field="*{firstName}" required>
-    </div>
-    <div>
-        <label>Last Name:</label>
-        <input type="text" th:field="*{lastName}" required>
-    </div>
-    <div>
-        <label>Email:</label>
-        <input type="email" th:field="*{email}"
-               pattern="^[^@]+@[^@]+\.[^@]+$"
-               title="Must be a valid email with @ and ."
-               required/><br/>
-    </div>
-    <div>
-        <label>Password:</label>
-        <input type="password" th:field="*{passwordHash}" id="password"
-               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$"
-               title="Password must be 8-12 characters, include uppercase, lowercase, number, and special symbol."
-               required>
-    </div>
-    <div>
-        <label>Confirm Password:</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" required>
-    </div>
-
-    <div>
-        <label>Phone Number:</label>
-        <input type="text" th:field="*{phoneNumber}"
-               pattern="^0\d{9}$"
-               title="Phone must be 10 digits and start with 0"
-               required/><br/>
-    </div>
-    <div>
-        <button type="submit">Register</button>
-    </div>
-</form>
-
-<p>Already have an account? <a th:href="@{/login}">Login here</a></p>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
