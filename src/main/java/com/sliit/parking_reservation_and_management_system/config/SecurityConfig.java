@@ -43,7 +43,7 @@ public class SecurityConfig {
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
                 redirectUrl = "/customer/dashboard";
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_PARKING_SLOT_MANAGER"))) {
-                redirectUrl = "/slotmanager/dashboard";
+                redirectUrl = "/fourwheel";
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_FINANCE_EXECUTIVE"))) {
                 redirectUrl = "/finance/dashboard";
             } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_SECURITY_OFFICER"))) {
@@ -72,6 +72,10 @@ public class SecurityConfig {
                         .requestMatchers("/finance/**").hasRole("FINANCE_EXECUTIVE")
                         .requestMatchers("/support/**").hasRole("CUSTOMER_SUPPORT_OFFICER")
                         .requestMatchers("/slotmanager/**").hasRole("PARKING_SLOT_MANAGER")
+                        
+                        // Vehicle type pages - accessible by PARKING_SLOT_MANAGER
+                        .requestMatchers("/twowheel", "/threewheel", "/fourwheel", "/heavyvehicle").hasRole("PARKING_SLOT_MANAGER")
+                        .requestMatchers("/updateslot", "/update-slot").hasRole("PARKING_SLOT_MANAGER")
 
                         .anyRequest().authenticated()
                 )

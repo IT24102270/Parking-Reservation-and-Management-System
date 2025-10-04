@@ -67,4 +67,33 @@ public class SlotController {
         }
         return "redirect:/slotmanager-dashboard?location=" + slot.getLocation();
     }
+
+    // Vehicle type specific page mappings
+    @GetMapping("/twowheel")
+    public String twoWheelPage(Model model) {
+        List<Slot> slots = slotService.getSlotsByLocation("TwoWheeler");
+        model.addAttribute("slots", slots);
+        return "twowheel";
+    }
+
+    @GetMapping("/threewheel")
+    public String threeWheelPage(Model model) {
+        List<Slot> slots = slotService.getSlotsByLocation("ThreeWheeler");
+        model.addAttribute("slots", slots);
+        return "threewheel";
+    }
+
+    @GetMapping("/fourwheel")
+    public String fourWheelPage(Model model) {
+        List<Slot> slots = slotService.getSlotsByLocation("FourWheeler");
+        model.addAttribute("slots", slots);
+        return "fourwheel";
+    }
+
+    @GetMapping("/heavyvehicle")
+    public String heavyVehiclePage(Model model) {
+        List<Slot> slots = slotService.getSlotsByLocation("HeavyVehicle");
+        model.addAttribute("slots", slots);
+        return "heavyvehicle";
+    }
 }

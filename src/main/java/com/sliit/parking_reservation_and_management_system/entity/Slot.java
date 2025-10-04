@@ -6,10 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.util.Date;
+// Removed timestamp imports as they're no longer needed
 
 @Entity
 @Table(name = "ParkingSlot")
@@ -32,13 +29,7 @@ public class Slot {
     @Column(name = "hourlyRate")
     private double hourlyRate;
 
-    @CreationTimestamp
-    @Column(name = "createdAt", nullable = true)
-    private Date createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updatedAt", nullable = true)
-    private Date updatedAt;
+    // Removed timestamp columns as they don't exist in the database
 
     // Default constructor
     public Slot() {}
@@ -84,19 +75,5 @@ public class Slot {
         this.hourlyRate = hourlyRate;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    // Removed getter and setter methods for timestamp columns
 }
