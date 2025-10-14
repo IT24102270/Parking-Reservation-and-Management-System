@@ -2,6 +2,7 @@ package com.sliit.parking_reservation_and_management_system.controller;
 
 import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
+import com.sliit.parking_reservation_and_management_system.util.AdminLogger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -70,6 +71,10 @@ public class AdminController {
         return "user-register";
     }
 
+    // ---------------------------
+    // User Management
+    // ---------------------------
+
     // Handle staff registration
     @PostMapping("/register")
     public String registerUser(
@@ -128,13 +133,11 @@ public class AdminController {
         // 6. Save user
         userService.saveUser(user);
         redirectAttributes.addFlashAttribute("success", "User registered successfully!");
+        // Log the action
+        AdminLogger.getInstance().log("Registered new user: " + user.getEmail());
         return "redirect:/admin/dashboard";
     }
 
-
-    // ---------------------------
-    // User Management
-    // ---------------------------
 
     // Edit user form
     @GetMapping("/edit/{id}")
@@ -181,6 +184,8 @@ public class AdminController {
 
         // Add success message for redirect
         redirectAttributes.addFlashAttribute("success", "User updated successfully!");
+        // log the action
+        AdminLogger.getInstance().log("Updated user details of userID: " + id);
         return "redirect:/admin/dashboard";
     }
 
@@ -190,6 +195,8 @@ public class AdminController {
     public String deleteUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         userService.deleteUser(id);
         redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
+        // Log the action
+        AdminLogger.getInstance().log("Deleted user with ID: " + id);
         return "redirect:/admin/dashboard";
     }
 
@@ -198,6 +205,8 @@ public class AdminController {
     public String deactivateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("success", "User deactivated successfully!");
         userService.deactivateUser(id);
+        // Log the action
+        AdminLogger.getInstance().log("Deactivated user with ID: " + id);
         return "redirect:/admin/dashboard";
     }
 
@@ -206,6 +215,8 @@ public class AdminController {
     public String activateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         userService.activateUser(id);
+        // Log the action
+        AdminLogger.getInstance().log("Activated user with ID: " + id);
         return "redirect:/admin/dashboard";
     }
 }
