@@ -1,10 +1,13 @@
-// SlotService.java
 package com.sliit.parking_reservation_and_management_system.service;
 
 import com.sliit.parking_reservation_and_management_system.entity.Slot;
 import com.sliit.parking_reservation_and_management_system.repository.SlotRepository;
+import com.sliit.parking_reservation_and_management_system.strategy.SlotStrategyFactory;
+import com.sliit.parking_reservation_and_management_system.strategy.SlotValidationStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +19,8 @@ public class SlotService {
     @Autowired
     private SlotRepository slotRepository;
 
-    private static final int MAX_SLOTS_PER_LOCATION = 20;
+    @Autowired
+    private SlotStrategyFactory slotStrategyFactory;
 
     public List<Slot> getSlotsByLocation(String location) {
         return slotRepository.findAll().stream()
@@ -28,23 +32,18 @@ public class SlotService {
         return slotRepository.findById(id);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Slot saveSlot(Slot slot) throws IllegalArgumentException {
-        // Check if adding a new slot would exceed the limit
-        if (slot.getId() == null) {
-            long currentCount = slotRepository.findAll().stream()
-                    .filter(s -> slot.getLocation().equals(s.getLocation()))
-                    .count();
-            if (currentCount >= MAX_SLOTS_PER_LOCATION) {
-                throw new IllegalArgumentException("Maximum slots (" + MAX_SLOTS_PER_LOCATION + ") reached for location: " + slot.getLocation());
-            }
-        }
-        // Additional validation
-        if (slot.getHourlyRate() <= 0) {
-            throw new IllegalArgumentException("Hourly rate must be positive");
-        }
-        if (!List.of("available", "occupied", "maintenance").contains(slot.getStatus())) {
-            throw new IllegalArgumentException("Invalid status");
-        }
-        return slotRepository.save(slot);
+        System.out.println("🔧 SlotService.saveSlot() called with slot: " + slot);
+
+        // Use Strategy Pattern: Select and delegate to the appropriate validation and save strategy
+        SlotValidationStrategy strategy = slotStrategyFactory.getStrategy(slot);
+        System.out.println("📋 Selected strategy: " + strategy.getClass().getSimpleName());
+
+        Slot savedSlot = strategy.validateAndSave(slot);
+
+        System.out.println("✅ Slot saved successfully with ID: " + savedSlot.getId() + " using Strategy Pattern");
+
+        return savedSlot;
     }
 }

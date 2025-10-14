@@ -53,14 +53,21 @@ public class SlotController {
 
     @PostMapping("/update-slot")
     public String updateSlot(@Valid @ModelAttribute Slot slot, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        System.out.println("🎯 SlotController.updateSlot() called with slot: " + slot);
+        System.out.println("🔍 BindingResult has errors: " + bindingResult.hasErrors());
+        
         if (bindingResult.hasErrors()) {
+            System.out.println("❌ Validation errors found: " + bindingResult.getAllErrors());
             model.addAttribute("isUpdate", slot.getId() != null);
             return "updateslot";
         }
         try {
+            System.out.println("💾 Calling slotService.saveSlot()...");
             slotService.saveSlot(slot);
             redirectAttributes.addFlashAttribute("successMessage", "Slot " + (slot.getId() != null ? "updated" : "added") + " successfully!");
+            System.out.println("✅ Slot saved successfully, redirecting...");
         } catch (IllegalArgumentException e) {
+            System.out.println("❌ Error saving slot: " + e.getMessage());
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("isUpdate", slot.getId() != null);
             return "updateslot";

@@ -10,7 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UserID")   // match DB column
-    private Long userID;
+    private Integer userID;
 
     @Column(name = "Role", nullable = false)
     private String role;
@@ -56,11 +56,11 @@ public class User {
     // ==========================
     // Getters and Setters
     // ==========================
-    public Long getUserID() {
+    public Integer getUserID() {
         return userID;
     }
 
-    public void setUserID(Long userID) {
+    public void setUserID(Integer userID) {
         this.userID = userID;
     }
 
