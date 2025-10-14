@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - Smart Parking</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .bookings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .bookings-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header-content p {
+            color: #666;
+            margin: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .bookings-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .booking-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .booking-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .booking-header-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .booking-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .booking-date {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .booking-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-confirmed {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+        }
+        
+        .status-active {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+        
+        .status-completed {
+            background: rgba(149, 165, 166, 0.1);
+            color: #95a5a6;
+        }
+        
+        .status-cancelled {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+        
+        .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .detail-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+        
+        .detail-icon.parking {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        
+        .detail-icon.time {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+        
+        .detail-icon.vehicle {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+        
+        .detail-icon.cost {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+        
+        .detail-content {
+            flex: 1;
+        }
+        
+        .detail-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        
+        .detail-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .booking-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+        
+        .btn-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-danger:hover {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-info {
+            background: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-info:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        
+        .btn-warning:hover {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .cancel-restricted {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #95a5a6;
+            background: rgba(149, 165, 166, 0.1);
+            border: 1px solid rgba(149, 165, 166, 0.3);
+            border-radius: 6px;
+            cursor: help;
+        }
+        
+        .cancel-restricted:hover {
+            background: rgba(149, 165, 166, 0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            color: #bdc3c7;
+            margin-bottom: 20px;
+        }
+        
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .empty-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+        
+        .cancel-restricted {
+            color: #95a5a6;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: help;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .bookings-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .booking-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/customer/dashboard">Dashboard</a></li>
+                    <li><a href="/customer/bookings" class="active">Bookings</a></li>
+                    <li><a href="/customer/slots">Slots</a></li>
+                    <li><a href="/customer/support">Get Help</a></li>
+                    <li><a href="/customer/feedback">Feedback</a></li>
+                    <li><a href="/customer/profile">Profile</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar" th:text="${user != null and user.firstName != null and user.lastName != null ? (#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)) : 'DA'}">DA</div>
+                    <div class="user-details">
+                        <div class="user-name" th:text="${user != null and user.firstName != null and user.lastName != null ? (user.firstName + ' ' + user.lastName) : 'Customer User'}">Customer User</div>
+                        <div class="user-role">Premium User</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="bookings-container">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <!-- Page Header -->
+            <div class="bookings-header">
+                <div class="header-content">
+                    <h1>My Bookings</h1>
+                    <p>Manage your parking reservations</p>
+                </div>
+                <div class="header-actions">
+                    <a href="/customer/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Dashboard
+                    </a>
+                    <a href="/customer/booking/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Booking
+                    </a>
+                </div>
+            </div>
+
+            <!-- Bookings List -->
+            <div class="bookings-grid" th:if="${reservations != null and !reservations.empty}">
+                <div class="booking-card" th:each="reservation : ${reservations}">
+                    <div class="booking-header-card">
+                        <div>
+                            <div class="booking-id" th:text="${reservation.bookingId ?: ('BK-' + reservation.id)}">BK-20250929-1482</div>
+                            <div class="booking-date" th:text="${#temporals.format(reservation.createdAt, 'MMM dd, yyyy HH:mm')}">Sept 29, 2025 14:15</div>
+                        </div>
+                        <div class="booking-status" 
+                             th:class="'booking-status status-' + ${#strings.toLowerCase(reservation.status)}"
+                             th:text="${reservation.status}">CONFIRMED</div>
+                    </div>
+                    
+                    <div class="booking-details">
+                        <div class="detail-item">
+                            <div class="detail-icon parking">
+                                <i class="fas fa-parking"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Parking Slot</div>
+                                <div class="detail-value" th:text="${reservation.slotId}">B-102</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon time">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Duration</div>
+                                <div class="detail-value" 
+                                     th:text="${#temporals.format(reservation.startTime, 'MMM dd HH:mm') + ' - ' + #temporals.format(reservation.endTime, 'HH:mm')}">
+                                    Oct 04 10:00 - 11:00
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon vehicle">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Vehicle</div>
+                                <div class="detail-value" th:text="${reservation.vehicleNumber ?: 'N/A'}">ABC-1234</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-icon cost">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Payment Status</div>
+                                <div class="detail-value">
+                                    <span th:if="${payments[reservation.id] != null}">
+                                        $<span th:text="${payments[reservation.id].amount}">5.00</span>
+                                        <div style="font-size: 11px; margin-top: 2px;">
+                                            <span class="payment-status-indicator"
+                                                  th:style="${payments[reservation.id].status == 'COMPLETED' ? 'color: #27ae60;' : 
+                                                            payments[reservation.id].status == 'PENDING' ? 'color: #f39c12;' : 
+                                                            payments[reservation.id].status == 'CANCELLED' ? 'color: #e74c3c;' : 
+                                                            payments[reservation.id].status == 'REFUNDED' ? 'color: #3498db;' : 'color: #95a5a6;'}"
+                                                  th:text="${'● ' + (payments[reservation.id].status == 'COMPLETED' ? 'Payment Completed' : 
+                                                           payments[reservation.id].status == 'PENDING' ? 'Payment Pending' : 
+                                                           payments[reservation.id].status == 'CANCELLED' ? 'Payment Cancelled' : 
+                                                           payments[reservation.id].status == 'REFUNDED' ? 'Payment Refunded' : payments[reservation.id].status)}">
+                                                ● Payment Status
+                                            </span>
+                                        </div>
+                                    </span>
+                                    <span th:if="${payments[reservation.id] == null}" 
+                                          class="payment-status-indicator" 
+                                          style="color: #95a5a6;">
+                                        ● No Payment Record
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="booking-actions">
+                        <!-- View Button - Always available -->
+                        <a th:href="@{'/customer/booking/' + ${reservation.id} + '/view'}" 
+                           class="btn btn-info btn-small">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </a>
+                        
+                        <!-- Payment Button - Only show for pending payments -->
+                        <a th:if="${payments[reservation.id] != null and payments[reservation.id].status == 'PENDING'}" 
+                           th:href="@{'/customer/payment/' + ${payments[reservation.id].paymentID} + '/pay'}" 
+                           class="btn btn-success btn-small">
+                            <i class="fas fa-credit-card"></i>
+                            Pay Now
+                        </a>
+                        
+                        <!-- Payment Status Button - Show for completed payments -->
+                        <a th:if="${payments[reservation.id] != null and payments[reservation.id].status == 'COMPLETED'}" 
+                           th:href="@{'/customer/payment/' + ${payments[reservation.id].paymentID}}" 
+                           class="btn btn-secondary btn-small">
+                            <i class="fas fa-check-circle"></i>
+                            Payment Complete
+                        </a>
+                        
+                        <!-- Edit Button - Only for CONFIRMED bookings -->
+                        <a th:if="${reservation.status == 'CONFIRMED'}" 
+                           th:href="@{'/customer/booking/' + ${reservation.id} + '/edit'}" 
+                           class="btn btn-warning btn-small">
+                            <i class="fas fa-edit"></i>
+                            Edit Times
+                        </a>
+                        
+                        <!-- Cancel Button - Only for bookings that can be cancelled (within 1 hour of creation) -->
+                        <div th:if="${reservation.status == 'CONFIRMED' or reservation.status == 'PENDING'}">
+                            <!-- Check if booking can be cancelled (within 1 hour of creation time) -->
+                            <div th:if="${T(java.time.temporal.ChronoUnit).MINUTES.between(reservation.createdAt, T(java.time.LocalDateTime).now()) <= 60}">
+                                <form th:action="@{'/customer/booking/' + ${reservation.id} + '/cancel'}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-danger btn-small" 
+                                            onclick="return confirm('Are you sure you want to cancel this booking? You will receive a full refund.')">
+                                        <i class="fas fa-times"></i>
+                                        Cancel
+                                    </button>
+                                </form>
+                                <div style="font-size: 11px; color: #27ae60; margin-top: 4px;">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${60 - T(java.time.temporal.ChronoUnit).MINUTES.between(reservation.createdAt, T(java.time.LocalDateTime).now())} + ' minutes left to cancel'">X minutes left to cancel</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Show restriction message if cannot be cancelled -->
+                            <div th:if="${T(java.time.temporal.ChronoUnit).MINUTES.between(reservation.createdAt, T(java.time.LocalDateTime).now()) > 60}">
+                                <span class="cancel-restricted" 
+                                      th:title="${'Cannot cancel - booking was made ' + T(java.time.temporal.ChronoUnit).MINUTES.between(reservation.createdAt, T(java.time.LocalDateTime).now()) + ' minutes ago (cancellation allowed only within 1 hour of booking)'}">
+                                    <i class="fas fa-ban"></i>
+                                    Cannot Cancel
+                                </span>
+                                <div style="font-size: 11px; color: #e74c3c; margin-top: 4px;">
+                                    <i class="fas fa-info-circle"></i>
+                                    Cancellation window expired
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" th:if="${reservations == null or reservations.empty}">
+                <div class="empty-icon">
+                    <i class="fas fa-calendar-times"></i>
+                </div>
+                <div class="empty-title">No Bookings Found</div>
+                <div class="empty-subtitle">You haven't made any parking reservations yet.</div>
+                <a href="/customer/booking/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Create Your First Booking
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

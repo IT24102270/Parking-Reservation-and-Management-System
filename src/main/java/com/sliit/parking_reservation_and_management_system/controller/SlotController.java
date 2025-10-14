@@ -10,26 +10,45 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/slotmanager")
 public class SlotController {
 
     @Autowired
     private SlotService slotService;
 
-    @GetMapping("/slotmanager-dashboard")
+    @GetMapping("/dashboard")
     public String showDashboard(@RequestParam(name = "location", required = false) String locationParam, Model model) {
+        System.out.println("=== SLOT MANAGER DASHBOARD ACCESSED ===");
+        System.out.println("URL: /slotmanager/dashboard");
+        System.out.println("Location parameter: " + locationParam);
+        
         String location = (locationParam == null || locationParam.isBlank()) ? "FourWheeler" : locationParam;
-        List<Slot> slotsForLocation = slotService.getSlotsByLocation(location);
-        model.addAttribute("slots", slotsForLocation);
-        model.addAttribute("currentLocation", location);
+        
+        try {
+            List<Slot> slotsForLocation = slotService.getSlotsByLocation(location);
+            model.addAttribute("slots", slotsForLocation);
+            model.addAttribute("currentLocation", location);
+            
+            System.out.println("Successfully loaded " + slotsForLocation.size() + " slots for location: " + location);
+            System.out.println("Returning template: slotmanager-dashboard.html");
+            
+        } catch (Exception e) {
+            System.err.println("Error loading slot data: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("slots", List.of());
+            model.addAttribute("currentLocation", location);
+            model.addAttribute("error", "Error loading slot data: " + e.getMessage());
+        }
+        
         return "slotmanager-dashboard";
     }
 
@@ -65,7 +84,7 @@ public class SlotController {
             model.addAttribute("isUpdate", slot.getId() != null);
             return "updateslot";
         }
-        return "redirect:/slotmanager-dashboard?location=" + slot.getLocation();
+        return "redirect:/slotmanager/dashboard?location=" + slot.getLocation();
     }
 
     // Vehicle type specific page mappings

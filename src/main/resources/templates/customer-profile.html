@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Smart Parking</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .profile-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .profile-name {
+            font-size: 28px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .profile-email {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .profile-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .profile-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #f0f0f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+        
+        .form-input:disabled {
+            background: #f8f9fa;
+            color: #666;
+            cursor: not-allowed;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+        
+        .password-section {
+            grid-column: 1 / -1;
+        }
+        
+        .password-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .password-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/customer/dashboard">Dashboard</a></li>
+                    <li><a href="/customer/bookings">Bookings</a></li>
+                    <li><a href="/customer/slots">Slots</a></li>
+                    <li><a href="/customer/support">Get Help</a></li>
+                    <li><a href="/customer/feedback">Feedback</a></li>
+                    <li><a href="/customer/profile" class="active">Profile</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar" th:text="${user != null and user.firstName != null and user.lastName != null ? (#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)) : 'DA'}">DA</div>
+                    <div class="user-details">
+                        <div class="user-name" th:text="${user != null and user.firstName != null and user.lastName != null ? (user.firstName + ' ' + user.lastName) : 'Customer User'}">Customer User</div>
+                        <div class="user-role">Premium User</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="profile-container">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-avatar" th:text="${user != null and user.firstName != null and user.lastName != null ? (#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)) : 'DA'}">DA</div>
+                <div class="profile-name" th:text="${user != null and user.firstName != null and user.lastName != null ? (user.firstName + ' ' + user.lastName) : 'Customer User'}">Customer User</div>
+                <div class="profile-email" th:text="${user != null ? user.email : 'customer@example.com'}">customer@example.com</div>
+                
+                <div class="profile-actions">
+                    <a th:href="${editMode ? '/customer/profile' : '/customer/profile/edit'}" class="btn btn-primary">
+                        <i th:class="${editMode ? 'fas fa-eye' : 'fas fa-edit'}"></i>
+                        <span th:text="${editMode ? 'View Profile' : 'Edit Profile'}">Edit Profile</span>
+                    </a>
+                    <a href="/customer/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <!-- Personal Information -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-user"></i>
+                        Personal Information
+                    </h2>
+                    
+                    <form th:if="${editMode}" th:action="@{/customer/profile/update}" method="post" th:object="${user}">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" th:field="*{firstName}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" th:field="*{lastName}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" th:field="*{phoneNumber}">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </form>
+                    
+                    <div th:unless="${editMode}">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" th:value="${user?.firstName}" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" th:value="${user?.lastName}" disabled>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" th:value="${user?.phoneNumber ?: 'Not provided'}" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="profile-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-id-card"></i>
+                        Account Information
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" class="form-input" th:value="${user?.email}" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">User Role</label>
+                        <input type="text" class="form-input" th:value="${user?.role ?: 'CUSTOMER'}" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Account Status</label>
+                        <input type="text" class="form-input" th:value="${user?.status ?: 'ACTIVE'}" disabled>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Member Since</label>
+                        <input type="text" class="form-input" th:value="${user?.created_at != null ? #temporals.format(user.created_at, 'MMM dd, yyyy') : 'N/A'}" disabled>
+                    </div>
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="profile-section password-section" th:if="${editMode}">
+                    <h2 class="section-title">
+                        <i class="fas fa-lock"></i>
+                        Change Password
+                    </h2>
+                    
+                    <form th:action="@{/customer/profile/change-password}" method="post">
+                        <div class="password-form">
+                            <div class="form-group">
+                                <label class="form-label">Current Password</label>
+                                <input type="password" class="form-input" name="currentPassword" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">New Password</label>
+                                <input type="password" class="form-input" name="newPassword" required minlength="6">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-input" name="confirmPassword" required minlength="6">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-key"></i>
+                            Change Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>

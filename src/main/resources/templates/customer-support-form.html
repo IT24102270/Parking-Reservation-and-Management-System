@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Help - Smart Parking</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .support-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        
+        .support-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .support-header h1 {
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        
+        .support-header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .support-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 600;
+        }
+        
+        .form-group select,
+        .form-group textarea,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-group select:focus,
+        .form-group textarea:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .priority-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .priority-option {
+            flex: 1;
+        }
+        
+        .priority-option input[type="radio"] {
+            display: none;
+        }
+        
+        .priority-option label {
+            display: block;
+            padding: 0.75rem;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .priority-option input[type="radio"]:checked + label {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            color: #8b5cf6;
+        }
+        
+        .priority-low label { border-left: 4px solid #10b981; }
+        .priority-medium label { border-left: 4px solid #f59e0b; }
+        .priority-high label { border-left: 4px solid #ef4444; }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .quick-help {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .quick-help h3 {
+            color: #1e40af;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-help-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quick-help-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #1e40af;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="support-container">
+        <!-- Header -->
+        <div class="support-header">
+            <h1><i class="fas fa-life-ring"></i> Get Help & Support</h1>
+            <p>We're here to help! Describe your issue and we'll get back to you within 24 hours.</p>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Success message</span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+        
+        <!-- Support Form -->
+        <form class="support-form" th:action="@{/customer/support/submit}" method="post">
+            <div class="form-group">
+                <label for="issueType">
+                    <i class="fas fa-tag"></i> Issue Type
+                </label>
+                <select id="issueType" name="issueType" required>
+                    <option value="">Select issue type...</option>
+                    <option value="PAYMENT">💳 Payment Issues</option>
+                    <option value="BOOKING">🅿️ Booking Problems</option>
+                    <option value="TECHNICAL">🔧 Technical Issues</option>
+                    <option value="GENERAL">💬 General Inquiry</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-exclamation-triangle"></i> Priority Level
+                </label>
+                <div class="priority-options">
+                    <div class="priority-option priority-low">
+                        <input type="radio" id="priority-low" name="priority" value="LOW">
+                        <label for="priority-low">
+                            <i class="fas fa-circle" style="color: #10b981;"></i>
+                            Low
+                        </label>
+                    </div>
+                    <div class="priority-option priority-medium">
+                        <input type="radio" id="priority-medium" name="priority" value="MEDIUM" checked>
+                        <label for="priority-medium">
+                            <i class="fas fa-circle" style="color: #f59e0b;"></i>
+                            Medium
+                        </label>
+                    </div>
+                    <div class="priority-option priority-high">
+                        <input type="radio" id="priority-high" name="priority" value="HIGH">
+                        <label for="priority-high">
+                            <i class="fas fa-circle" style="color: #ef4444;"></i>
+                            High
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">
+                    <i class="fas fa-comment-alt"></i> Describe Your Issue
+                </label>
+                <textarea id="description" name="description" 
+                         placeholder="Please provide as much detail as possible about your issue. Include any error messages, steps you took, and what you expected to happen..."
+                         required></textarea>
+            </div>
+            
+            <div class="form-actions">
+                <a href="/customer/dashboard" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i>
+                    Submit Support Request
+                </button>
+            </div>
+        </form>
+        
+        <!-- Quick Help Section -->
+        <div class="quick-help">
+            <h3><i class="fas fa-lightbulb"></i> Quick Help</h3>
+            <div class="quick-help-items">
+                <div class="quick-help-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Check our FAQ section</span>
+                </div>
+                <div class="quick-help-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Call: +94 11 234 5678</span>
+                </div>
+                <div class="quick-help-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Email: support@smartparking.lk</span>
+                </div>
+                <div class="quick-help-item">
+                    <i class="fas fa-clock"></i>
+                    <span>Response time: 24 hours</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.support-form');
+            const issueType = document.getElementById('issueType');
+            const description = document.getElementById('description');
+            
+            // Auto-focus description when issue type is selected
+            issueType.addEventListener('change', function() {
+                if (this.value) {
+                    description.focus();
+                }
+            });
+            
+            // Form submission validation
+            form.addEventListener('submit', function(e) {
+                if (!issueType.value || !description.value.trim()) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                if (description.value.trim().length < 10) {
+                    e.preventDefault();
+                    alert('Please provide more details about your issue (at least 10 characters).');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>

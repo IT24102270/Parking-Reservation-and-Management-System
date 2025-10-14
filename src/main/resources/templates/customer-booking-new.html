@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Booking - Smart Parking</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .booking-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #2c3e50;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .booking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .booking-title {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .booking-subtitle {
+            font-size: 16px;
+            color: #bdc3c7;
+        }
+        
+        .booking-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section {
+            background: rgba(52, 73, 94, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .form-section.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #ecf0f1;
+        }
+        
+        .form-label i {
+            color: #3498db;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(44, 62, 80, 0.8);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #3498db;
+            background: rgba(44, 62, 80, 1);
+        }
+        
+        .form-input::placeholder {
+            color: #7f8c8d;
+        }
+        
+        .form-select option {
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .form-help {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .vehicle-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .guidelines-section {
+            background: rgba(41, 128, 185, 0.1);
+            border: 1px solid rgba(41, 128, 185, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .guidelines-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #3498db;
+        }
+        
+        .guidelines-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .guidelines-list li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            color: #ecf0f1;
+        }
+        
+        .guidelines-list li::before {
+            content: "•";
+            color: #3498db;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .summary-section {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .summary-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #27ae60;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+        
+        .summary-item {
+            background: rgba(39, 174, 96, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-bottom: 5px;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+        
+        .summary-value.cost {
+            color: #27ae60;
+            font-size: 24px;
+        }
+        
+        .summary-value.status {
+            color: #f39c12;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(149, 165, 166, 0.2);
+            color: #bdc3c7;
+            border: 2px solid rgba(149, 165, 166, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(149, 165, 166, 0.3);
+            color: white;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .booking-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .time-inputs, .vehicle-inputs {
+                grid-template-columns: 1fr;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="booking-container">
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Success message</span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <!-- Header -->
+        <div class="booking-header">
+            <h1 class="booking-title">
+                <i class="fas fa-plus-circle"></i>
+                Create New Booking
+            </h1>
+            <p class="booking-subtitle">Reserve your parking spot with ease</p>
+        </div>
+
+        <!-- Booking Form -->
+        <form th:action="@{/customer/booking/create}" method="post" id="bookingForm">
+            <div class="booking-form">
+                <!-- Parking Slot Selection -->
+                <div class="form-section">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-parking"></i>
+                            Parking Slot <span class="required">*</span>
+                        </label>
+                        <select name="slotId" class="form-select" required id="slotSelect">
+                            <option value="">Select a parking slot</option>
+                            <option th:each="slot : ${availableSlots}" 
+                                    th:value="${slot.id}" 
+                                    th:text="'Slot ' + ${slot.id} + ' - ' + ${slot.location} + ' ($5.00/hr)'"
+                                    data-price="5.0">
+                                Slot 1 - Ground Floor ($5.00/hr)
+                            </option>
+                        </select>
+                        <div class="form-help">Choose an available parking slot</div>
+                    </div>
+                </div>
+
+                <!-- Time Selection -->
+                <div class="form-section">
+                    <div class="time-inputs">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                Start Time <span class="required">*</span>
+                            </label>
+                            <input type="datetime-local" 
+                                   name="startTimeStr" 
+                                   class="form-input" 
+                                   required 
+                                   id="startTime"
+                                   th:value="${#temporals.format(reservation.startTime, 'yyyy-MM-dd''T''HH:mm')}">
+                            <div class="form-help">When you'll arrive</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>
+                                End Time <span class="required">*</span>
+                            </label>
+                            <input type="datetime-local" 
+                                   name="endTimeStr" 
+                                   class="form-input" 
+                                   required 
+                                   id="endTime"
+                                   th:value="${#temporals.format(reservation.endTime, 'yyyy-MM-dd''T''HH:mm')}">
+                            <div class="form-help">When you'll leave</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vehicle Information -->
+                <div class="form-section">
+                    <div class="vehicle-inputs">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-car"></i>
+                                Vehicle Type <span class="required">*</span>
+                            </label>
+                            <select name="vehicleType" class="form-select" required>
+                                <option value="">Select vehicle type</option>
+                                <option value="Car">Car</option>
+                                <option value="SUV">SUV</option>
+                                <option value="Motorcycle">Motorcycle</option>
+                                <option value="Van">Van</option>
+                                <option value="Truck">Truck</option>
+                            </select>
+                            <div class="form-help">Type of vehicle you'll be parking</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hashtag"></i>
+                                Vehicle Number <span class="required">*</span>
+                            </label>
+                            <input type="text" 
+                                   name="vehicleNumber" 
+                                   class="form-input" 
+                                   placeholder="E.G. ABC-1234" 
+                                   required
+                                   pattern="[A-Za-z0-9\-]+"
+                                   title="Please enter a valid vehicle number"
+                                   maxlength="20">
+                            <div class="form-help">Your vehicle registration number</div>
+                        </div>
+                    </div>
+                </div>
+
+                    </div>
+                </div>
+
+                <!-- Booking Guidelines -->
+                <div class="form-section guidelines-section">
+                    <div class="guidelines-title">
+                        <i class="fas fa-info-circle"></i>
+                        Booking Guidelines:
+                    </div>
+                    <ul class="guidelines-list">
+                        <li>Start time must be at least 5 minutes in the future</li>
+                        <li>Minimum booking duration is 30 minutes</li>
+                        <li>Default times have been set for your convenience</li>
+                        <li>Cost is calculated automatically based on duration</li>
+                    </ul>
+                </div>
+
+                <!-- Booking Summary -->
+                <div class="form-section summary-section">
+                    <div class="summary-title">
+                        <i class="fas fa-calculator"></i>
+                        Booking Summary
+                    </div>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-label">Duration</div>
+                            <div class="summary-value" id="duration">1 hour</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Estimated Cost</div>
+                            <div class="summary-value cost" id="cost">$5.00</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-label">Status</div>
+                            <div class="summary-value status">Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="/customer/bookings" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Bookings
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Create Booking
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Calculate duration and cost dynamically
+        function updateSummary() {
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const slotSelect = document.getElementById('slotSelect');
+            
+            if (startTime && endTime) {
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                const diffMs = end - start;
+                const diffHours = Math.ceil(diffMs / (1000 * 60 * 60)); // Round up to nearest hour
+                
+                document.getElementById('duration').textContent = diffHours + ' hour' + (diffHours !== 1 ? 's' : '');
+                
+                // Calculate cost
+                const selectedOption = slotSelect.options[slotSelect.selectedIndex];
+                const pricePerHour = selectedOption.dataset.price || 5.0;
+                const totalCost = diffHours * pricePerHour;
+                
+                document.getElementById('cost').textContent = '$' + totalCost.toFixed(2);
+            }
+        }
+        
+        // Add event listeners
+        document.getElementById('startTime').addEventListener('change', updateSummary);
+        document.getElementById('endTime').addEventListener('change', updateSummary);
+        document.getElementById('slotSelect').addEventListener('change', updateSummary);
+        
+        // Set minimum datetime to current time + 5 minutes
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 5);
+        const minDateTime = now.toISOString().slice(0, 16);
+        document.getElementById('startTime').min = minDateTime;
+        document.getElementById('endTime').min = minDateTime;
+        
+        // Update end time minimum when start time changes
+        document.getElementById('startTime').addEventListener('change', function() {
+            const startTime = new Date(this.value);
+            startTime.setMinutes(startTime.getMinutes() + 30); // Minimum 30 minutes duration
+            document.getElementById('endTime').min = startTime.toISOString().slice(0, 16);
+        });
+        
+        // Initial summary update
+        updateSummary();
+    </script>
+</body>
+</html>

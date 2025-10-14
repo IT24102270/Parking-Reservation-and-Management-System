@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parking Management - Four Wheel Slots</title>
+    <title>Parking Management - Three Wheel Slots</title>
+    <!-- Same CSS as two-wheels.html -->
     <style>
         :root {
             --primary-blue: #3498db;
@@ -131,6 +132,9 @@
             cursor: pointer;
             transition: all 0.3s;
             border-bottom: 3px solid transparent;
+            text-decoration: none;
+            color: var(--dark-gray);
+            display: block;
         }
 
         .nav-tab:hover {
@@ -257,25 +261,6 @@
             font-weight: 500;
         }
 
-        .edit-btn {
-            background: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: background 0.3s;
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .edit-btn:hover {
-            background: var(--dark-blue);
-        }
-
         /* Responsive Design */
         @media (max-width: 1024px) {
             .slots-grid {
@@ -313,25 +298,6 @@
                 display: none;
             }
         }
-        /* Alert Styles */
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert-success {
-            background: rgba(46, 204, 113, 0.2);
-            color: #2ecc71;
-            border: 1px solid #2ecc71;
-        }
-
-        .alert-error {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
-        }
     </style>
 </head>
 <body>
@@ -353,18 +319,10 @@
 <nav>
     <div class="nav-container">
         <ul class="nav-tabs">
-            <li class="nav-tab" th:classappend="${currentLocation}=='TwoWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='TwoWheeler')}" style="text-decoration:none;color:inherit;display:block">Two Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='ThreeWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='ThreeWheeler')}" style="text-decoration:none;color:inherit;display:block">Three Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='FourWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='FourWheeler')}" style="text-decoration:none;color:inherit;display:block">Four Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='HeavyVehicle' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='HeavyVehicle')}" style="text-decoration:none;color:inherit;display:block">Heavy Vehicles</a>
-            </li>
+            <li><a th:href="@{/slotmanager/twowheel}" class="nav-tab">Two Wheels</a></li>
+            <li><a th:href="@{/slotmanager/threewheel}" class="nav-tab active">Three Wheels</a></li>
+            <li><a th:href="@{/slotmanager/fourwheel}" class="nav-tab">Four Wheels</a></li>
+            <li><a th:href="@{/slotmanager/heavyvehicle}" class="nav-tab">Heavy Vehicles</a></li>
         </ul>
     </div>
 </nav>
@@ -372,33 +330,39 @@
 <!-- Main Content -->
 <div class="container">
     <div class="page-header">
-        <h1 class="page-title" th:text="${#strings.replace(currentLocation,'Wheeler',' Wheel')} + ' Parking Slots'"></h1>
-        <a th:href="@{/slotmanager/updateslot(location=${currentLocation})}" class="add-btn">
+        <h1 class="page-title">Three Wheel Parking Slots</h1>
+        <a th:href="@{/slotmanager/updateslot(location='ThreeWheeler')}" class="add-btn">
             <i>+</i> Add Slot
         </a>
     </div>
 
-    <!-- Success Message -->
-    <div th:if="${successMessage}" class="alert alert-success" style="display: block; margin-bottom: 20px;">
-        <span th:text="${successMessage}"></span>
-    </div>
-
     <div class="slots-grid">
-        <div class="slot-card" th:each="slot : ${slots}">
+        <!-- Three Wheel parking slots from database -->
+        <div th:each="slot : ${slots}" class="slot-card">
             <div class="slot-header">
-                <div class="slot-number">Slot <span th:text="${slot.id}"></span></div>
-                <div class="slot-status" th:classappend="'status-' + ${slot.status}" th:text="${#strings.capitalize(slot.status)}"></div>
+                <div class="slot-number" th:text="'THW-' + ${slot.id}">THW-001</div>
+                <div class="slot-status" th:classappend="'status-' + ${slot.status}" th:text="${slot.status}">Available</div>
             </div>
             <div class="slot-details">
                 <div class="slot-detail">
+                    <span class="slot-detail-label">Type:</span>
+                    <span class="slot-detail-value" th:text="${slot.type}">General</span>
+                </div>
+                <div class="slot-detail">
                     <span class="slot-detail-label">Hourly Rate:</span>
-                    <span class="slot-detail-value" th:text="'$' + ${#numbers.formatDecimal(slot.hourlyRate, 1, 2)}"></span>
+                    <span class="slot-detail-value" th:text="'$' + ${#numbers.formatDecimal(slot.hourlyRate, 1, 2)}">$3.00</span>
                 </div>
             </div>
-            <a th:href="@{/slotmanager/updateslot(id=${slot.id}, location=${currentLocation})}" class="edit-btn">Edit</a>
+        </div>
+
+        <!-- Show message if no slots -->
+        <div th:if="${#lists.isEmpty(slots)}" class="slot-card" style="text-align: center; padding: 40px;">
+            <p style="color: var(--dark-gray); font-size: 18px;">No three-wheel parking slots available.</p>
+            <a th:href="@{/slotmanager/updateslot(location='ThreeWheeler')}" class="add-btn" style="margin-top: 15px; display: inline-flex;">
+                <i>+</i> Add First Slot
+            </a>
         </div>
     </div>
 </div>
-
 </body>
 </html>

@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Parking Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        /* Feedback Form Card */
+        .feedback-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .form-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        /* Star Rating */
+        .star-rating {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            font-size: 32px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #f39c12;
+            transform: scale(1.1);
+        }
+
+        .rating-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .form-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-help {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        /* Previous Feedback Section */
+        .previous-feedback {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .feedback-rating {
+            display: flex;
+            gap: 5px;
+        }
+
+        .feedback-star {
+            color: #f39c12;
+            font-size: 16px;
+        }
+
+        .feedback-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        .feedback-comment {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .empty-feedback {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .empty-feedback i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .star-rating {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1 class="header-title">
+                    <i class="fas fa-comment"></i>
+                    Feedback
+                </h1>
+                <div class="header-actions">
+                    <a href="/customer/feedback/history" class="btn btn-secondary">
+                        <i class="fas fa-history"></i>
+                        View History
+                    </a>
+                    <a href="/customer/dashboard" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div th:if="${error}" class="alert alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Success message</span>
+        </div>
+
+        <!-- Feedback Form -->
+        <div class="feedback-card">
+            <div class="form-header">
+                <div class="form-title">Share Your Experience</div>
+                <div class="form-subtitle">Help us improve our parking management system</div>
+            </div>
+
+            <form th:action="@{/customer/feedback/submit}" method="post" id="feedbackForm">
+                <!-- Rating Section -->
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-star"></i>
+                        Rate Your Experience <span class="required">*</span>
+                    </label>
+                    <div class="star-rating" id="starRating">
+                        <i class="fas fa-star star" data-rating="1"></i>
+                        <i class="fas fa-star star" data-rating="2"></i>
+                        <i class="fas fa-star star" data-rating="3"></i>
+                        <i class="fas fa-star star" data-rating="4"></i>
+                        <i class="fas fa-star star" data-rating="5"></i>
+                    </div>
+                    <div class="rating-text" id="ratingText">Click on stars to rate</div>
+                    <input type="hidden" name="rating" id="ratingInput" required>
+                </div>
+
+                <!-- Comment Section -->
+                <div class="form-section">
+                    <label class="form-label">
+                        <i class="fas fa-comment-alt"></i>
+                        Your Feedback <span class="required">*</span>
+                    </label>
+                    <textarea name="comment" 
+                              class="form-textarea" 
+                              placeholder="Tell us about your experience with our parking system. What did you like? What can we improve?"
+                              maxlength="1000"
+                              required></textarea>
+                    <div class="form-help">Maximum 1000 characters</div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Feedback
+                    </button>
+                    <a href="/customer/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Previous Feedback -->
+        <div class="previous-feedback" th:if="${userFeedback != null and !userFeedback.empty}">
+            <div class="section-title">
+                <i class="fas fa-history"></i>
+                Your Recent Feedback
+            </div>
+            
+            <div th:each="feedback : ${userFeedback}" class="feedback-item">
+                <div class="feedback-header">
+                    <div class="feedback-rating">
+                        <i th:each="i : ${#numbers.sequence(1, feedback.rating)}" class="fas fa-star feedback-star"></i>
+                        <i th:each="i : ${#numbers.sequence(feedback.rating + 1, 5)}" class="far fa-star feedback-star" style="color: rgba(255,255,255,0.3);"></i>
+                    </div>
+                    <div class="feedback-date" th:text="${#temporals.format(feedback.date, 'MMM dd, yyyy HH:mm')}">Oct 04, 2025 20:30</div>
+                </div>
+                <div class="feedback-comment" th:text="${feedback.comment}">Great parking system! Very easy to use and convenient.</div>
+            </div>
+        </div>
+
+        <!-- Empty State for No Previous Feedback -->
+        <div class="previous-feedback" th:if="${userFeedback == null or userFeedback.empty}">
+            <div class="empty-feedback">
+                <i class="fas fa-comment-slash"></i>
+                <h3>No Previous Feedback</h3>
+                <p>This will be your first feedback submission</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star');
+            const ratingInput = document.getElementById('ratingInput');
+            const ratingText = document.getElementById('ratingText');
+            
+            const ratingTexts = {
+                1: 'Poor - Needs significant improvement',
+                2: 'Fair - Below expectations',
+                3: 'Good - Meets expectations',
+                4: 'Very Good - Exceeds expectations',
+                5: 'Excellent - Outstanding service'
+            };
+            
+            let selectedRating = 0;
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    selectedRating = parseInt(this.dataset.rating);
+                    ratingInput.value = selectedRating;
+                    updateStars();
+                    ratingText.textContent = ratingTexts[selectedRating];
+                });
+                
+                star.addEventListener('mouseenter', function() {
+                    const hoverRating = parseInt(this.dataset.rating);
+                    highlightStars(hoverRating);
+                });
+            });
+            
+            document.getElementById('starRating').addEventListener('mouseleave', function() {
+                updateStars();
+            });
+            
+            function updateStars() {
+                stars.forEach((star, index) => {
+                    if (index < selectedRating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+            
+            function highlightStars(rating) {
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Form validation
+            document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+                if (selectedRating === 0) {
+                    e.preventDefault();
+                    alert('Please select a rating before submitting your feedback.');
+                    return;
+                }
+                
+                const comment = document.querySelector('textarea[name="comment"]').value.trim();
+                if (comment.length === 0) {
+                    e.preventDefault();
+                    alert('Please provide your feedback comment.');
+                    return;
+                }
+                
+                if (comment.length > 1000) {
+                    e.preventDefault();
+                    alert('Comment must be less than 1000 characters.');
+                    return;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

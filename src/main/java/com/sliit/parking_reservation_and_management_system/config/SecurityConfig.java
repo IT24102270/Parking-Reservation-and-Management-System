@@ -62,8 +62,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public pages
-                        .requestMatchers("/", "/index", "/login", "/register", "/css/**", "/js/**").permitAll()
+                        // Public pages and static resources
+                        .requestMatchers("/", "/index", "/login", "/register", "/css/**", "/js/**", "/static/**", "/images/**", "/fonts/**").permitAll()
 
                         // Protected dashboards
                         // ✅ Admin has access to everything

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Parking Slot</title>
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --dark-blue: #2980b9;
+            --light-gray: #f5f7fa;
+            --medium-gray: #e0e6ed;
+            --dark-gray: #4a5568;
+            --text-color: #2d3748;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --error-color: #e74c3c;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Header Styles */
+        header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-gray);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logout-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: var(--dark-blue);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 0 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-gray);
+        }
+
+        .back-btn {
+            background: var(--medium-gray);
+            color: var(--dark-gray);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #d1d9e6;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .submit-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: var(--dark-blue);
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container, .container {
+                padding: 0 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <div class="logo-icon">CPS</div>
+            <div class="logo-text">City Park Solutions</div>
+        </div>
+        <div class="user-profile">
+            <span>Parking Manager</span>
+            <a th:href="@{/logout}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Update Parking Slot</h1>
+        <a th:href="@{/slotmanager/dashboard}" class="back-btn">Back to Dashboard</a>
+    </div>
+
+    <!-- Server-side Alert Messages -->
+    <div th:if="${successMessage}" class="alert alert-success" style="display:block">
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-error" style="display:block">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div class="form-container">
+        <form id="updateSlotForm" th:action="@{/slotmanager/update-slot}" th:object="${slot}" method="post">
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-error" style="display:block">
+                <span th:each="err : ${#fields.globalErrors()}" th:text="${err}"></span>
+            </div>
+            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div class="form-group" th:if="${isUpdate}">
+                <label class="form-label">Slot ID</label>
+                <input type="number" class="form-input" th:field="*{id}" readonly>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Slot Type *</label>
+                    <select class="form-select" th:field="*{type}" required>
+                        <option value="">Select slot type</option>
+                        <option value="VIP">VIP</option>
+                        <option value="General">General</option>
+                        <option value="Staff">Staff</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="alert alert-error" style="display:block"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Vehicle Type *</label>
+                    <select class="form-select" th:field="*{location}" required>
+                        <option value="">Select vehicle type</option>
+                        <option value="TwoWheeler">Two Wheeler</option>
+                        <option value="ThreeWheeler">Three Wheeler</option>
+                        <option value="FourWheeler">Four Wheeler</option>
+                        <option value="HeavyVehicle">Heavy Vehicle</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('location')}" th:errors="*{location}" class="alert alert-error" style="display:block"></div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Hourly Rate ($) *</label>
+                    <input type="number" class="form-input" th:field="*{hourlyRate}" placeholder="0.00" min="0" step="0.01" required>
+                    <div th:if="${#fields.hasErrors('hourlyRate')}" th:errors="*{hourlyRate}" class="alert alert-error" style="display:block"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Status *</label>
+                    <select class="form-select" th:field="*{status}" required>
+                        <option value="">Select status</option>
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="maintenance">Under Maintenance</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('status')}" th:errors="*{status}" class="alert alert-error" style="display:block"></div>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn" th:text="${isUpdate} ? 'Update Slot' : 'Add Slot'"></button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // No custom JS needed; form posts to server via Thymeleaf th:action
+</script>
+</body>
+</html>

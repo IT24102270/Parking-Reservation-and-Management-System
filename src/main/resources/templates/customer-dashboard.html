@@ -1,11 +1,291 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Customer Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Customer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<h2>Welcome Customer!</h2>
-<p>You can book parking slots and view your reservations here.</p>
-<a th:href="@{/logout}">Logout</a>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Modern Solutions</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/customer/dashboard" class="active">Dashboard</a></li>
+                    <li><a href="/customer/bookings">Bookings</a></li>
+                    <li><a href="/customer/slots">Slots</a></li>
+                    <li><a href="/customer/support">Get Help</a></li>
+                    <li><a href="/customer/feedback">Feedback</a></li>
+                    <li><a href="/customer/profile">Profile</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="notifications" id="notificationToggle">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" th:if="${unreadCount > 0}" th:text="${unreadCount}">3</span>
+                    
+                    <!-- Notification Dropdown -->
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">
+                            <h3>Notifications</h3>
+                            <span class="notification-count" th:text="${unreadCount + ' unread'}">3 unread</span>
+                        </div>
+                        
+                        <div class="notification-list">
+                            <!-- Recent Notifications -->
+                            <div th:if="${recentNotifications != null and !recentNotifications.empty}">
+                                <div th:each="notification : ${recentNotifications}" 
+                                     class="notification-item unread"
+                                     th:onclick="'markAsRead(' + ${notification.notificationId} + ')'">
+                                    <div class="notification-icon info">
+                                        <i class="fas fa-bell"></i>
+                                    </div>
+                                    <div class="notification-content">
+                                        <div class="notification-title" th:text="${notification.title}">Notification</div>
+                                        <div class="notification-message" th:text="${notification.message}">Notification message</div>
+                                        <div class="notification-time" th:text="${notification.timeAgo}">Just now</div>
+                                    </div>
+                                    <div class="notification-actions">
+                                        <a href="/customer/dashboard" class="notification-action-btn">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Empty State -->
+                            <div th:if="${recentNotifications == null or recentNotifications.empty}" class="notification-empty">
+                                <i class="fas fa-bell-slash"></i>
+                                <p>No notifications yet</p>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-footer">
+                            <a href="/customer/notifications" class="view-all-btn">View All Notifications</a>
+                            <button onclick="markAllAsRead()" class="mark-all-read-btn" th:if="${unreadCount > 0}">Mark All Read</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" th:text="${user?.firstName != null ? user.firstName.substring(0,1) : 'D'}">D</div>
+                    <div class="user-details">
+                        <div class="user-name" th:text="${user?.firstName != null ? user.firstName + ' ' + (user.lastName ?: '') : 'Customer'}">Customer</div>
+                        <div class="user-role">Premium User</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <div class="welcome-content">
+                <h1 class="welcome-title">
+                    Welcome back, 
+                    <span class="welcome-name" th:text="${user?.firstName ?: 'Customer'}">Customer</span>! 
+                    <span class="welcome-emoji">🚗</span>
+                </h1>
+                <p class="welcome-subtitle">Ready to manage your parking like a pro?</p>
+                
+                <div class="welcome-meta">
+                    <span class="current-date">📅 <span class="current-time">October 4, 2025</span></span>
+                    <span class="current-time">🕐 01:28 PM</span>
+                </div>
+            </div>
+            
+            <div class="quick-stats">
+                <h4>Quick Stats</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number">0</span>
+                        Active
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">6</span>
+                        Total
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Cards -->
+        <section class="stats-grid-main">
+            <div class="stat-card bookings">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-trend trend-up">+12%</div>
+                </div>
+                <div class="stat-value" th:text="${totalBookings ?: 5}">5</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+
+            <div class="stat-card active">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="stat-trend trend-live">LIVE</div>
+                </div>
+                <div class="stat-value" th:text="${activeBookings ?: 0}">0</div>
+                <div class="stat-label">Active Now</div>
+            </div>
+
+            <div class="stat-card available">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-parking"></i>
+                    </div>
+                    <div class="stat-trend">Available</div>
+                </div>
+                <div class="stat-value" th:text="${availableSlots ?: 18}">18</div>
+                <div class="stat-label">Open Slots</div>
+            </div>
+
+            <div class="stat-card spent">
+                <div class="stat-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-trend">This Month</div>
+                </div>
+                <div class="stat-value" th:text="${totalSpent ?: '$0'}">$0</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <div class="dashboard-content">
+            <!-- Quick Actions -->
+            <section class="actions-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h2>
+                
+                <div class="actions-grid">
+                    <div class="action-card new-booking" data-action="new-booking">
+                        <div class="action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="action-title">New Booking</div>
+                        <div class="action-subtitle">Reserve your spot</div>
+                    </div>
+
+                    <div class="action-card my-bookings" data-action="my-bookings">
+                        <div class="action-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                        <div class="action-title">My Bookings</div>
+                        <div class="action-subtitle">View reservations</div>
+                    </div>
+
+                    <div class="action-card view-slots" data-action="view-slots">
+                        <div class="action-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="action-title">View Slots</div>
+                        <div class="action-subtitle">Browse available</div>
+                    </div>
+
+                    <div class="action-card get-help" data-action="get-help">
+                        <div class="action-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="action-title">Get Help</div>
+                        <div class="action-subtitle">Need assistance?</div>
+                    </div>
+
+                    <div class="action-card feedback" data-action="feedback">
+                        <div class="action-icon">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="action-title">Feedback</div>
+                        <div class="action-subtitle">Share thoughts</div>
+                    </div>
+
+                    <div class="action-card profile" data-action="profile">
+                        <div class="action-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="action-title">Profile</div>
+                        <div class="action-subtitle">Manage account</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <h2 class="section-title">
+                    <i class="fas fa-clock"></i>
+                    Recent Activity
+                </h2>
+                
+                <div class="activity-list">
+                    <!-- Activity items -->
+                    <div th:if="${recentReservations != null and !recentReservations.empty}">
+                        <div class="activity-item" th:each="reservation : ${recentReservations}">
+                            <div class="activity-icon" 
+                                 th:class="${reservation.status == 'CONFIRMED' ? 'activity-icon confirmed' : 
+                                           reservation.status == 'CANCELLED' ? 'activity-icon cancelled' : 
+                                           reservation.status == 'COMPLETED' ? 'activity-icon completed' : 
+                                           reservation.status == 'ACTIVE' ? 'activity-icon active' : 
+                                           'activity-icon pending'}">
+                                <i class="fas" 
+                                   th:class="${reservation.status == 'CONFIRMED' ? 'fas fa-check' : 
+                                             reservation.status == 'CANCELLED' ? 'fas fa-times' : 
+                                             reservation.status == 'COMPLETED' ? 'fas fa-check-circle' : 
+                                             reservation.status == 'ACTIVE' ? 'fas fa-car' : 
+                                             'fas fa-clock'}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title" th:text="${reservation.bookingId ?: ('Reservation #' + reservation.id)}">Reservation</div>
+                                <div class="activity-details">
+                                    <span>Slot </span><span th:text="${reservation.slotId}">1</span>
+                                    <span> • </span>
+                                    <span th:text="${reservation.startTime != null ? #temporals.format(reservation.startTime, 'MMM dd, HH:mm') : 'No date'}">Oct 04, 19:15</span>
+                                    <span th:if="${payments != null and payments[reservation.id] != null}"> • $</span>
+                                    <span th:if="${payments != null and payments[reservation.id] != null}" th:text="${#numbers.formatDecimal(payments[reservation.id].amount, 1, 2)}">0.00</span>
+                                    <span th:if="${reservation.vehicleNumber != null}"> • </span>
+                                    <span th:if="${reservation.vehicleNumber != null}" th:text="${reservation.vehicleNumber}">Vehicle</span>
+                                </div>
+                            </div>
+                            <div class="activity-status" 
+                                 th:class="'activity-status status-' + ${reservation.status != null ? reservation.status.toLowerCase() : 'pending'}"
+                                 th:text="${reservation.status ?: 'PENDING'}">PENDING</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State when no reservations -->
+                    <div th:if="${recentReservations == null or recentReservations.empty}" class="activity-empty">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="empty-text">
+                            <h4>No Recent Activity</h4>
+                            <p>Your recent bookings will appear here</p>
+                            <a href="/customer/booking/new" class="btn-link">Make your first booking</a>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="/customer/bookings" class="view-all-link">
+                    View all bookings
+                </a>
+            </section>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/dashboard.js}"></script>
 </body>
 </html>

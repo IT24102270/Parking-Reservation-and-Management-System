@@ -1,13 +1,9 @@
 package com.sliit.parking_reservation_and_management_system;
 
-import com.sliit.parking_reservation_and_management_system.entity.User;
-import com.sliit.parking_reservation_and_management_system.repository.UserRepository;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 public class ParkingReservationAndManagementSystemApplication {
@@ -33,22 +29,22 @@ public class ParkingReservationAndManagementSystemApplication {
         return "debug-info";
     }
 
-    @Bean
-    public CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return args -> {
-            if (userRepository.findByEmail("admin@parking.com").isEmpty()) {
-                User admin = new User();
-                admin.setFirstName("Default");
-                admin.setLastName("Admin");
-                admin.setEmail("admin@parking.com");
-                admin.setPasswordHash(passwordEncoder.encode("admin123"));
-                admin.setRole("ADMIN");
-                admin.setPhoneNumber("0000000000");
-                userRepository.save(admin);
-                System.out.println("✅ Default admin created: admin@parking.com / admin123");
-            }
-        };
-    }
+//    @Bean
+//    public CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+//        return args -> {
+//            if (userRepository.findByEmail("admin@parking.com").isEmpty()) {
+//                User admin = new User();
+//                admin.setFirstName("Default");
+//                admin.setLastName("Admin");
+//                admin.setEmail("admin@parking.com");
+//                admin.setPasswordHash(passwordEncoder.encode("admin123"));
+//                admin.setRole("ADMIN");
+//                admin.setPhoneNumber("0000000000");
+//                userRepository.save(admin);
+//                System.out.println("✅ Default admin created: admin@parking.com / admin123");
+//            }
+//        };
+//    }
 
 
 
