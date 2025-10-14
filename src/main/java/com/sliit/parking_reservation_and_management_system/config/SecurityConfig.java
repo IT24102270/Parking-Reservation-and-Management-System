@@ -1,5 +1,7 @@
 package com.sliit.parking_reservation_and_management_system.config;
 
+import com.sliit.parking_reservation_and_management_system.util.AdminLogger;
+import com.sliit.parking_reservation_and_management_system.util.AdminSessionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,16 @@ public class SecurityConfig {
     public AuthenticationSuccessHandler customSuccessHandler() {
         return (request, response, authentication) -> {
             var authorities = authentication.getAuthorities();
+
+            String email = authentication.getName();
+            String role = authorities.iterator().next().getAuthority();
+
+            // ✅ Only track admin logins
+            if (role.equals("ROLE_ADMIN")) {
+                AdminSessionManager.getInstance().login(email, role);
+                AdminLogger.getInstance().log("Admin logged in successfully.");
+            }
+
             String redirectUrl = "/";
 
             if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
