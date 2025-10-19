@@ -1,4 +1,4 @@
-/* Modern Dashboard Styles */
+/* Modern Customer Dashboard Styles - City Park Solutions */
 * {
     margin: 0;
     padding: 0;
@@ -6,10 +6,10 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a2332 0%, #2c3e50 25%, #34495e 50%, #7f8c8d 75%, #d4d8dd 100%);
     min-height: 100vh;
-    color: #333;
+    color: #2c3e50;
 }
 
 .dashboard-container {
@@ -38,16 +38,17 @@ body {
 }
 
 .logo-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 10px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: bold;
-    font-size: 18px;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 }
 
 .logo-text {
@@ -64,14 +65,18 @@ body {
 
 .nav-menu a {
     text-decoration: none;
-    color: #666;
+    color: #7f8c8d;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 8px;
 }
 
 .nav-menu a:hover,
 .nav-menu a.active {
-    color: #667eea;
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateY(-1px);
 }
 
 .user-profile {
@@ -82,29 +87,41 @@ body {
 
 .notifications {
     position: relative;
-    background: #f8f9fa;
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notifications:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
 }
 
 .notification-badge {
     position: absolute;
     top: -5px;
     right: -5px;
-    background: #ff4757;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
     border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
+    width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
+    border: 2px solid white;
 }
 
 .user-info {
@@ -114,15 +131,18 @@ body {
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #3498db, #2980b9);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    border: 3px solid rgba(255, 255, 255, 0.9);
 }
 
 /* Welcome Section */
@@ -144,7 +164,7 @@ body {
     right: 0;
     width: 200px;
     height: 200px;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
     border-radius: 50%;
     transform: translate(50%, -50%);
 }
@@ -161,10 +181,11 @@ body {
 }
 
 .welcome-name {
-    color: #f39c12;
+    color: #3498db;
     display: inline-flex;
     align-items: center;
     gap: 10px;
+    font-weight: 600;
 }
 
 .welcome-subtitle {
@@ -184,15 +205,18 @@ body {
     position: absolute;
     top: 30px;
     right: 30px;
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(52, 152, 219, 0.1);
     border-radius: 15px;
     padding: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(52, 152, 219, 0.2);
     text-align: center;
 }
 
 .quick-stats h4 {
-    color: #667eea;
+    color: #3498db;
     margin-bottom: 10px;
+    font-weight: 600;
 }
 
 .stats-grid {

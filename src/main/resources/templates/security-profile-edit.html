@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Park Solutions Pvt Ltd - Edit Profile</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="cps-header">
+            <div class="container">
+                <div class="cps-logo">
+                    <div class="cps-logo-icon">CPS</div>
+                    <span>City Park Solutions Pvt Ltd</span>
+                    <small style="display: block; font-size: var(--font-size-xs); opacity: 0.8;">Security Portal</small>
+                </div>
+                
+                <nav class="cps-nav">
+                    <a href="/security/dashboard">Dashboard</a>
+                    <a href="/security/reports">Reports</a>
+                    <a href="/security/verify">Verify Vehicles</a>
+                    <a href="/security/scanner">QR Scanner</a>
+                </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile" class="active"><i class="fas fa-user"></i> Profile</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="confirmLogout()" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-user-edit"></i> Edit Profile</h1>
+                    <p>Update your personal information and account settings</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/profile" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigation Breadcrumb -->
+            <div class="breadcrumb-nav">
+                <nav class="breadcrumb">
+                    <a href="/security/dashboard" class="breadcrumb-item">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <span class="breadcrumb-separator">></span>
+                    <a href="/security/profile" class="breadcrumb-item">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <span class="breadcrumb-separator">></span>
+                    <span class="breadcrumb-item active">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </span>
+                </nav>
+                <div class="nav-actions">
+                    <a href="/security/profile" class="nav-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                    <a href="/security/dashboard" class="nav-btn">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <!-- Profile Edit Form -->
+            <div class="form-container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h2>Edit Profile Information</h2>
+                            <p>Update your personal details and security settings</p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/security/profile/update}" method="post" th:object="${user}">
+                        <!-- Personal Information Section -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-user"></i> Personal Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">First Name <span class="required">*</span></label>
+                                    <input type="text" id="firstName" name="firstName" th:value="${user.firstName}" 
+                                           class="form-control" required maxlength="50">
+                                </div>
+                                <div class="form-group">
+                                    <label for="lastName">Last Name <span class="required">*</span></label>
+                                    <input type="text" id="lastName" name="lastName" th:value="${user.lastName}" 
+                                           class="form-control" required maxlength="50">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email Address <span class="required">*</span></label>
+                                    <input type="email" id="email" name="email" th:value="${user.email}" 
+                                           class="form-control" required maxlength="100">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phoneNumber">Phone Number</label>
+                                    <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}" 
+                                           class="form-control" maxlength="20" placeholder="+1 234 567 8900">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password Change Section -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-lock"></i> Change Password</h3>
+                            <p class="section-note">Leave password fields empty if you don't want to change your password</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="currentPassword">Current Password</label>
+                                    <input type="password" id="currentPassword" name="currentPassword" 
+                                           class="form-control" placeholder="Enter current password">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="newPassword">New Password</label>
+                                    <input type="password" id="newPassword" name="newPassword" 
+                                           class="form-control" placeholder="Enter new password" minlength="6">
+                                    <small class="form-help">Password must be at least 6 characters long</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="confirmPassword">Confirm New Password</label>
+                                    <input type="password" id="confirmPassword" name="confirmPassword" 
+                                           class="form-control" placeholder="Confirm new password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Information (Read-only) -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-info-circle"></i> Account Information</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>User ID</label>
+                                    <input type="text" th:value="${user.userID}" class="form-control" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Role</label>
+                                    <input type="text" th:value="${user.role}" class="form-control" readonly>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Account Status</label>
+                                    <input type="text" th:value="${user.status}" class="form-control" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label>Member Since</label>
+                                    <input type="text" th:value="${#temporals.format(user.created_at, 'MMMM dd, yyyy')}" 
+                                           class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a href="/security/profile" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Confirm Logout</h3>
+                <span class="modal-close" onclick="closeLogoutModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the security officer portal?</p>
+                <p class="logout-warning">You will need to login again to access the system.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeLogoutModal()" class="btn btn-secondary">Cancel</button>
+                <form action="/logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        function confirmLogout() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('logoutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword && confirmPassword) {
+                if (newPassword !== confirmPassword) {
+                    this.setCustomValidity('Passwords do not match');
+                } else {
+                    this.setCustomValidity('');
+                }
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
+        // New password validation
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword.value) {
+                confirmPassword.dispatchEvent(new Event('input'));
+            }
+        });
+    </script>
+    
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            margin: 0;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-note {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .form-control {
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .form-help {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        
+        @media (max-width: 768px) {
+            .form-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</body>
+</html>

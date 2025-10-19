@@ -1,11 +1,295 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Finance Executive Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Dashboard - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: var(--gradient-primary);
+            min-height: 100vh;
+        }
+        
+        .finance-container {
+            min-height: 100vh;
+            padding: var(--spacing-lg);
+        }
+        
+        .finance-header {
+            background: var(--color-surface);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .finance-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .finance-logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-inverse);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .finance-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin: 0;
+        }
+        
+        .finance-subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .stat-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-base);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-lg);
+            color: var(--color-text-inverse);
+        }
+        
+        .stat-icon.revenue { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .stat-icon.payments { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .stat-icon.refunds { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .stat-icon.pending { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        
+        .stat-value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .action-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            text-align: center;
+            text-decoration: none;
+            color: var(--color-text-primary);
+            box-shadow: var(--shadow-base);
+            transition: all var(--transition-base);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            color: var(--color-text-primary);
+        }
+        
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-secondary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            color: var(--color-text-inverse);
+            font-size: var(--font-size-xl);
+        }
+        
+        .content-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-base);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .finance-header {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-lg);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
-<h2>Welcome Finance Executive!</h2>
-<p>You can view payments, process refunds, and generate financial reports.</p>
-<a th:href="@{/logout}">Logout</a>
+    <div class="finance-container">
+        <!-- Header -->
+        <div class="finance-header">
+            <div class="finance-logo">
+                <div class="finance-logo-icon">CPS</div>
+                <div>
+                    <h1 class="finance-title">Finance Dashboard</h1>
+                    <p class="finance-subtitle">City Park Solutions Pvt Ltd</p>
+                </div>
+            </div>
+            <div>
+                <a href="/logout" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="content-card">
+            <h2 style="color: var(--color-text-primary); margin-bottom: var(--spacing-md);">
+                <i class="fas fa-chart-line" style="color: var(--color-success);"></i>
+                Welcome, Finance Executive!
+            </h2>
+            <p style="color: var(--color-text-secondary); margin: 0;">
+                Monitor financial performance, manage payments, process refunds, and generate comprehensive financial reports for City Park Solutions.
+            </p>
+        </div>
+
+        <!-- Financial Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon revenue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">$12,450</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon payments">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stat-value">248</div>
+                <div class="stat-label">Payments Processed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon refunds">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <div class="stat-value">$320</div>
+                <div class="stat-label">Refunds Issued</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon pending">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-value">12</div>
+                <div class="stat-label">Pending Reviews</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="content-card">
+            <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg);">
+                <i class="fas fa-tasks"></i>
+                Quick Actions
+            </h3>
+            <div class="actions-grid">
+                <a href="/finance/payments" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-list"></i>
+                    </div>
+                    <h4>View Payments</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        Review all payment transactions
+                    </p>
+                </a>
+                <a href="/finance/refunds" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <h4>Process Refunds</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        Handle refund requests
+                    </p>
+                </a>
+                <a href="/finance/reports" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h4>Financial Reports</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        Generate detailed reports
+                    </p>
+                </a>
+                <a href="/finance/analytics" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-analytics"></i>
+                    </div>
+                    <h4>Analytics</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        View performance metrics
+                    </p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="content-card">
+            <h3 style="color: var(--color-text-primary); margin-bottom: var(--spacing-lg);">
+                <i class="fas fa-history"></i>
+                Recent Financial Activity
+            </h3>
+            <div style="color: var(--color-text-secondary); text-align: center; padding: var(--spacing-xl);">
+                <i class="fas fa-chart-line" style="font-size: var(--font-size-3xl); opacity: 0.3; margin-bottom: var(--spacing-md);"></i>
+                <p>Financial activity data will be displayed here once the payment system is integrated.</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

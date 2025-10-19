@@ -70,4 +70,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // Recent reservations for dashboard
     @Query("SELECT r FROM Reservation r WHERE r.userId = :userId ORDER BY r.createdAt DESC")
     List<Reservation> findRecentByUserId(@Param("userId") Long userId, org.springframework.data.domain.Pageable pageable);
+    
+    // Slot availability queries for automatic status management
+    @Query("SELECT r FROM Reservation r WHERE r.slotId = :slotId AND r.status NOT IN ('CANCELLED', 'COMPLETED') AND " +
+           "((r.startTime <= :endTime AND r.endTime >= :startTime))")
+    List<Reservation> findOverlappingReservations(@Param("slotId") Long slotId, 
+                                                  @Param("startTime") LocalDateTime startTime, 
+                                                  @Param("endTime") LocalDateTime endTime);
+    
+    @Query("SELECT r FROM Reservation r WHERE r.slotId = :slotId AND r.status IN ('ACTIVE', 'CONFIRMED') AND " +
+           "r.startTime <= :currentTime AND r.endTime > :currentTime")
+    List<Reservation> findActiveReservationsForSlot(@Param("slotId") Long slotId, @Param("currentTime") LocalDateTime currentTime);
+    
+    @Query("SELECT r FROM Reservation r WHERE r.startTime BETWEEN :startTime AND :endTime AND r.status = 'CONFIRMED'")
+    List<Reservation> findReservationsStartingBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    
+    @Query("SELECT r FROM Reservation r WHERE r.endTime BETWEEN :startTime AND :endTime AND r.status = 'ACTIVE'")
+    List<Reservation> findReservationsEndingBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 }

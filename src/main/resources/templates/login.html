@@ -1,70 +1,211 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Parking System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(to right, #3498db, #2ecc71);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .login-container {
-            height: 100vh;
+            background: var(--gradient-primary);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: var(--spacing-lg);
         }
-        .card {
+
+        .auth-container {
             width: 100%;
-            max-width: 400px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+            max-width: 450px;
+        }
+
+        .auth-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            padding: var(--spacing-3xl);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .auth-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-2xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-lg);
+            color: var(--color-text-inverse);
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+        }
+
+        .auth-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .auth-subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+        }
+
+        .alert {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--color-success);
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .alert-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--color-error);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .alert-info {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--color-info);
+            border: 1px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+            border-top: 1px solid var(--color-border-light);
+        }
+
+        .auth-footer a {
+            color: var(--color-interactive-primary);
+            font-weight: var(--font-weight-medium);
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            color: var(--color-interactive-primary-hover);
+        }
+
+        .back-to-home {
+            position: absolute;
+            top: var(--spacing-xl);
+            left: var(--spacing-xl);
+            color: var(--color-text-inverse);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: var(--font-weight-medium);
+            opacity: 0.8;
+            transition: opacity var(--transition-base);
+        }
+
+        .back-to-home:hover {
+            opacity: 1;
+            color: var(--color-text-inverse);
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: var(--spacing-2xl);
+            }
+            
+            .back-to-home {
+                position: static;
+                justify-content: center;
+                margin-bottom: var(--spacing-lg);
+            }
         }
     </style>
 </head>
 <body>
+    <a th:href="@{/}" class="back-to-home">
+        <i class="fas fa-arrow-left"></i>
+        Back to Home
+    </a>
 
-<div class="login-container">
-    <div class="card p-4 bg-light">
-        <h2 class="text-center mb-4">🔑 Login</h2>
-
-        <!-- Alerts -->
-        <div th:if="${param.error}" class="alert alert-danger text-center">
-            Invalid email or password
-        </div>
-        <div th:if="${param.logout}" class="alert alert-info text-center">
-            You have been logged out
-        </div>
-        <div th:if="${param.success}" class="alert alert-success text-center">
-            Registration successful! Please log in
-        </div>
-        <div th:if="${session.error}" class="alert alert-danger text-center" th:text="${session.error}"></div>
-
-        <!-- Login Form -->
-        <form th:action="@{/login}" method="post">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="text" id="email" name="username" class="form-control" placeholder="Enter your email" required>
+    <div class="auth-container">
+        <div class="card auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">CPS</div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to City Park Solutions Pvt Ltd</p>
             </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+            <!-- Alerts -->
+            <div th:if="${param.error}" class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-circle"></i>
+                Invalid email or password
+            </div>
+            <div th:if="${param.logout}" class="alert alert-info text-center">
+                <i class="fas fa-info-circle"></i>
+                You have been logged out successfully
+            </div>
+            <div th:if="${param.success}" class="alert alert-success text-center">
+                <i class="fas fa-check-circle"></i>
+                Registration successful! Please log in
+            </div>
+            <div th:if="${session.error}" class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${session.error}"></span>
             </div>
 
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Login</button>
-            </div>
-        </form>
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" 
+                           id="email" 
+                           name="username" 
+                           class="form-control" 
+                           placeholder="Enter your email address" 
+                           required 
+                           autocomplete="email">
+                </div>
 
-        <p class="text-center mt-3">
-            Don't have an account?
-            <a th:href="@{/register}" class="text-success fw-bold">Register here</a>
-        </p>
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" 
+                           id="password" 
+                           name="password" 
+                           class="form-control" 
+                           placeholder="Enter your password" 
+                           required 
+                           autocomplete="current-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p class="text-secondary">
+                    Don't have an account?
+                    <a th:href="@{/register}">Create one here</a>
+                </p>
+            </div>
+        </div>
     </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

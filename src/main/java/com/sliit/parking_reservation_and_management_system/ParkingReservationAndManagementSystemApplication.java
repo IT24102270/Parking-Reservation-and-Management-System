@@ -4,8 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class ParkingReservationAndManagementSystemApplication {
 
     public static void main(String[] args) {
@@ -21,7 +23,7 @@ public class ParkingReservationAndManagementSystemApplication {
 
     @Bean
     public String debugInfo(Environment env) {
-        System.out.println("🚀 Starting Parking Reservation and Management System");
+        System.out.println("🚀 Starting City Park Solutions Pvt Ltd - Parking Management System");
         System.out.println("🔗 Database URL: " + env.getProperty("spring.datasource.url"));
         System.out.println("👤 Database User: " + env.getProperty("spring.datasource.username"));
         System.out.println("🌐 Server Port: " + env.getProperty("server.port"));

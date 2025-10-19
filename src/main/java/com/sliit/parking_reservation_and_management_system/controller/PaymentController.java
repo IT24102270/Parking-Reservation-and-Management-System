@@ -5,6 +5,7 @@ import com.sliit.parking_reservation_and_management_system.entity.Reservation;
 import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.service.PaymentService;
 import com.sliit.parking_reservation_and_management_system.service.ReservationService;
+import com.sliit.parking_reservation_and_management_system.service.SlotAvailabilityService;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
 import com.sliit.parking_reservation_and_management_system.service.NotificationService;
 import com.sliit.parking_reservation_and_management_system.service.ParkingSlotService;
@@ -37,6 +38,9 @@ public class PaymentController {
     
     @Autowired
     private ParkingSlotService parkingSlotService;
+    
+    @Autowired
+    private SlotAvailabilityService slotAvailabilityService;
 
     @GetMapping("/payments")
     public String viewPayments(Model model) {
@@ -211,9 +215,17 @@ public class PaymentController {
                 // Update reservation status to CONFIRMED
                 reservationService.updateReservationStatus(reservation.getId(), "CONFIRMED");
                 
-                // Update parking slot status if booking starts soon
-                if (reservation.getStartTime().isBefore(java.time.LocalDateTime.now().plusMinutes(10))) {
-                    parkingSlotService.updateSlotStatus(reservation.getSlotId(), "OCCUPIED");
+                // Check if booking should start immediately (within 10 minutes)
+                java.time.LocalDateTime now = java.time.LocalDateTime.now();
+                if (reservation.getStartTime().isBefore(now.plusMinutes(10))) {
+                    // Use SlotAvailabilityService to properly manage slot status
+                    slotAvailabilityService.occupySlot(reservation.getSlotId(), reservation.getId());
+                    
+                    // Also update reservation to ACTIVE if it should start now
+                    if (reservation.getStartTime().isBefore(now.plusMinutes(2))) {
+                        reservationService.updateReservationStatus(reservation.getId(), "ACTIVE");
+                        System.out.println("Reservation " + reservation.getId() + " activated immediately after payment");
+                    }
                 }
                 
                 // Send booking confirmation notifications

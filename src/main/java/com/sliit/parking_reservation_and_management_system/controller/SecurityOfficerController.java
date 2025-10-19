@@ -687,112 +687,174 @@ public class SecurityOfficerController {
             System.out.println("Authentication object: " + authentication);
             System.out.println("Is authenticated: " + (authentication != null ? authentication.isAuthenticated() : "null"));
             
-            // First, let's get all users to see what we have
-            List<User> allUsers = userService.getAllUsers();
-            System.out.println("Total users in database: " + allUsers.size());
-            
-            if (!allUsers.isEmpty()) {
-                System.out.println("Available users:");
-                for (User user : allUsers) {
-                    System.out.println("  - ID: " + user.getUserID() + ", Email: " + user.getEmail() + ", Role: " + user.getRole());
-                }
-            }
-            
             if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
                 String username = authentication.getName();
                 System.out.println("Authenticated user: " + username);
                 
-                // Find user by email
+                // Find user by email in database
+                List<User> allUsers = userService.getAllUsers();
                 Optional<User> userOpt = allUsers.stream()
                     .filter(user -> user.getEmail().equals(username))
                     .findFirst();
                 
                 if (userOpt.isPresent()) {
                     User user = userOpt.get();
-                    System.out.println("Found authenticated user in database: " + user.getEmail() + " (ID: " + user.getUserID() + ")");
+                    System.out.println("Found authenticated user in database: " + user.getEmail() + " (ID: " + user.getUserID() + ", Role: " + user.getRole() + ")");
+                    
+                    // Verify the user has SECURITY_OFFICER role
+                    if (!"SECURITY_OFFICER".equals(user.getRole())) {
+                        System.err.println("WARNING: User " + user.getEmail() + " does not have SECURITY_OFFICER role. Current role: " + user.getRole());
+                        // Still return the user - role-based access control should be handled by Spring Security
+                    }
+                    
                     return user;
+                } else {
+                    System.err.println("ERROR: Authenticated user '" + username + "' not found in database");
+                    throw new RuntimeException("Authenticated user not found in database: " + username);
                 }
-                
-                System.out.println("Authenticated user not found in database, will use Security Officer fallback");
             } else {
-                System.out.println("No valid authentication found, using Security Officer fallback");
-            }
-            
-            // Fallback: Use existing Security Officer or create one
-            Optional<User> securityOfficer = allUsers.stream()
-                .filter(user -> "SECURITY_OFFICER".equals(user.getRole()))
-                .findFirst();
-            
-            if (securityOfficer.isPresent()) {
-                User officer = securityOfficer.get();
-                System.out.println("Using existing Security Officer: " + officer.getEmail() + " (ID: " + officer.getUserID() + ")");
-                return officer;
-            } else {
-                // Create a new Security Officer if none exist
-                System.out.println("No Security Officer exists, creating new one");
-                User newSecurityOfficer = new User();
-                newSecurityOfficer.setFirstName("Security");
-                newSecurityOfficer.setLastName("Officer");
-                newSecurityOfficer.setEmail("security.officer@parking.com");
-                newSecurityOfficer.setRole("SECURITY_OFFICER");
-                newSecurityOfficer.setPasswordHash("securitypass123");
-                newSecurityOfficer.setPhoneNumber("1234567890");
-                
-                try {
-                    User savedUser = userService.saveUser(newSecurityOfficer);
-                    System.out.println("Created new Security Officer with ID: " + savedUser.getUserID());
-                    return savedUser;
-                } catch (Exception saveError) {
-                    System.err.println("Failed to save new Security Officer: " + saveError.getMessage());
-                    saveError.printStackTrace();
-                }
+                System.err.println("ERROR: No valid authentication found");
+                throw new RuntimeException("No authenticated user found. Please log in.");
             }
             
         } catch (Exception e) {
             System.err.println("Error in getCurrentUser: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to get current user: " + e.getMessage());
         }
-        
-        System.out.println("getCurrentUser returning null - this should not happen");
-        return null;
     }
     
-    // Helper method to get a valid User ID that exists in the User table
-    private Long getValidUserID() {
+    // Profile Management
+    
+    // View profile page
+    @GetMapping("/profile")
+    public String viewProfile(Model model) {
         try {
-            List<User> allUsers = userService.getAllUsers();
-            if (!allUsers.isEmpty()) {
-                Long validID = allUsers.get(0).getUserID();
-                System.out.println("getValidUserID() returning: " + validID);
-                return validID;
-            } else {
-                // Create a user if none exist
-                User newUser = new User();
-                newUser.setFirstName("Security");
-                newUser.setLastName("Officer");
-                newUser.setEmail("security@parking.com");
-                newUser.setRole("SECURITY_OFFICER");
-                newUser.setPasswordHash("securitypass123");
-                newUser.setPhoneNumber("1234567890");
+            User currentUser = getCurrentUser();
+            model.addAttribute("user", currentUser);
+            
+            // Add profile statistics
+            if (currentUser != null && currentUser.getUserID() != null) {
+                Long officerID = currentUser.getUserID();
                 
-                User savedUser = userService.saveUser(newUser);
-                System.out.println("Created new user with valid ID: " + savedUser.getUserID());
-                return savedUser.getUserID();
+                // Get profile statistics
+                long totalReports = suspiciousReportService.countReportsBySecurityOfficer(officerID);
+                long pendingReports = suspiciousReportService.getReportsBySecurityOfficerAndStatus(officerID, "PENDING").size();
+                long resolvedReports = suspiciousReportService.getReportsBySecurityOfficerAndStatus(officerID, "RESOLVED").size();
+                
+                model.addAttribute("totalReports", totalReports);
+                model.addAttribute("pendingReports", pendingReports);
+                model.addAttribute("resolvedReports", resolvedReports);
+                
+                // Get recent activity
+                List<SuspiciousReport> recentReports = suspiciousReportService.getLatestReportsBySecurityOfficer(officerID, 5);
+                model.addAttribute("recentReports", recentReports);
+                
+                System.out.println("Profile loaded for officer: " + currentUser.getEmail());
             }
+            
+            return "security-profile";
+            
         } catch (Exception e) {
-            System.err.println("Error getting valid user ID: " + e.getMessage());
-            return null;
+            System.err.println("Error loading profile: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to load profile: " + e.getMessage());
+            return "security-profile";
         }
     }
     
-    // Helper method to validate that a User ID exists in the database
-    private boolean validateUserExists(Long userID) {
+    // Edit profile form
+    @GetMapping("/profile/edit")
+    public String editProfileForm(Model model) {
         try {
-            List<User> allUsers = userService.getAllUsers();
-            return allUsers.stream().anyMatch(user -> user.getUserID().equals(userID));
+            User currentUser = getCurrentUser();
+            model.addAttribute("user", currentUser);
+            
+            return "security-profile-edit";
+            
         } catch (Exception e) {
-            System.err.println("Error validating user existence: " + e.getMessage());
-            return false;
+            System.err.println("Error loading profile edit form: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Failed to load profile edit form: " + e.getMessage());
+            return "redirect:/security/profile";
+        }
+    }
+    
+    // Update profile
+    @PostMapping("/profile/update")
+    public String updateProfile(@ModelAttribute("user") User updatedUser, 
+                               @RequestParam(required = false) String currentPassword,
+                               @RequestParam(required = false) String newPassword,
+                               @RequestParam(required = false) String confirmPassword,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            User currentUser = getCurrentUser();
+            
+            if (currentUser == null || currentUser.getUserID() == null) {
+                redirectAttributes.addFlashAttribute("error", "User authentication failed. Please login again.");
+                return "redirect:/security/profile";
+            }
+            
+            // Validate input
+            if (updatedUser.getFirstName() == null || updatedUser.getFirstName().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "First name is required.");
+                return "redirect:/security/profile/edit";
+            }
+            
+            if (updatedUser.getLastName() == null || updatedUser.getLastName().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Last name is required.");
+                return "redirect:/security/profile/edit";
+            }
+            
+            if (updatedUser.getEmail() == null || updatedUser.getEmail().trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Email is required.");
+                return "redirect:/security/profile/edit";
+            }
+            
+            // Update basic profile information
+            currentUser.setFirstName(updatedUser.getFirstName().trim());
+            currentUser.setLastName(updatedUser.getLastName().trim());
+            currentUser.setEmail(updatedUser.getEmail().trim());
+            currentUser.setPhoneNumber(updatedUser.getPhoneNumber());
+            
+            // Handle password change if provided
+            if (newPassword != null && !newPassword.trim().isEmpty()) {
+                if (currentPassword == null || currentPassword.trim().isEmpty()) {
+                    redirectAttributes.addFlashAttribute("error", "Current password is required to change password.");
+                    return "redirect:/security/profile/edit";
+                }
+                
+                if (!newPassword.equals(confirmPassword)) {
+                    redirectAttributes.addFlashAttribute("error", "New password and confirmation do not match.");
+                    return "redirect:/security/profile/edit";
+                }
+                
+                if (newPassword.length() < 6) {
+                    redirectAttributes.addFlashAttribute("error", "New password must be at least 6 characters long.");
+                    return "redirect:/security/profile/edit";
+                }
+                
+                // Set new password (will be hashed by UserService)
+                currentUser.setPasswordHash(newPassword);
+            }
+            
+            // Save updated user
+            User savedUser = userService.saveUser(currentUser);
+            
+            if (savedUser != null) {
+                redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
+                System.out.println("Profile updated for user: " + currentUser.getEmail());
+            } else {
+                redirectAttributes.addFlashAttribute("error", "Failed to update profile. Please try again.");
+            }
+            
+            return "redirect:/security/profile";
+            
+        } catch (Exception e) {
+            System.err.println("Error updating profile: " + e.getMessage());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "An error occurred while updating profile: " + e.getMessage());
+            return "redirect:/security/profile/edit";
         }
     }
 }

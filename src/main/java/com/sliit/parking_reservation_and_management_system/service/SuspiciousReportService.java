@@ -21,19 +21,9 @@ public class SuspiciousReportService {
         return suspiciousReportRepository.save(report);
     }
 
-    // Save a suspicious report with User validation
+    // Save a suspicious report (validation handled by controller)
     public SuspiciousReport saveReport(SuspiciousReport report) {
-        // Validate that the SecurityOfficerID exists in User table
-        if (report.getSecurityOfficerID() != null) {
-            validateSecurityOfficerExists(report.getSecurityOfficerID());
-        }
         return suspiciousReportRepository.save(report);
-    }
-    
-    // Validate that a User ID exists in the database
-    private void validateSecurityOfficerExists(Long securityOfficerID) {
-        // This will be injected - we need UserService
-        // For now, we'll add validation in the controller
     }
 
     // Get all reports by security officer
@@ -70,6 +60,29 @@ public class SuspiciousReportService {
             return suspiciousReportRepository.save(report);
         }
         return null;
+    }
+
+    // Update entire report
+    public SuspiciousReport updateReport(Long reportId, SuspiciousReport updatedReport) {
+        Optional<SuspiciousReport> existingReportOpt = suspiciousReportRepository.findById(reportId);
+        if (existingReportOpt.isPresent()) {
+            SuspiciousReport existingReport = existingReportOpt.get();
+            
+            // Update fields (preserve ID and timestamps)
+            existingReport.setDescription(updatedReport.getDescription());
+            existingReport.setDate(updatedReport.getDate());
+            existingReport.setStatus(updatedReport.getStatus());
+            // SecurityOfficerID should not be changed after creation
+            
+            return suspiciousReportRepository.save(existingReport);
+        }
+        return null;
+    }
+
+    // Check if report belongs to security officer (for authorization)
+    public boolean isReportOwnedByOfficer(Long reportId, Long securityOfficerID) {
+        Optional<SuspiciousReport> reportOpt = suspiciousReportRepository.findById(reportId);
+        return reportOpt.isPresent() && reportOpt.get().getSecurityOfficerID().equals(securityOfficerID);
     }
 
     // Delete report

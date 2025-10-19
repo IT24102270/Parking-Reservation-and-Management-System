@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Management Dashboard - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
+    <style>
+        :root {
+            --primary-blue: #3498db;
+            --dark-blue: #2980b9;
+            --darker-blue: #21618c;
+            --navy-blue: #1a2332;
+            --slate-blue: #2c3e50;
+            --medium-blue: #34495e;
+            --gray-blue: #7f8c8d;
+            --light-gray: #d4d8dd;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --available-color: #27ae60;
+            --occupied-color: #e74c3c;
+            --maintenance-color: #f39c12;
+            --shadow-light: 0 4px 12px rgba(52, 152, 219, 0.1);
+            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--navy-blue) 0%, var(--slate-blue) 25%, var(--medium-blue) 50%, var(--gray-blue) 75%, var(--light-gray) 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-medium);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: var(--danger-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--dark-gray);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-available { color: var(--available-color); }
+        .stat-occupied { color: var(--occupied-color); }
+        .stat-maintenance { color: var(--maintenance-color); }
+        .stat-total { color: var(--primary-blue); }
+
+        /* Filters and Controls */
+        .controls-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-input, .form-select {
+            padding: 12px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Bulk Operations */
+        .bulk-operations {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .bulk-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .bulk-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .bulk-section {
+            padding: 20px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 8px;
+        }
+
+        .bulk-section h4 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        /* Slots Grid */
+        .slots-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .slots-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .slot-card {
+            background: white;
+            border: 2px solid var(--medium-gray);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .slot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .slot-card.selected {
+            border-color: var(--primary-blue);
+            background: #f8f9ff;
+        }
+
+        .slot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .slot-number {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .slot-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-occupied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-maintenance {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .slot-details {
+            margin-bottom: 15px;
+        }
+
+        .slot-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .slot-detail-label {
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        .slot-detail-value {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .slot-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .slot-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bulk-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .slots-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <div class="logo-icon">CPS</div>
+            <span>City Park Solutions Pvt Ltd</span>
+        </div>
+        <div class="user-profile">
+            <span>Parking Manager</span>
+            <a th:href="@{/logout}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Parking Slot Management Dashboard</h1>
+        <a th:href="@{/slotmanager/updateslot}" class="btn btn-primary">
+            ➕ Add New Slot
+        </a>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div th:if="${successMessage}" class="alert alert-success">
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-error">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number stat-total" th:text="${totalSlots}">0</div>
+            <div class="stat-label">Total Slots</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number stat-available" th:text="${availableSlots}">0</div>
+            <div class="stat-label">Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number stat-occupied" th:text="${occupiedSlots}">0</div>
+            <div class="stat-label">Occupied</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number stat-maintenance" th:text="${maintenanceSlots}">0</div>
+            <div class="stat-label">Maintenance</div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="controls-section">
+        <form th:action="@{/slotmanager/dashboard}" method="get">
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label class="form-label">Location Filter</label>
+                    <select name="location" class="form-select" th:value="${currentLocation}">
+                        <option th:each="location : ${locationOptions}" 
+                                th:value="${location}" 
+                                th:text="${location}"
+                                th:selected="${location == currentLocation}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status Filter</label>
+                    <select name="status" class="form-select" th:value="${currentStatus}">
+                        <option th:each="status : ${statusOptions}" 
+                                th:value="${status}" 
+                                th:text="${status}"
+                                th:selected="${status == currentStatus}"></option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-input" 
+                           placeholder="Search by ID or type..." th:value="${searchTerm}">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">🔍 Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bulk Operations -->
+    <div class="bulk-operations">
+        <h3 class="bulk-header">Bulk Operations</h3>
+        <div class="bulk-controls">
+            <!-- Bulk Status Update -->
+            <div class="bulk-section">
+                <h4>Update Status</h4>
+                <form th:action="@{/slotmanager/bulk-update-status}" method="post" id="bulkStatusForm">
+                    <div class="form-group">
+                        <select name="newStatus" class="form-select" required>
+                            <option value="AVAILABLE">Available</option>
+                            <option value="OCCUPIED">Occupied</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-sm">Update Selected</button>
+                </form>
+            </div>
+
+            <!-- Bulk Add Slots -->
+            <div class="bulk-section">
+                <h4>Add Multiple Slots</h4>
+                <form th:action="@{/slotmanager/bulk-add}" method="post">
+                    <div class="form-group">
+                        <select name="location" class="form-select" required>
+                            <option value="TwoWheeler">Two Wheeler</option>
+                            <option value="ThreeWheeler">Three Wheeler</option>
+                            <option value="FourWheeler">Four Wheeler</option>
+                            <option value="HeavyVehicle">Heavy Vehicle</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="type" class="form-input" placeholder="Type (e.g., VIP, Regular)" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="count" class="form-input" placeholder="Count" min="1" max="10" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="hourlyRate" class="form-input" placeholder="Hourly Rate" step="0.01" min="0.01" required>
+                    </div>
+                    <button type="submit" class="btn btn-success btn-sm">Add Slots</button>
+                </form>
+            </div>
+
+            <!-- Bulk Delete -->
+            <div class="bulk-section">
+                <h4>Delete Selected</h4>
+                <form th:action="@{/slotmanager/bulk-delete}" method="post" id="bulkDeleteForm" 
+                      onsubmit="return confirm('Are you sure you want to delete selected slots?')">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete Selected</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slots Grid -->
+    <div class="slots-section">
+        <div class="slots-header">
+            <h3>Parking Slots (<span th:text="${#lists.size(slots)}">0</span> slots)</h3>
+            <div>
+                <button onclick="selectAll()" class="btn btn-primary btn-sm">Select All</button>
+                <button onclick="clearSelection()" class="btn btn-primary btn-sm">Clear Selection</button>
+            </div>
+        </div>
+
+        <div class="slots-grid">
+            <div th:each="slot : ${slots}" class="slot-card">
+                <input type="checkbox" class="slot-checkbox" th:value="${slot.id}" name="slotSelection">
+                
+                <div class="slot-header">
+                    <div class="slot-number">
+                        <span th:text="${slot.location == 'TwoWheeler' ? 'TW-' : 
+                                       slot.location == 'ThreeWheeler' ? 'THW-' : 
+                                       slot.location == 'FourWheeler' ? 'FW-' : 
+                                       slot.location == 'HeavyVehicle' ? 'HV-' : 'S-'}"></span>
+                        <span th:text="${slot.id}"></span>
+                    </div>
+                    <div class="slot-status" th:classappend="'status-' + ${#strings.toLowerCase(slot.status)}" 
+                         th:text="${#strings.capitalize(slot.status)}"></div>
+                </div>
+
+                <div class="slot-details">
+                    <div class="slot-detail">
+                        <span class="slot-detail-label">Location:</span>
+                        <span class="slot-detail-value" th:text="${slot.location}"></span>
+                    </div>
+                    <div class="slot-detail">
+                        <span class="slot-detail-label">Type:</span>
+                        <span class="slot-detail-value" th:text="${slot.type ?: 'Standard'}"></span>
+                    </div>
+                    <div class="slot-detail">
+                        <span class="slot-detail-label">Hourly Rate:</span>
+                        <span class="slot-detail-value">$<span th:text="${#numbers.formatDecimal(slot.hourlyRate, 1, 2)}"></span></span>
+                    </div>
+                </div>
+
+                <div class="slot-actions">
+                    <a th:href="@{/slotmanager/updateslot(id=${slot.id})}" class="btn btn-primary btn-sm">✏️ Edit</a>
+                    
+                    <!-- Quick Status Change -->
+                    <form th:action="@{/slotmanager/quick-status-change}" method="post" style="display: inline;">
+                        <input type="hidden" name="slotId" th:value="${slot.id}">
+                        <select name="newStatus" class="form-select" style="width: auto; padding: 4px 8px; font-size: 12px;" 
+                                onchange="this.form.submit()">
+                            <option value="">Change Status</option>
+                            <option value="AVAILABLE">Available</option>
+                            <option value="OCCUPIED">Occupied</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                        </select>
+                    </form>
+                    
+                    <form th:action="@{/slotmanager/delete-slot}" method="post" style="display: inline;"
+                          onsubmit="return confirm('Are you sure you want to delete this slot?')">
+                        <input type="hidden" name="slotId" th:value="${slot.id}">
+                        <button type="submit" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(slots)}" style="text-align: center; padding: 60px; color: var(--dark-gray);">
+            <h3>No slots found</h3>
+            <p>Try adjusting your filters or add some new slots.</p>
+            <a th:href="@{/slotmanager/updateslot}" class="btn btn-primary" style="margin-top: 20px;">
+                ➕ Add First Slot
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Bulk operations JavaScript
+    function selectAll() {
+        const checkboxes = document.querySelectorAll('input[name="slotSelection"]');
+        checkboxes.forEach(cb => {
+            cb.checked = true;
+            cb.closest('.slot-card').classList.add('selected');
+        });
+    }
+
+    function clearSelection() {
+        const checkboxes = document.querySelectorAll('input[name="slotSelection"]');
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+            cb.closest('.slot-card').classList.remove('selected');
+        });
+    }
+
+    // Handle checkbox selection visual feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('input[name="slotSelection"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                if (this.checked) {
+                    this.closest('.slot-card').classList.add('selected');
+                } else {
+                    this.closest('.slot-card').classList.remove('selected');
+                }
+            });
+        });
+
+        // Bulk operations form handling
+        const bulkStatusForm = document.getElementById('bulkStatusForm');
+        const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+
+        function getSelectedSlotIds() {
+            const selected = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    selected.push(cb.value);
+                }
+            });
+            return selected;
+        }
+
+        bulkStatusForm.addEventListener('submit', function(e) {
+            const selected = getSelectedSlotIds();
+            if (selected.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one slot to update.');
+                return;
+            }
+            
+            // Add selected slot IDs to form
+            selected.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'slotIds';
+                input.value = id;
+                this.appendChild(input);
+            });
+        });
+
+        bulkDeleteForm.addEventListener('submit', function(e) {
+            const selected = getSelectedSlotIds();
+            if (selected.length === 0) {
+                e.preventDefault();
+                alert('Please select at least one slot to delete.');
+                return;
+            }
+            
+            // Add selected slot IDs to form
+            selected.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'slotIds';
+                input.value = id;
+                this.appendChild(input);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

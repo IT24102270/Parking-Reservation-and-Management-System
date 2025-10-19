@@ -22,7 +22,7 @@ public class EmailService {
     @Value("${spring.mail.username:noreply@smartparking.lk}")
     private String fromEmail;
     
-    @Value("${app.name:Smart Parking System}")
+    @Value("${app.name:City Park Solutions Pvt Ltd}")
     private String appName;
     
     // Send simple text email

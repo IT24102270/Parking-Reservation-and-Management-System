@@ -3,32 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parking Management - Four Wheel Slots</title>
+    <title>Slot Manager Dashboard - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-blue: #3498db;
-            --dark-blue: #2980b9;
-            --light-gray: #f5f7fa;
-            --medium-gray: #e0e6ed;
-            --dark-gray: #4a5568;
-            --text-color: #2d3748;
-            --available-color: #2ecc71;
-            --occupied-color: #e74c3c;
-            --maintenance-color: #f39c12;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        body {
+            background: linear-gradient(135deg, #1a2332 0%, #2c3e50 25%, #34495e 50%, #7f8c8d 75%, #d4d8dd 100%);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #2c3e50;
         }
-
-        * {
+        
+        .slot-manager-container {
+            min-height: 100vh;
+        }
+        
+        .slot-header {
+            background: var(--color-surface);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-lg);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .slot-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .slot-logo-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-inverse);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+        }
+        
+        .slot-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin: 0;
+        }
+        
+        .slot-subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin: 0;
+        }
+        
+        .slot-nav {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            margin: 0 var(--spacing-lg) var(--spacing-lg);
+            padding: var(--spacing-md);
+            box-shadow: var(--shadow-base);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            list-style: none;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            gap: var(--spacing-sm);
         }
-
-        body {
-            background-color: var(--light-gray);
-            color: var(--text-color);
-            line-height: 1.6;
+        
+        .nav-tab {
+            flex: 1;
+        }
+        
+        .nav-tab a {
+            display: block;
+            padding: var(--spacing-md) var(--spacing-lg);
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+            text-align: center;
+        }
+        
+        .nav-tab.active a {
+            background: var(--gradient-primary);
+            color: var(--color-text-inverse);
+            box-shadow: var(--shadow-base);
+        }
+        
+        .nav-tab:not(.active) a:hover {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--color-text-primary);
+        }
+        
+        .main-content {
+            padding: 0 var(--spacing-lg) var(--spacing-lg);
+        }
+        
+        .content-header {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-base);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin: 0;
+        }
+        
+        .slots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .slot-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-base);
+            transition: all var(--transition-base);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .slot-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .slot-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .slot-number {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+        
+        .slot-status {
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+        }
+        
+        .status-available {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--color-success);
+        }
+        
+        .status-occupied {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--color-error);
+        }
+        
+        .status-maintenance {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--color-warning);
+        }
+        
+        .slot-details {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .slot-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-sm);
+        }
+        
+        .slot-detail-label {
+            color: var(--color-text-secondary);
+        }
+        
+        .slot-detail-value {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
+        }
+        
+        .alert {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin: 0 var(--spacing-lg) var(--spacing-lg);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .alert-success {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--color-success);
+            border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .slot-header {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-lg);
+            }
+            
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-md);
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .slots-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Header Styles */
@@ -335,70 +543,90 @@
     </style>
 </head>
 <body>
-<!-- Header -->
-<header>
-    <div class="header-container">
-        <div class="logo">
-            <div class="logo-icon">CPS</div>
-            <div class="logo-text">City Park Solutions</div>
-        </div>
-        <div class="user-profile">
-            <span>Parking Manager</span>
-            <a th:href="@{/logout}" class="logout-btn">Logout</a>
-        </div>
-    </div>
-</header>
-
-<!-- Navigation -->
-<nav>
-    <div class="nav-container">
-        <ul class="nav-tabs">
-            <li class="nav-tab" th:classappend="${currentLocation}=='TwoWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='TwoWheeler')}" style="text-decoration:none;color:inherit;display:block">Two Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='ThreeWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='ThreeWheeler')}" style="text-decoration:none;color:inherit;display:block">Three Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='FourWheeler' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='FourWheeler')}" style="text-decoration:none;color:inherit;display:block">Four Wheels</a>
-            </li>
-            <li class="nav-tab" th:classappend="${currentLocation}=='HeavyVehicle' ? ' active'">
-                <a th:href="@{/slotmanager/dashboard(location='HeavyVehicle')}" style="text-decoration:none;color:inherit;display:block">Heavy Vehicles</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<!-- Main Content -->
-<div class="container">
-    <div class="page-header">
-        <h1 class="page-title" th:text="${#strings.replace(currentLocation,'Wheeler',' Wheel')} + ' Parking Slots'"></h1>
-        <a th:href="@{/slotmanager/updateslot(location=${currentLocation})}" class="add-btn">
-            <i>+</i> Add Slot
-        </a>
-    </div>
-
-    <!-- Success Message -->
-    <div th:if="${successMessage}" class="alert alert-success" style="display: block; margin-bottom: 20px;">
-        <span th:text="${successMessage}"></span>
-    </div>
-
-    <div class="slots-grid">
-        <div class="slot-card" th:each="slot : ${slots}">
-            <div class="slot-header">
-                <div class="slot-number">Slot <span th:text="${slot.id}"></span></div>
-                <div class="slot-status" th:classappend="'status-' + ${slot.status}" th:text="${#strings.capitalize(slot.status)}"></div>
-            </div>
-            <div class="slot-details">
-                <div class="slot-detail">
-                    <span class="slot-detail-label">Hourly Rate:</span>
-                    <span class="slot-detail-value" th:text="'$' + ${#numbers.formatDecimal(slot.hourlyRate, 1, 2)}"></span>
+    <div class="slot-manager-container">
+        <!-- Header -->
+        <div class="slot-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="slot-logo">
+                <div class="slot-logo-icon">CPS</div>
+                <div>
+                    <h1 class="slot-title">Slot Manager Dashboard</h1>
+                    <p class="slot-subtitle">City Park Solutions Pvt Ltd</p>
                 </div>
             </div>
-            <a th:href="@{/slotmanager/updateslot(id=${slot.id}, location=${currentLocation})}" class="edit-btn">Edit</a>
+            <div>
+                <a href="/logout" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="slot-nav">
+            <ul class="nav-tabs">
+                <li class="nav-tab" th:classappend="${currentLocation}=='TwoWheeler' ? ' active'">
+                    <a th:href="@{/slotmanager/dashboard(location='TwoWheeler')}">
+                        <i class="fas fa-motorcycle"></i>
+                        Two Wheels
+                    </a>
+                </li>
+                <li class="nav-tab" th:classappend="${currentLocation}=='ThreeWheeler' ? ' active'">
+                    <a th:href="@{/slotmanager/dashboard(location='ThreeWheeler')}">
+                        <i class="fas fa-taxi"></i>
+                        Three Wheels
+                    </a>
+                </li>
+                <li class="nav-tab" th:classappend="${currentLocation}=='FourWheeler' ? ' active'">
+                    <a th:href="@{/slotmanager/dashboard(location='FourWheeler')}">
+                        <i class="fas fa-car"></i>
+                        Four Wheels
+                    </a>
+                </li>
+                <li class="nav-tab" th:classappend="${currentLocation}=='HeavyVehicle' ? ' active'">
+                    <a th:href="@{/slotmanager/dashboard(location='HeavyVehicle')}">
+                        <i class="fas fa-truck"></i>
+                        Heavy Vehicles
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Success Message -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <h2 class="page-title" th:text="${#strings.replace(currentLocation,'Wheeler',' Wheel')} + ' Parking Slots'"></h2>
+                <a th:href="@{/slotmanager/updateslot(location=${currentLocation})}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Add Slot
+                </a>
+            </div>
+
+            <div class="slots-grid">
+                <div class="slot-card" th:each="slot : ${slots}">
+                    <div class="slot-card-header">
+                        <div class="slot-number">Slot <span th:text="${slot.id}"></span></div>
+                        <div class="slot-status" th:classappend="'status-' + ${slot.status}" th:text="${#strings.capitalize(slot.status)}"></div>
+                    </div>
+                    <div class="slot-details">
+                        <div class="slot-detail">
+                            <span class="slot-detail-label">Hourly Rate:</span>
+                            <span class="slot-detail-value" th:text="'$' + ${#numbers.formatDecimal(slot.hourlyRate, 1, 2)}"></span>
+                        </div>
+                    </div>
+                    <a th:href="@{/slotmanager/updateslot(id=${slot.id}, location=${currentLocation})}" class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-md);">
+                        <i class="fas fa-edit"></i>
+                        Edit Slot
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
 </body>
 </html>

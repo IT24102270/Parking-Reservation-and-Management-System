@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback - Parking Management System</title>
+    <title>Feedback - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
     <style>
         * {
             margin: 0;
@@ -13,10 +18,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2332 0%, #2c3e50 25%, #34495e 50%, #7f8c8d 75%, #d4d8dd 100%);
             min-height: 100vh;
-            color: #333;
+            color: #2c3e50;
         }
 
         .container {
@@ -27,12 +32,13 @@
 
         /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 30px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         .header-content {
@@ -44,8 +50,8 @@
         }
 
         .header-title {
-            color: white;
-            font-size: 28px;
+            color: #2c3e50;
+            font-size: 32px;
             font-weight: 700;
         }
 
@@ -70,8 +76,15 @@
         }
 
         .btn-primary {
-            background: #3498db;
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #21618c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
         }
 
         .btn-primary:hover {

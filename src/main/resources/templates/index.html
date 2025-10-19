@@ -1,60 +1,676 @@
+
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Welcome - Parking System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Park Solutions Pvt Ltd - Smart Parking Management</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(to right, #3498db, #2ecc71);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* Homepage specific styles using global design system */
         .hero-section {
-            height: 100vh;
+            min-height: 100vh;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-inverse);
+            margin-bottom: var(--spacing-xl);
+            text-shadow: 0 2px 4px var(--shadow-dark);
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-primary-lightest);
+            margin-bottom: var(--spacing-2xl);
+            font-weight: var(--font-weight-normal);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--spacing-lg);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: var(--color-background);
+            padding: var(--spacing-4xl) 0;
+        }
+
+        .feature-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-xl);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            border: none;
+            box-shadow: var(--shadow-base);
+            transition: all var(--transition-base);
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-2xl);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto var(--spacing-xl);
+            color: var(--color-text-inverse);
+            font-size: var(--font-size-2xl);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--color-primary-dark);
+            color: var(--color-text-inverse);
+            padding: var(--spacing-4xl) 0;
+        }
+
+        .stat-item {
             text-align: center;
+        }
+
+        .stat-number {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-lg);
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: var(--gradient-secondary);
+            color: var(--color-text-inverse);
+            padding: var(--spacing-4xl) 0;
+            text-align: center;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .btn-hero {
+            padding: 0.875rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 160px;
+            justify-content: center;
+        }
+
+        .btn-hero-primary {
+            background: var(--bg-card);
+            color: var(--primary-blue);
+            border: 2px solid transparent;
+        }
+
+        .btn-hero-primary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-hero-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-hero-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Features Section */
+        .features-section {
+            background: var(--bg-light);
+            padding: 5rem 0;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--primary-blue);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--secondary-purple), var(--primary-blue));
+            color: white;
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h5 {
+            margin-bottom: 1rem;
             color: white;
         }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
         }
-        .btn-custom {
-            padding: 10px 20px;
-            font-size: 1.1em;
-            border-radius: 8px;
+
+        .footer-section ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul li a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Success Alert */
+        .alert-success-custom {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-hero {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .cta-title {
+                font-size: 2rem;
+            }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- Success message after registration -->
-<div th:if="${param.success}" class="alert alert-success text-center m-3">
-    Registration successful! Please login.
+<!-- Navigation -->
+<header class="cps-header">
+    <div class="container">
+        <div class="cps-logo">
+            <div class="cps-logo-icon">CPS</div>
+            <span>City Park Solutions Pvt Ltd</span>
+        </div>
+        <nav class="cps-nav">
+            <a href="#features">Features</a>
+            <a href="#about">About</a>
+            <a th:href="@{/login}">Login</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Success Message -->
+<div th:if="${param.success}" class="alert alert-success-custom text-center animate-fade-in-up">
+    <i class="bi bi-check-circle me-2"></i>
+    Registration successful! Please login to access your dashboard.
 </div>
 
 <!-- Hero Section -->
-<div class="hero-section">
-    <div class="card p-5 bg-light text-dark">
-        <h1 class="mb-4">🚗 Parking Reservation & Management System</h1>
-        <p class="mb-4">Please login to access your dashboard or register if you are new.</p>
+<section id="home" class="hero-section">
+    <!-- Floating Elements -->
+    <div class="floating-element">
+        <i class="bi bi-car-front" style="font-size: 4rem; color: white;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="bi bi-geo-alt" style="font-size: 3rem; color: white;"></i>
+    </div>
+    <div class="floating-element">
+        <i class="bi bi-clock" style="font-size: 3.5rem; color: white;"></i>
+    </div>
 
-        <div class="d-flex justify-content-center gap-3">
-            <a th:href="@{/login}" class="btn btn-primary btn-custom">
-                <i class="bi bi-box-arrow-in-right"></i> Login
-            </a>
-            <a th:href="@{/register}" class="btn btn-success btn-custom">
-                <i class="bi bi-person-plus"></i> Register
-            </a>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center hero-content animate-fade-in-up">
+                <h1 class="hero-title">Smart Parking Made Simple</h1>
+                <p class="hero-subtitle">
+                    Reserve, manage, and track parking spaces with our comprehensive parking management system. 
+                    Experience seamless parking solutions for the modern world.
+                </p>
+                <div class="hero-buttons">
+                    <a th:href="@{/login}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login to Dashboard
+                    </a>
+                    <a th:href="@{/register}" class="btn btn-outline btn-lg">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Bootstrap icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<!-- Features Section -->
+<section id="features" class="features-section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-3">Powerful Features</h2>
+                <p class="lead text-muted">Everything you need for efficient parking management</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card feature-card">
+                    <div class="card-body">
+                        <div class="feature-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h3>Smart Reservations</h3>
+                        <p>
+                            Book parking spots in advance with real-time availability checking and automatic conflict prevention.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <h3 class="feature-title">Secure Payments</h3>
+                    <p class="feature-description">
+                        Multiple payment options with automatic billing, refunds, and payment adjustment for booking changes.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h3 class="feature-title">Security Management</h3>
+                    <p class="feature-description">
+                        Comprehensive security features with vehicle verification, QR scanning, and incident reporting.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                    <h3 class="feature-title">Automated Management</h3>
+                    <p class="feature-description">
+                        Automatic slot status updates, reservation lifecycle management, and intelligent conflict resolution.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h3 class="feature-title">Analytics & Reports</h3>
+                    <p class="feature-description">
+                        Detailed analytics, usage reports, and financial insights for better decision making.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="bi bi-phone"></i>
+                    </div>
+                    <h3 class="feature-title">Mobile Friendly</h3>
+                    <p class="feature-description">
+                        Responsive design that works perfectly on all devices - desktop, tablet, and mobile.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">System Availability</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Automated Management</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">5min</span>
+                    <span class="stat-label">Auto Status Updates</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stat-item">
+                    <span class="stat-number">∞</span>
+                    <span class="stat-label">Scalable Slots</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h2 class="cta-title">Ready to Get Started?</h2>
+                <p class="cta-subtitle">
+                    Join thousands of users who trust our parking management system for their daily parking needs.
+                </p>
+                <div class="hero-buttons">
+                    <a th:href="@{/register}" class="btn-hero btn-hero-primary">
+                        <i class="bi bi-person-plus"></i>
+                        Sign Up Now
+                    </a>
+                    <a th:href="@{/public/slot-availability}" class="btn-hero btn-hero-secondary">
+                        <i class="bi bi-eye"></i>
+                        View Live Status
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="cps-footer">
+    <div class="container">
+        <div class="cps-footer-content">
+            <div class="cps-footer-section">
+                <h4>City Park Solutions Pvt Ltd</h4>
+                <p>
+                    Modern parking management solution with automated reservations, 
+                    secure payments, and intelligent slot management.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h5>Quick Links</h5>
+                <ul>
+                    <li><a th:href="@{/login}">Login</a></li>
+                    <li><a th:href="@{/register}">Register</a></li>
+                    <li><a th:href="@{/public/slot-availability}">Live Status</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>System Features</h5>
+                <ul>
+                    <li><a href="#features">Smart Reservations</a></li>
+                    <li><a href="#features">Automated Management</a></li>
+                    <li><a href="#features">Security Features</a></li>
+                    <li><a href="#features">Mobile Support</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>User Roles</h5>
+                <ul>
+                    <li>Customer Dashboard</li>
+                    <li>Slot Manager Portal</li>
+                    <li>Security Officer Panel</li>
+                    <li>Finance Executive Tools</li>
+                </ul>
+            </div>
+        </div>
+        <div class="cps-footer-bottom">
+            <p>&copy; 2024 City Park Solutions Pvt Ltd. All rights reserved. | Built with Spring Boot & Modern Web Technologies</p>
+        </div>
+    </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-in-up');
+            }
+        });
+    }, observerOptions);
+
+    // Observe feature cards
+    document.querySelectorAll('.feature-card').forEach(card => {
+        observer.observe(card);
+    });
+
+    // Auto-hide success message after 5 seconds
+    const successAlert = document.querySelector('.alert-success-custom');
+    if (successAlert) {
+        setTimeout(() => {
+            successAlert.style.opacity = '0';
+            setTimeout(() => {
+                successAlert.remove();
+            }, 300);
+        }, 5000);
+    }
+</script>
 </body>
 </html>

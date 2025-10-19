@@ -31,6 +31,11 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public Optional<User> getUserById(Long id) {
+        if (id == null) return Optional.empty();
+        return userRepository.findById(id.intValue());
+    }
+
     /**
      * Centralized save:
      * - Hash password if not already BCrypt

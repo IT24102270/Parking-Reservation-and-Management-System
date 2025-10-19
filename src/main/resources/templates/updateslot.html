@@ -3,41 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Parking Slot</title>
+    <title>Update Parking Slot - City Park Solutions Pvt Ltd</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #3498db;
             --dark-blue: #2980b9;
-            --light-gray: #f5f7fa;
-            --medium-gray: #e0e6ed;
-            --dark-gray: #4a5568;
-            --text-color: #2d3748;
-            --success-color: #2ecc71;
+            --darker-blue: #21618c;
+            --navy-blue: #1a2332;
+            --slate-blue: #2c3e50;
+            --medium-blue: #34495e;
+            --gray-blue: #7f8c8d;
+            --light-gray: #d4d8dd;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --success-color: #27ae60;
             --warning-color: #f39c12;
             --error-color: #e74c3c;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-light: 0 4px 12px rgba(52, 152, 219, 0.1);
+            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--light-gray);
-            color: var(--text-color);
+            background: linear-gradient(135deg, var(--navy-blue) 0%, var(--slate-blue) 25%, var(--medium-blue) 50%, var(--gray-blue) 75%, var(--light-gray) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
             line-height: 1.6;
         }
 
         /* Header Styles */
         header {
-            background: white;
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-medium);
             position: sticky;
             top: 0;
             z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-container {
@@ -56,16 +68,17 @@
         }
 
         .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-blue);
-            border-radius: 8px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             font-size: 20px;
+            box-shadow: var(--shadow-light);
         }
 
         .logo-text {
@@ -134,10 +147,12 @@
 
         /* Form Styles */
         .form-container {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: var(--shadow-medium);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .form-group {
@@ -172,20 +187,23 @@
         }
 
         .submit-btn {
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 6px;
+            padding: 15px 30px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
             width: 100%;
+            box-shadow: var(--shadow-light);
         }
 
         .submit-btn:hover {
-            background: var(--dark-blue);
+            background: linear-gradient(135deg, var(--dark-blue), var(--darker-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
         }
 
         /* Alert Styles */

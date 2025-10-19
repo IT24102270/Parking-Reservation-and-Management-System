@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Park Solutions - Slot Availability Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .info-section h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li::before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active {
+            background: #28a745;
+        }
+        .status-inactive {
+            background: #dc3545;
+        }
+        .auto-refresh {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚗 City Park Solutions - Automatic Slot Management</h1>
+            <p>Monitor and control the automatic parking slot availability system</p>
+            <div class="auto-refresh">
+                <span class="status-indicator status-active"></span>
+                <strong>Automatic Updates:</strong> Every 5 minutes
+                <button onclick="refreshStats()" class="btn btn-primary" style="margin-left: 15px;">🔄 Refresh Stats</button>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success">
+            <span th:text="${success}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-error">
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid" th:if="${stats}">
+            <div class="stat-card">
+                <div class="stat-number" th:text="${stats.totalSlots}">0</div>
+                <div class="stat-label">Total Slots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${stats.availableSlots}">0</div>
+                <div class="stat-label">Available Slots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${stats.occupiedSlots}">0</div>
+                <div class="stat-label">Occupied Slots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${stats.maintenanceSlots}">0</div>
+                <div class="stat-label">Maintenance Slots</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" th:text="${stats.activeReservations}">0</div>
+                <div class="stat-label">Active Reservations</div>
+            </div>
+        </div>
+
+        <!-- Manual Controls -->
+        <div class="actions">
+            <form th:action="@{/public/force-update-slots}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    🔄 Force Update All Slots
+                </button>
+            </form>
+            
+            <form th:action="@{/public/trigger-scheduled-update}" method="post" style="margin: 0;">
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    ⏰ Trigger Scheduled Update
+                </button>
+            </form>
+            
+            <a href="/slotmanager/dashboard" class="btn btn-warning">
+                🏢 Slot Manager Dashboard
+            </a>
+        </div>
+
+        <!-- Information Section -->
+        <div class="info-section">
+            <h3>🤖 How Automatic Slot Management Works</h3>
+            <ul class="feature-list">
+                <li><strong>Real-time Availability Checking:</strong> Prevents double-booking by checking overlapping reservations</li>
+                <li><strong>Automatic Status Updates:</strong> Slots become OCCUPIED when reservations start</li>
+                <li><strong>Automatic Slot Release:</strong> Slots become AVAILABLE when reservations end</li>
+                <li><strong>Scheduled Processing:</strong> System runs every 5 minutes to update statuses</li>
+                <li><strong>Immediate Activation:</strong> Bookings starting within 2 minutes are activated immediately</li>
+                <li><strong>Smart Conflict Resolution:</strong> Handles overlapping reservations intelligently</li>
+                <li><strong>Maintenance Mode Support:</strong> Respects manual maintenance status</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>📋 Reservation Status Flow</h3>
+            <ul class="feature-list">
+                <li><strong>PENDING:</strong> Reservation created, waiting for payment</li>
+                <li><strong>CONFIRMED:</strong> Payment completed, reservation confirmed</li>
+                <li><strong>ACTIVE:</strong> Reservation time started, slot is occupied</li>
+                <li><strong>COMPLETED:</strong> Reservation time ended, slot is available</li>
+                <li><strong>CANCELLED:</strong> Reservation cancelled by user</li>
+            </ul>
+        </div>
+
+        <div class="info-section">
+            <h3>🔧 Testing & Debugging</h3>
+            <p><strong>Manual Controls:</strong></p>
+            <ul class="feature-list">
+                <li><strong>Force Update All Slots:</strong> Immediately recalculates all slot statuses</li>
+                <li><strong>Trigger Scheduled Update:</strong> Runs the 5-minute scheduled task manually</li>
+                <li><strong>Refresh Stats:</strong> Updates the statistics display</li>
+            </ul>
+            
+            <p style="margin-top: 15px;"><strong>API Endpoints:</strong></p>
+            <ul class="feature-list">
+                <li><strong>GET /public/slot-stats:</strong> Returns current statistics as JSON</li>
+                <li><strong>POST /public/force-update-slots:</strong> Forces immediate slot update</li>
+                <li><strong>POST /public/trigger-scheduled-update:</strong> Triggers scheduled update</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh stats every 30 seconds
+        setInterval(refreshStats, 30000);
+        
+        function refreshStats() {
+            fetch('/public/slot-stats')
+                .then(response => response.json())
+                .then(data => {
+                    // Update stat numbers
+                    const statNumbers = document.querySelectorAll('.stat-number');
+                    if (statNumbers.length >= 5) {
+                        statNumbers[0].textContent = data.totalSlots;
+                        statNumbers[1].textContent = data.availableSlots;
+                        statNumbers[2].textContent = data.occupiedSlots;
+                        statNumbers[3].textContent = data.maintenanceSlots;
+                        statNumbers[4].textContent = data.activeReservations;
+                    }
+                    
+                    console.log('Stats refreshed:', data);
+                })
+                .catch(error => {
+                    console.error('Error refreshing stats:', error);
+                });
+        }
+        
+        // Show loading state for buttons
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const button = this.querySelector('button[type="submit"]');
+                button.disabled = true;
+                button.textContent = '⏳ Processing...';
+            });
+        });
+    </script>
+</body>
+</html>

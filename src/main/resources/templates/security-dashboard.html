@@ -3,65 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking - Security Officer Dashboard</title>
+    <title>City Park Solutions Pvt Ltd - Security Officer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
     <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">SP</div>
-                <div class="logo-text">Smart Parking</div>
-                <span class="logo-subtitle">Security Portal</span>
-            </div>
-            
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="/security/dashboard" class="active">Dashboard</a></li>
-                    <li><a href="/security/reports">Reports</a></li>
-                    <li><a href="/security/verify">Verify Vehicles</a></li>
-                    <li><a href="/security/scanner">QR Scanner</a></li>
-                </ul>
-            </nav>
-            
-            <div class="user-profile">
-                <div class="profile-dropdown" id="profileToggle">
+        <header class="cps-header">
+            <div class="container">
+                <div class="cps-logo">
+                    <div class="cps-logo-icon">CPS</div>
+                    <span>City Park Solutions Pvt Ltd</span>
+                    <small style="display: block; font-size: var(--font-size-xs); opacity: 0.8;">Security Portal</small>
+                </div>
+                
+                <nav class="cps-nav">
+                    <a href="/security/dashboard" class="active">Dashboard</a>
+                    <a href="/security/reports">Reports</a>
+                    <a href="/security/verify">Verify Vehicles</a>
+                    <a href="/security/scanner">QR Scanner</a>
+                </nav>
+                
+                <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle" title="Click to open profile menu">
                     <div class="profile-info">
                         <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
                         <span class="profile-role">Security Officer</span>
                     </div>
-                    <i class="fas fa-chevron-down"></i>
+                    <i class="fas fa-chevron-down" id="chevronIcon"></i>
                     
                     <!-- Profile Dropdown -->
-                    <div class="profile-dropdown-menu" id="profileDropdown">
+                    <div class="profile-dropdown-menu" id="profileDropdown" style="display: none;">
                         <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
-                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="confirmLogout()" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content container">
             <!-- Welcome Section -->
-            <section class="welcome-section">
-                <div class="welcome-content">
-                    <h1>Welcome back, <span th:text="${user.firstName}">Security Officer</span>!</h1>
-                    <p>Monitor parking activities, verify vehicles, and maintain security protocols.</p>
-                    <div class="current-time" id="currentTime"></div>
+            <section class="card welcome-section">
+                <div class="card-body">
+                    <div class="welcome-content">
+                        <h1>Welcome back, <span th:text="${user.firstName}">Security Officer</span>!</h1>
+                        <p>Monitor parking activities, verify vehicles, and maintain security protocols.</p>
+                        <div class="current-time" id="currentTime"></div>
+                    </div>
+                    <div class="welcome-actions">
+                        <a href="/security/report/new" class="btn btn-primary">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Report Incident
+                        </a>
+                        <a href="/security/scanner" class="btn btn-secondary">
+                            <i class="fas fa-qrcode"></i>
+                            QR Scanner
+                        </a>
+                    </div>
                 </div>
-                <div class="welcome-actions">
-                    <a href="/security/report/new" class="btn btn-primary">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Report Incident
+            </section>
+
+            <!-- Quick Navigation -->
+            <section class="navigation-section">
+                <div class="nav-title text-center">
+                    <h2><i class="fas fa-compass"></i> Quick Navigation</h2>
+                    <p class="text-secondary">Access all security officer functions</p>
+                </div>
+                <div class="nav-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-xl);">
+                    <a href="/security/dashboard" class="card nav-card" style="text-decoration: none; border: 2px solid var(--color-interactive-primary);">
+                        <div class="card-body text-center">
+                            <div class="nav-icon" style="width: 60px; height: 60px; background: var(--gradient-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md); color: var(--color-text-inverse); font-size: var(--font-size-xl);">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="nav-content">
+                                <h3>Dashboard</h3>
+                                <p class="text-muted">Overview & Statistics</p>
+                            </div>
+                        </div>
                     </a>
-                    <a href="/security/scanner" class="btn btn-secondary">
-                        <i class="fas fa-qrcode"></i>
-                        QR Scanner
+                    <a href="/security/reports" class="nav-card">
+                        <div class="nav-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="nav-content">
+                            <h3>All Reports</h3>
+                            <p>View & Manage Reports</p>
+                        </div>
+                    </a>
+                    <a href="/security/report/new" class="nav-card">
+                        <div class="nav-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="nav-content">
+                            <h3>New Report</h3>
+                            <p>Create Incident Report</p>
+                        </div>
+                    </a>
+                    <a href="/security/verify" class="nav-card">
+                        <div class="nav-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="nav-content">
+                            <h3>Verify Vehicles</h3>
+                            <p>Check Reservations</p>
+                        </div>
+                    </a>
+                    <a href="/security/scanner" class="nav-card">
+                        <div class="nav-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="nav-content">
+                            <h3>QR Scanner</h3>
+                            <p>Scan Entry/Exit</p>
+                        </div>
                     </a>
                 </div>
             </section>
@@ -111,64 +175,6 @@
                 </div>
             </section>
 
-            <!-- Quick Actions -->
-            <section class="actions-section">
-                <h2>Quick Actions</h2>
-                <div class="actions-grid">
-                    <div class="action-card" onclick="location.href='/security/report/new'">
-                        <div class="action-icon">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        <div class="action-content">
-                            <h3>Create Report</h3>
-                            <p>Report suspicious activity or unauthorized vehicles</p>
-                        </div>
-                        <div class="action-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="action-card" onclick="location.href='/security/verify'">
-                        <div class="action-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <div class="action-content">
-                            <h3>Verify Vehicles</h3>
-                            <p>Check vehicle details and booking information</p>
-                        </div>
-                        <div class="action-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="action-card" onclick="location.href='/security/scanner'">
-                        <div class="action-icon">
-                            <i class="fas fa-qrcode"></i>
-                        </div>
-                        <div class="action-content">
-                            <h3>QR Scanner</h3>
-                            <p>Scan QR codes at entry and exit gates</p>
-                        </div>
-                        <div class="action-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                    
-                    <div class="action-card" onclick="location.href='/security/reports'">
-                        <div class="action-icon">
-                            <i class="fas fa-list-alt"></i>
-                        </div>
-                        <div class="action-content">
-                            <h3>View Reports</h3>
-                            <p>Review all submitted suspicious reports</p>
-                        </div>
-                        <div class="action-arrow">
-                            <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <!-- Recent Activity -->
             <section class="activity-section">
                 <div class="section-header">
@@ -186,9 +192,7 @@
                         <div th:each="report : ${recentReportsList}" class="activity-item">
                             <div class="activity-icon">
                                 <i class="fas fa-exclamation-triangle" 
-                                   th:classappend="${report.status.equals('PENDING')} ? 'text-warning' : 
-                                                  ${report.status.equals('RESOLVED')} ? 'text-success' : 
-                                                  ${report.status.equals('INVESTIGATING')} ? 'text-info' : 'text-danger'"></i>
+                                   th:class="'fas fa-exclamation-triangle ' + ${report.status.equals('PENDING') ? 'text-warning' : (report.status.equals('RESOLVED') ? 'text-success' : (report.status.equals('INVESTIGATING') ? 'text-info' : 'text-danger'))}"></i>
                             </div>
                             <div class="activity-content">
                                 <h4 th:text="'Report #' + ${report.suspiciousID}">Report #1</h4>
@@ -197,9 +201,7 @@
                                     <span class="activity-time" th:text="${#temporals.format(report.date, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
                                     <span class="activity-status" 
                                           th:text="${report.status}"
-                                          th:classappend="${report.status.equals('PENDING')} ? 'status-pending' : 
-                                                         ${report.status.equals('RESOLVED')} ? 'status-resolved' : 
-                                                         ${report.status.equals('INVESTIGATING')} ? 'status-investigating' : 'status-closed'">PENDING</span>
+                                          th:class="'activity-status ' + ${report.status.equals('PENDING') ? 'status-pending' : (report.status.equals('RESOLVED') ? 'status-resolved' : (report.status.equals('INVESTIGATING') ? 'status-investigating' : 'status-closed'))}">PENDING</span>
                                 </div>
                             </div>
                             <div class="activity-action">
@@ -249,7 +251,103 @@
         </main>
     </div>
 
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Confirm Logout</h3>
+                <span class="modal-close" onclick="closeLogoutModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the security officer portal?</p>
+                <p class="logout-warning">You will need to login again to access the system.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeLogoutModal()" class="btn btn-secondary">Cancel</button>
+                <form action="/logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        // Enhanced profile dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileToggle = document.getElementById('profileToggle');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const chevronIcon = document.getElementById('chevronIcon');
+            
+            console.log('Setting up profile dropdown...');
+            
+            if (profileToggle && profileDropdown) {
+                console.log('Profile dropdown elements found');
+                
+                // Toggle dropdown on click
+                profileToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isVisible = profileDropdown.classList.contains('show') || 
+                                    profileDropdown.style.display === 'block';
+                    
+                    if (isVisible) {
+                        // Hide dropdown
+                        profileDropdown.classList.remove('show');
+                        profileDropdown.style.display = 'none';
+                        profileToggle.classList.remove('active');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                        console.log('Dropdown hidden');
+                    } else {
+                        // Show dropdown
+                        profileDropdown.classList.add('show');
+                        profileDropdown.style.display = 'block';
+                        profileToggle.classList.add('active');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(180deg)';
+                        console.log('Dropdown shown');
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                        profileDropdown.classList.remove('show');
+                        profileDropdown.style.display = 'none';
+                        profileToggle.classList.remove('active');
+                        if (chevronIcon) chevronIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+                
+                // Prevent dropdown from closing when clicking inside it
+                profileDropdown.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+            } else {
+                console.error('Profile dropdown elements not found!');
+            }
+        });
+        
+        function confirmLogout() {
+            console.log('Logout confirmation triggered');
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+        
+        function closeLogoutModal() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('logoutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

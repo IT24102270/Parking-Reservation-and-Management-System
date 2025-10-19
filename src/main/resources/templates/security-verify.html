@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Parking - Vehicle Verification</title>
+    <title>City Park Solutions Pvt Ltd - Vehicle Verification</title>
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
     <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- Font Awesome for icons -->
@@ -12,21 +13,20 @@
 <body>
     <div class="dashboard-container">
         <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <div class="logo-icon">SP</div>
-                <div class="logo-text">Smart Parking</div>
-                <span class="logo-subtitle">Security Portal</span>
-            </div>
-            
-            <nav>
-                <ul class="nav-menu">
-                    <li><a href="/security/dashboard">Dashboard</a></li>
-                    <li><a href="/security/reports">Reports</a></li>
-                    <li><a href="/security/verify" class="active">Verify Vehicles</a></li>
-                    <li><a href="/security/scanner">QR Scanner</a></li>
-                </ul>
-            </nav>
+        <header class="cps-header">
+            <div class="container">
+                <div class="cps-logo">
+                    <div class="cps-logo-icon">CPS</div>
+                    <span>City Park Solutions Pvt Ltd</span>
+                    <small style="display: block; font-size: var(--font-size-xs); opacity: 0.8;">Security Portal</small>
+                </div>
+                
+                <nav class="cps-nav">
+                    <a href="/security/dashboard">Dashboard</a>
+                    <a href="/security/reports">Reports</a>
+                    <a href="/security/verify" class="active">Verify Vehicles</a>
+                    <a href="/security/scanner">QR Scanner</a>
+                </nav>
             
             <div class="user-profile">
                 <div class="profile-dropdown" id="profileToggle">
@@ -39,7 +39,10 @@
                     <!-- Profile Dropdown -->
                     <div class="profile-dropdown-menu" id="profileDropdown">
                         <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
-                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="confirmLogout()" class="logout-link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
@@ -56,6 +59,30 @@
                 <div class="page-actions">
                     <a href="/security/report/new" class="btn btn-primary">
                         <i class="fas fa-exclamation-triangle"></i> Report Issue
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigation Breadcrumb -->
+            <div class="breadcrumb-nav">
+                <nav class="breadcrumb">
+                    <a href="/security/dashboard" class="breadcrumb-item">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                    <span class="breadcrumb-separator">></span>
+                    <span class="breadcrumb-item active">
+                        <i class="fas fa-car"></i> Vehicle Verification
+                    </span>
+                </nav>
+                <div class="nav-actions">
+                    <a href="/security/dashboard" class="nav-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="/security/scanner" class="nav-btn">
+                        <i class="fas fa-qrcode"></i> QR Scanner
+                    </a>
+                    <a href="/security/reports" class="nav-btn">
+                        <i class="fas fa-file-alt"></i> Reports
                     </a>
                 </div>
             </div>
@@ -190,6 +217,28 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Confirm Logout</h3>
+                <span class="modal-close" onclick="closeLogoutModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the security officer portal?</p>
+                <p class="logout-warning">You will need to login again to access the system.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeLogoutModal()" class="btn btn-secondary">Cancel</button>
+                <form action="/logout" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript -->

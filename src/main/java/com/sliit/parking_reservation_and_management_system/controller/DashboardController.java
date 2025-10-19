@@ -161,7 +161,7 @@ public class DashboardController {
                     notificationService.createNotification(
                         currentUser.getUserID(), 
                         "INFO", 
-                        "Welcome to the Parking Management System! Your dashboard is ready to use."
+                        "Welcome to City Park Solutions Pvt Ltd! Your dashboard is ready to use."
                     );
                 }
                 

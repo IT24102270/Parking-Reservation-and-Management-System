@@ -8,6 +8,7 @@ import com.sliit.parking_reservation_and_management_system.service.NotificationS
 import com.sliit.parking_reservation_and_management_system.service.PaymentService;
 import com.sliit.parking_reservation_and_management_system.service.ParkingSlotService;
 import com.sliit.parking_reservation_and_management_system.service.ReservationService;
+import com.sliit.parking_reservation_and_management_system.service.SlotAvailabilityService;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
 import com.parking.observer.booking.NotificationManager;
 import com.parking.observer.booking.EmailNotifier;
@@ -44,6 +45,9 @@ public class BookingController {
     
     @Autowired
     private NotificationService notificationService;
+    
+    @Autowired
+    private SlotAvailabilityService slotAvailabilityService;
     
     /**
      * Observer Pattern Implementation for Booking Notifications
@@ -191,8 +195,8 @@ public class BookingController {
                 return "redirect:/customer/booking/new";
             }
             
-            // Check if slot is available
-            if (!reservationService.isSlotAvailable(slotId, startTime, endTime)) {
+            // Check if slot is available using the new SlotAvailabilityService
+            if (!slotAvailabilityService.isSlotAvailable(slotId, startTime, endTime)) {
                 redirectAttributes.addFlashAttribute("error", "Selected slot is not available for the chosen time period");
                 return "redirect:/customer/booking/new";
             }
