@@ -12,7 +12,8 @@ public class Payment {
     @Column(name = "PaymentID")
     private Integer paymentID;
 
-    @OneToOne
+    // ✅ THIS IS THE KEY CHANGE
+    @OneToOne(fetch = FetchType.EAGER) // Change from LAZY (default) to EAGER
     @JoinColumn(name = "ReservationID", nullable = false)
     private Reservation reservation;
 
@@ -20,21 +21,19 @@ public class Payment {
     private BigDecimal amount;
 
     @Column(name = "Status", nullable = false)
-    private String status; // e.g., COMPLETED, PENDING, FAILED, REFUNDED
+    private String status;
 
     @Column(name = "PaymentDate", nullable = false)
     private LocalDateTime paymentDate;
 
-    // 🆕 START: Add new fields for refunds
     @Column(name = "RefundStatus")
-    private String refundStatus; // e.g., NONE, PROCESSED
+    private String refundStatus;
 
     @Column(name = "RefundDate")
     private LocalDateTime refundDate;
-    // 🆕 END: Add new fields for refunds
 
+    // --- Getters and Setters ---
 
-    // Getters and Setters for all fields
     public Integer getPaymentID() {
         return paymentID;
     }
@@ -75,7 +74,6 @@ public class Payment {
         this.paymentDate = paymentDate;
     }
 
-    // 🆕 START: Add getters and setters for new fields
     public String getRefundStatus() {
         return refundStatus;
     }
@@ -91,5 +89,4 @@ public class Payment {
     public void setRefundDate(LocalDateTime refundDate) {
         this.refundDate = refundDate;
     }
-    // 🆕 END: Add getters and setters for new fields
 }

@@ -1,7 +1,8 @@
 package com.sliit.parking_reservation_and_management_system.controller;
 
+import com.sliit.parking_reservation_and_management_system.dto.ReportDetailsDTO;
 import com.sliit.parking_reservation_and_management_system.entity.Pricing;
-import com.sliit.parking_reservation_and_management_system.service.PaymentService; // 👈 1. Import PaymentService
+import com.sliit.parking_reservation_and_management_system.service.PaymentService;
 import com.sliit.parking_reservation_and_management_system.service.PricingService;
 import com.sliit.parking_reservation_and_management_system.service.ReportService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,9 +20,8 @@ public class FinanceController {
 
     private final ReportService reportService;
     private final PricingService pricingService;
-    private final PaymentService paymentService; // 👈 2. Inject PaymentService
+    private final PaymentService paymentService;
 
-    // 3. Update constructor
     public FinanceController(ReportService reportService, PricingService pricingService, PaymentService paymentService) {
         this.reportService = reportService;
         this.pricingService = pricingService;
@@ -33,13 +33,49 @@ public class FinanceController {
         model.addAttribute("reports", reportService.findAllReports());
         model.addAttribute("pricingRules", pricingService.getAllPricingRules());
         model.addAttribute("newPricingRule", new Pricing());
-        model.addAttribute("payments", paymentService.getAllPayments()); // 👈 4. Add payments to the model
+        model.addAttribute("payments", paymentService.getAllPayments());
         return "finance-dashboard";
     }
 
-    // ... (your existing generate-report and pricing methods remain the same)
+    @PostMapping("/generate-report")
+    public String generateReport(@RequestParam String reportType,
+                                 @RequestParam LocalDate startDate,
+                                 @RequestParam LocalDate endDate,
+                                 @AuthenticationPrincipal UserDetails userDetails,
+                                 RedirectAttributes redirectAttributes) {
+        if (startDate.isAfter(endDate)) {
+            redirectAttributes.addFlashAttribute("error", "Start date cannot be after end date.");
+            return "redirect:/finance/dashboard";
+        }
+        String userEmail = userDetails.getUsername();
+        if ("FINANCIAL".equals(reportType)) {
+            reportService.generateFinancialReport(startDate, endDate, userEmail);
+        } else if ("STATISTIC".equals(reportType)) {
+            reportService.generateStatisticReport(startDate, endDate, userEmail);
+        }
+        redirectAttributes.addFlashAttribute("success", "Report generated successfully!");
+        return "redirect:/finance/dashboard";
+    }
 
-    // 🆕 START: Add this new method for processing refunds
+    // ✅ ADD THIS NEW METHOD FOR THE DETAILS PAGE
+    @GetMapping("/report/{id}")
+    public String getReportDetails(@PathVariable("id") Integer id, Model model) {
+        ReportDetailsDTO reportDetails = reportService.getReportDetailsById(id);
+        model.addAttribute("reportDetails", reportDetails);
+        return "report-details";
+    }
+
+    @PostMapping("/pricing/add")
+    public String addPricingRule(@ModelAttribute("newPricingRule") Pricing newPricingRule, RedirectAttributes redirectAttributes) {
+        if (newPricingRule.getStartTime().isAfter(newPricingRule.getEndTime())) {
+            redirectAttributes.addFlashAttribute("pricingError", "Start time must be before end time.");
+            return "redirect:/finance/dashboard";
+        }
+        pricingService.savePricingRule(newPricingRule);
+        redirectAttributes.addFlashAttribute("pricingSuccess", "New pricing rule added successfully!");
+        return "redirect:/finance/dashboard";
+    }
+
     @PostMapping("/payments/refund/{id}")
     public String refundPayment(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
@@ -50,5 +86,4 @@ public class FinanceController {
         }
         return "redirect:/finance/dashboard";
     }
-    // 🆕 END: Add this new method
 }

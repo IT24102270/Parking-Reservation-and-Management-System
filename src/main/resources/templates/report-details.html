@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Details - Parking System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .card { border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5" th:if="${reportDetails != null}">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary">Report Details</h1>
+        <a th:href="@{/finance/dashboard}" class="btn btn-outline-secondary">⬅ Back to Dashboard</a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Summary</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4"><strong>Report ID:</strong> <span th:text="${reportDetails.report.reportID}"></span></div>
+                <div class="col-md-4"><strong>Type:</strong> <span th:text="${reportDetails.report.reportType}"></span></div>
+                <div class="col-md-4"><strong>Date Range:</strong> <span th:text="${#temporals.format(reportDetails.report.startDate, 'MMM dd, yyyy')} + ' - ' + ${#temporals.format(reportDetails.report.endDate, 'MMM dd, yyyy')}"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4" th:if="${reportDetails.report.reportType == 'FINANCIAL'}">
+        <div class="card-header">
+            <h4>Financial Metrics</h4>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col">
+                    <div class="stat-box p-3 border rounded">
+                        <h5 class="text-muted">Total Revenue</h5>
+                        <h2 class="text-success" th:text="'$' + ${#numbers.formatDecimal(reportDetails.report.totalRevenue, 1, 'COMMA', 2, 'POINT')}"></h2>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="stat-box p-3 border rounded">
+                        <h5 class="text-muted">Total Reservations</h5>
+                        <h2 class="text-info" th:text="${reportDetails.report.totalReservations}"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Transaction Breakdown</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead class="table-light">
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Transaction Date</th>
+                    <th>Associated User</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(reportDetails.transactions)}">
+                    <td colspan="5" class="text-center text-muted">No transactions found for this period.</td>
+                </tr>
+                <tr th:each="tx : ${reportDetails.transactions}">
+                    <td th:text="${tx.paymentID}"></td>
+                    <td th:text="${#temporals.format(tx.paymentDate, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${tx.reservation?.user?.email ?: 'N/A'}"></td>
+                    <td><span class="badge bg-success" th:text="${tx.status}"></span></td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(tx.amount, 1, 'COMMA', 2, 'POINT')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

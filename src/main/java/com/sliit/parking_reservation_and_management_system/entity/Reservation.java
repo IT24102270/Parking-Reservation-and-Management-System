@@ -12,7 +12,8 @@ public class Reservation {
     @Column(name = "ReservationID")
     private Integer reservationID;
 
-    @ManyToOne
+    // ✅ THIS IS THE KEY CHANGE
+    @ManyToOne(fetch = FetchType.EAGER) // Change from LAZY (default) to EAGER
     @JoinColumn(name = "UserID", nullable = false)
     private User user;
 
@@ -22,5 +23,37 @@ public class Reservation {
     @Column(name = "ReservationDate", nullable = false)
     private LocalDateTime reservationDate;
 
-    // Getters and Setters
+    // --- Getters and Setters ---
+
+    public Integer getReservationID() {
+        return reservationID;
+    }
+
+    public void setReservationID(Integer reservationID) {
+        this.reservationID = reservationID;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public BigDecimal getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(BigDecimal totalCost) {
+        this.totalCost = totalCost;
+    }
+
+    public LocalDateTime getReservationDate() {
+        return reservationDate;
+    }
+
+    public void setReservationDate(LocalDateTime reservationDate) {
+        this.reservationDate = reservationDate;
+    }
 }

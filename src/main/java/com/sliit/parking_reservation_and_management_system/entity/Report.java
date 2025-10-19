@@ -88,7 +88,7 @@ public class Report {
         return generatedBy;
     }
 
-    // ✅ THIS IS THE MISSING METHOD
+    // ✅ THIS IS THE MISSING METHOD THAT FIXES THE ERROR
     public void setGeneratedBy(Integer generatedBy) {
         this.generatedBy = generatedBy;
     }
