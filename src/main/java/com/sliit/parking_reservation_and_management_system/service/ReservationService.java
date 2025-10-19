@@ -65,6 +65,35 @@ public class ReservationService {
         return reservationRepository.findActiveBySlotId(slotId, LocalDateTime.now());
     }
     
+    public List<Reservation> getActiveReservations() {
+        return reservationRepository.findActiveReservations(LocalDateTime.now());
+    }
+    
+    // Enhanced methods for security officer
+    public List<Reservation> getCurrentActiveReservations() {
+        return reservationRepository.findCurrentActiveReservations(LocalDateTime.now());
+    }
+    
+    public List<Reservation> getActiveReservationsByVehicleNumber(String vehicleNumber) {
+        return reservationRepository.findActiveReservationsByVehicleNumber(vehicleNumber, LocalDateTime.now());
+    }
+    
+    public Long countActiveReservations() {
+        return reservationRepository.countActiveReservations(LocalDateTime.now());
+    }
+    
+    // Method to verify if a vehicle is authorized to be in the parking
+    public boolean isVehicleAuthorized(String vehicleNumber) {
+        List<Reservation> activeReservations = getActiveReservationsByVehicleNumber(vehicleNumber);
+        return !activeReservations.isEmpty();
+    }
+    
+    // Get reservation details for vehicle verification
+    public Optional<Reservation> getActiveReservationForVehicle(String vehicleNumber) {
+        List<Reservation> activeReservations = getActiveReservationsByVehicleNumber(vehicleNumber);
+        return activeReservations.isEmpty() ? Optional.empty() : Optional.of(activeReservations.get(0));
+    }
+    
     public Reservation updateReservationStatus(Long id, String status) {
         Optional<Reservation> reservationOpt = reservationRepository.findById(id);
         if (reservationOpt.isPresent()) {

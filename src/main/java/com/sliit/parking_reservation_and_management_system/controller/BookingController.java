@@ -521,24 +521,27 @@ public class BookingController {
         return "customer-booking-edit";
     }
     
+    // Update booking with payment adjustment
     @PostMapping("/booking/{id}/update")
     public String updateBooking(@PathVariable Long id,
                                @RequestParam String startTimeStr,
                                @RequestParam String endTimeStr,
                                RedirectAttributes redirectAttributes) {
+        // Update booking with payment adjustment logic
+        
         try {
-            // Get current user
             User currentUser = getCurrentUser();
             if (currentUser == null) {
                 return "redirect:/login";
             }
             
-            // Get existing reservation
+            // Get reservation details
             Reservation reservation = reservationService.getReservationById(id).orElse(null);
             if (reservation == null) {
                 redirectAttributes.addFlashAttribute("error", "Booking not found");
                 return "redirect:/customer/bookings";
             }
+            System.out.println("Found reservation: " + reservation.getId());
             
             // Check if reservation belongs to current user
             if (!reservation.getUserId().equals(currentUser.getUserID())) {
@@ -553,8 +556,16 @@ public class BookingController {
             }
             
             // Parse new times
-            LocalDateTime startTime = LocalDateTime.parse(startTimeStr);
-            LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+            LocalDateTime startTime;
+            LocalDateTime endTime;
+            
+            try {
+                startTime = LocalDateTime.parse(startTimeStr);
+                endTime = LocalDateTime.parse(endTimeStr);
+            } catch (Exception parseError) {
+                redirectAttributes.addFlashAttribute("error", "Invalid date/time format. Please use the date picker.");
+                return "redirect:/customer/booking/" + id + "/edit";
+            }
             
             // Validate times
             LocalDateTime now = LocalDateTime.now();
@@ -574,30 +585,81 @@ public class BookingController {
             double pricePerHour = 5.0; // Fixed price
             double totalAmount = durationHours * pricePerHour;
             
-            // Update reservation
-            reservation.setStartTime(startTime);
-            reservation.setEndTime(endTime);
-            reservation.setUpdatedAt(LocalDateTime.now());
-            
-            // Update payment amount in Payment table
-            Optional<Payment> paymentOpt = paymentService.getPaymentByReservationId(reservation.getId());
-            if (paymentOpt.isPresent()) {
-                Payment payment = paymentOpt.get();
-                payment.setAmount(java.math.BigDecimal.valueOf(totalAmount));
-                paymentService.savePayment(payment);
-                System.out.println("Payment amount updated: $" + totalAmount);
+            // Calculate payment adjustment
+            PaymentService.PaymentAdjustment adjustment;
+            try {
+                adjustment = paymentService.calculatePaymentAdjustment(
+                    reservation.getId(), 
+                    java.math.BigDecimal.valueOf(totalAmount)
+                );
+                
+                if (adjustment == null) {
+                    redirectAttributes.addFlashAttribute("error", "Failed to calculate payment adjustment. Please try again.");
+                    return "redirect:/customer/booking/" + id + "/edit";
+                }
+            } catch (Exception adjustmentError) {
+                redirectAttributes.addFlashAttribute("error", "Error calculating payment adjustment: " + adjustmentError.getMessage());
+                return "redirect:/customer/booking/" + id + "/edit";
             }
             
-            // Save updated reservation
-            Reservation updatedReservation = reservationService.saveReservation(reservation);
+            // Handle different adjustment scenarios
+            if (adjustment.isAdditionalPaymentRequired()) {
+                // Additional payment required - redirect to payment confirmation
+                redirectAttributes.addFlashAttribute("paymentAdjustment", adjustment);
+                redirectAttributes.addFlashAttribute("reservationId", id);
+                redirectAttributes.addFlashAttribute("newStartTime", startTimeStr);
+                redirectAttributes.addFlashAttribute("newEndTime", endTimeStr);
+                redirectAttributes.addFlashAttribute("info", 
+                    String.format("Additional payment of $%.2f is required for the time change. Please confirm to proceed.", 
+                    adjustment.getAbsoluteAdjustmentAmount()));
+                
+                return "redirect:/customer/booking/" + id + "/payment-adjustment";
+                
+            } else if (adjustment.isRefundDue()) {
+                // Process refund automatically
+                boolean refundProcessed = paymentService.processRefund(
+                    reservation.getId(), 
+                    adjustment.getAbsoluteAdjustmentAmount(), 
+                    "Booking time change - shorter duration"
+                );
+                
+                if (refundProcessed) {
+                    try {
+                        // Update reservation and payment
+                        updateReservationAndPayment(reservation, startTime, endTime, totalAmount);
+                        
+                        redirectAttributes.addFlashAttribute("success", 
+                            String.format("Booking updated successfully! A refund of $%.2f has been processed.", 
+                            adjustment.getAbsoluteAdjustmentAmount()));
+                    } catch (Exception updateError) {
+                        System.err.println("Error updating reservation after refund: " + updateError.getMessage());
+                        redirectAttributes.addFlashAttribute("error", "Refund processed but failed to update booking. Please contact support.");
+                        return "redirect:/customer/booking/" + id + "/edit";
+                    }
+                } else {
+                    redirectAttributes.addFlashAttribute("error", "Failed to process refund. Please contact support.");
+                    return "redirect:/customer/booking/" + id + "/edit";
+                }
+                
+            } else {
+                try {
+                    // No payment change - update directly
+                    updateReservationAndPayment(reservation, startTime, endTime, totalAmount);
+                    redirectAttributes.addFlashAttribute("success", "Booking updated successfully!");
+                } catch (Exception updateError) {
+                    System.err.println("Error updating reservation: " + updateError.getMessage());
+                    redirectAttributes.addFlashAttribute("error", "Failed to update booking: " + updateError.getMessage());
+                    return "redirect:/customer/booking/" + id + "/edit";
+                }
+            }
             
             System.out.println("Booking updated successfully:");
-            System.out.println("- Reservation ID: " + updatedReservation.getId());
+            System.out.println("- Reservation ID: " + reservation.getId());
             System.out.println("- New Start Time: " + startTime);
             System.out.println("- New End Time: " + endTime);
             System.out.println("- New Amount: $" + totalAmount);
+            System.out.println("- Adjustment Type: " + adjustment.getAdjustmentType());
             
-            redirectAttributes.addFlashAttribute("success", "Booking updated successfully!");
             return "redirect:/customer/booking/" + id + "/view";
             
         } catch (Exception e) {
@@ -605,6 +667,141 @@ public class BookingController {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Error updating booking: " + e.getMessage());
             return "redirect:/customer/booking/" + id + "/edit";
+        }
+    }
+    
+    // Helper method to update reservation and payment
+    private void updateReservationAndPayment(Reservation reservation, LocalDateTime startTime, 
+                                           LocalDateTime endTime, double totalAmount) {
+        try {
+            // Update reservation
+            reservation.setStartTime(startTime);
+            reservation.setEndTime(endTime);
+            reservation.setUpdatedAt(LocalDateTime.now());
+            reservationService.saveReservation(reservation);
+            
+            // Update payment amount - create payment if it doesn't exist
+            boolean paymentUpdated = paymentService.updatePaymentAmount(reservation.getId(), java.math.BigDecimal.valueOf(totalAmount));
+            
+            if (!paymentUpdated) {
+                // Create new payment if none exists
+                System.out.println("No existing payment found. Creating new payment for reservation: " + reservation.getId());
+                paymentService.createPayment(
+                    reservation.getId(), 
+                    java.math.BigDecimal.valueOf(totalAmount), 
+                    "ONLINE"
+                );
+            }
+            
+            System.out.println("Reservation and payment updated successfully");
+            
+        } catch (Exception e) {
+            System.err.println("Error updating reservation and payment: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to update reservation and payment", e);
+        }
+    }
+    
+    // Payment adjustment confirmation page
+    @GetMapping("/booking/{id}/payment-adjustment")
+    public String showPaymentAdjustment(@PathVariable Long id, Model model) {
+        try {
+            User currentUser = getCurrentUser();
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            
+            Reservation reservation = reservationService.getReservationById(id).orElse(null);
+            if (reservation == null || !reservation.getUserId().equals(currentUser.getUserID())) {
+                model.addAttribute("error", "Booking not found or access denied");
+                return "redirect:/customer/bookings";
+            }
+            
+            model.addAttribute("reservation", reservation);
+            model.addAttribute("user", currentUser);
+            
+            return "customer-booking-payment-adjustment";
+            
+        } catch (Exception e) {
+            System.err.println("Error showing payment adjustment: " + e.getMessage());
+            return "redirect:/customer/bookings";
+        }
+    }
+    
+    // Process payment adjustment
+    @PostMapping("/booking/{id}/confirm-payment-adjustment")
+    public String confirmPaymentAdjustment(@PathVariable Long id,
+                                         @RequestParam String startTimeStr,
+                                         @RequestParam String endTimeStr,
+                                         @RequestParam String paymentMethod,
+                                         RedirectAttributes redirectAttributes) {
+        try {
+            User currentUser = getCurrentUser();
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            
+            Reservation reservation = reservationService.getReservationById(id).orElse(null);
+            if (reservation == null || !reservation.getUserId().equals(currentUser.getUserID())) {
+                redirectAttributes.addFlashAttribute("error", "Booking not found or access denied");
+                return "redirect:/customer/bookings";
+            }
+            
+            // Parse new times
+            LocalDateTime startTime = LocalDateTime.parse(startTimeStr);
+            LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+            
+            // Calculate new cost
+            long durationMinutes = ChronoUnit.MINUTES.between(startTime, endTime);
+            double durationHours = Math.ceil(durationMinutes / 60.0);
+            double totalAmount = durationHours * 5.0;
+            
+            // Calculate payment adjustment
+            PaymentService.PaymentAdjustment adjustment = paymentService.calculatePaymentAdjustment(
+                reservation.getId(), 
+                java.math.BigDecimal.valueOf(totalAmount)
+            );
+            
+            if (adjustment.isAdditionalPaymentRequired()) {
+                try {
+                    // Create additional payment
+                    Payment additionalPayment = paymentService.createAdditionalPayment(
+                        reservation.getId(),
+                        adjustment.getAbsoluteAdjustmentAmount(),
+                        "Booking time change - extended duration"
+                    );
+                    
+                    // Complete the additional payment immediately (in real app, this would go through payment gateway)
+                    boolean paymentCompleted = paymentService.completePayment(additionalPayment.getPaymentID(), paymentMethod);
+                    
+                    if (paymentCompleted) {
+                        // Update only the reservation (payment already updated by createAdditionalPayment)
+                        reservation.setStartTime(startTime);
+                        reservation.setEndTime(endTime);
+                        reservation.setUpdatedAt(LocalDateTime.now());
+                        reservationService.saveReservation(reservation);
+                        
+                        redirectAttributes.addFlashAttribute("success", 
+                            String.format("Booking updated successfully! Additional payment of $%.2f has been processed.", 
+                            adjustment.getAbsoluteAdjustmentAmount()));
+                    } else {
+                        redirectAttributes.addFlashAttribute("error", "Payment processing failed. Please try again.");
+                        return "redirect:/customer/booking/" + id + "/payment-adjustment";
+                    }
+                } catch (Exception paymentError) {
+                    System.err.println("Error processing additional payment: " + paymentError.getMessage());
+                    paymentError.printStackTrace();
+                    redirectAttributes.addFlashAttribute("error", "Error processing payment adjustment: " + paymentError.getMessage());
+                    return "redirect:/customer/booking/" + id + "/payment-adjustment";
+                }
+            }
+            
+            return "redirect:/customer/booking/" + id + "/view";
+            
+        } catch (Exception e) {
+            System.err.println("Error confirming payment adjustment: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error processing payment adjustment: " + e.getMessage());
+            return "redirect:/customer/booking/" + id + "/payment-adjustment";
         }
     }
 }

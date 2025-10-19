@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Suspicious Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; box-sizing: border-box; }
+        input:focus, textarea:focus, select:focus { border-color: #007bff; outline: none; }
+        button { background: #28a745; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        .alert { padding: 15px; margin: 15px 0; border-radius: 6px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        small { color: #666; font-size: 12px; }
+        .readonly { background-color: #f8f9fa; }
+        .char-count { text-align: right; font-size: 12px; color: #666; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Suspicious Report</h1>
+        <p>Fill out the form below to create a suspicious activity report.</p>
+        
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}">Success message</div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}">Error message</div>
+        
+        <form action="/public/save-report" method="post">
+            <!-- SecurityOfficerID - Database Field -->
+            <div class="form-group">
+                <label for="securityOfficerID">Security Officer ID *</label>
+                <input type="number" id="securityOfficerID" name="securityOfficerID" 
+                       th:value="${validUserID}" readonly class="readonly">
+                <small>Your security officer ID (from User table)</small>
+            </div>
+            
+            <!-- Description - Database Field -->
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" name="description" 
+                          placeholder="Provide a detailed description of the suspicious activity..."
+                          rows="6" required maxlength="500"></textarea>
+                <div class="char-count">
+                    <span id="charCount">0</span>/500 characters
+                </div>
+                <small>Detailed description of the incident (required)</small>
+            </div>
+            
+            <!-- Date - Database Field -->
+            <div class="form-group">
+                <label for="date">Incident Date & Time *</label>
+                <input type="datetime-local" id="date" name="date" required>
+                <small>When the incident occurred</small>
+            </div>
+            
+            <!-- Status - Database Field -->
+            <div class="form-group">
+                <label for="status">Status *</label>
+                <select id="status" name="status" required>
+                    <option value="">Select Status...</option>
+                    <option value="PENDING" selected>PENDING</option>
+                    <option value="INVESTIGATING">INVESTIGATING</option>
+                    <option value="RESOLVED">RESOLVED</option>
+                    <option value="CLOSED">CLOSED</option>
+                </select>
+                <small>Current status of the report</small>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-group" style="text-align: center; margin-top: 30px;">
+                <button type="submit">Create Suspicious Report</button>
+                <br><br>
+                <a href="/public/test-links" style="color: #6c757d; text-decoration: none;">← Back to Test Links</a>
+            </div>
+        </form>
+        
+        <hr style="margin: 30px 0;">
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 6px;">
+            <h4>Database Fields Only:</h4>
+            <ul>
+                <li><strong>SuspiciousID:</strong> Auto-generated (Primary Key)</li>
+                <li><strong>SecurityOfficerID:</strong> Foreign Key to User table</li>
+                <li><strong>Description:</strong> Text description (max 500 chars)</li>
+                <li><strong>Date:</strong> DateTime of incident</li>
+                <li><strong>Status:</strong> Report status</li>
+                <li><strong>created_at:</strong> Auto-timestamp</li>
+                <li><strong>updated_at:</strong> Auto-timestamp</li>
+            </ul>
+            <p><strong>Valid User ID:</strong> <span th:text="${validUserID}">1</span></p>
+        </div>
+    </div>
+    
+    <script>
+        // Set current date and time on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                dateInput.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+        });
+        
+        // Character counter
+        document.getElementById('description').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('charCount').textContent = charCount;
+            
+            if (charCount > 450) {
+                document.getElementById('charCount').style.color = '#dc3545';
+            } else {
+                document.getElementById('charCount').style.color = '#666';
+            }
+        });
+        
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const description = document.getElementById('description').value.trim();
+            const status = document.getElementById('status').value;
+            const date = document.getElementById('date').value;
+            const officerID = document.getElementById('securityOfficerID').value;
+            
+            if (!description) {
+                e.preventDefault();
+                alert('Please provide a description for the report.');
+                return false;
+            }
+            
+            if (description.length < 10) {
+                e.preventDefault();
+                alert('Please provide a more detailed description (at least 10 characters).');
+                return false;
+            }
+            
+            if (!status) {
+                e.preventDefault();
+                alert('Please select a status for the report.');
+                return false;
+            }
+            
+            if (!date) {
+                e.preventDefault();
+                alert('Please select the date and time of the incident.');
+                return false;
+            }
+            
+            if (!officerID) {
+                e.preventDefault();
+                alert('Security Officer ID is required.');
+                return false;
+            }
+            
+            return true;
+        });
+    </script>
+</body>
+</html>

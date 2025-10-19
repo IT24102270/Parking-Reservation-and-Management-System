@@ -1,11 +1,255 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Security Officer Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Security Officer Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-<h2>Welcome Security Officer!</h2>
-<p>You can verify vehicles, report incidents, and check CCTV logs here.</p>
-<a th:href="@{/logout}">Logout</a>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard" class="active">Dashboard</a></li>
+                    <li><a href="/security/reports">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Section -->
+            <section class="welcome-section">
+                <div class="welcome-content">
+                    <h1>Welcome back, <span th:text="${user.firstName}">Security Officer</span>!</h1>
+                    <p>Monitor parking activities, verify vehicles, and maintain security protocols.</p>
+                    <div class="current-time" id="currentTime"></div>
+                </div>
+                <div class="welcome-actions">
+                    <a href="/security/report/new" class="btn btn-primary">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Report Incident
+                    </a>
+                    <a href="/security/scanner" class="btn btn-secondary">
+                        <i class="fas fa-qrcode"></i>
+                        QR Scanner
+                    </a>
+                </div>
+            </section>
+
+            <!-- Statistics Cards -->
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 th:text="${totalReports}">0</h3>
+                            <p>Total Reports</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 th:text="${pendingReports}">0</h3>
+                            <p>Pending Reports</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-car"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 th:text="${totalActiveReservations}">0</h3>
+                            <p>Active Reservations</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 th:text="${recentReports}">0</h3>
+                            <p>This Week</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="actions-section">
+                <h2>Quick Actions</h2>
+                <div class="actions-grid">
+                    <div class="action-card" onclick="location.href='/security/report/new'">
+                        <div class="action-icon">
+                            <i class="fas fa-plus-circle"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Create Report</h3>
+                            <p>Report suspicious activity or unauthorized vehicles</p>
+                        </div>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" onclick="location.href='/security/verify'">
+                        <div class="action-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Verify Vehicles</h3>
+                            <p>Check vehicle details and booking information</p>
+                        </div>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" onclick="location.href='/security/scanner'">
+                        <div class="action-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>QR Scanner</h3>
+                            <p>Scan QR codes at entry and exit gates</p>
+                        </div>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" onclick="location.href='/security/reports'">
+                        <div class="action-icon">
+                            <i class="fas fa-list-alt"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>View Reports</h3>
+                            <p>Review all submitted suspicious reports</p>
+                        </div>
+                        <div class="action-arrow">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="activity-section">
+                <div class="section-header">
+                    <h2>Recent Reports</h2>
+                    <div class="section-info">
+                        <span th:if="${weeklyReportsCount != null and weeklyReportsCount > 0}" 
+                              th:text="${weeklyReportsCount} + ' reports this week'" 
+                              class="weekly-count">5 reports this week</span>
+                        <a href="/security/reports" class="view-all-link">View All</a>
+                    </div>
+                </div>
+                
+                <div class="activity-list">
+                    <div th:if="${recentReportsList != null and !recentReportsList.empty}">
+                        <div th:each="report : ${recentReportsList}" class="activity-item">
+                            <div class="activity-icon">
+                                <i class="fas fa-exclamation-triangle" 
+                                   th:classappend="${report.status.equals('PENDING')} ? 'text-warning' : 
+                                                  ${report.status.equals('RESOLVED')} ? 'text-success' : 
+                                                  ${report.status.equals('INVESTIGATING')} ? 'text-info' : 'text-danger'"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4 th:text="'Report #' + ${report.suspiciousID}">Report #1</h4>
+                                <p th:text="${#strings.abbreviate(report.description, 100)}">Suspicious activity reported...</p>
+                                <div class="activity-meta">
+                                    <span class="activity-time" th:text="${#temporals.format(report.date, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
+                                    <span class="activity-status" 
+                                          th:text="${report.status}"
+                                          th:classappend="${report.status.equals('PENDING')} ? 'status-pending' : 
+                                                         ${report.status.equals('RESOLVED')} ? 'status-resolved' : 
+                                                         ${report.status.equals('INVESTIGATING')} ? 'status-investigating' : 'status-closed'">PENDING</span>
+                                </div>
+                            </div>
+                            <div class="activity-action">
+                                <a th:href="@{/security/report/{id}(id=${report.suspiciousID})}" class="btn btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${recentReportsList == null or recentReportsList.empty}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No Recent Reports</h3>
+                        <p>You haven't submitted any reports recently.</p>
+                        <a href="/security/report/new" class="btn btn-primary">Create First Report</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Reservations -->
+            <section class="reservations-section">
+                <div class="section-header">
+                    <h2>Active Reservations</h2>
+                    <a href="/security/verify" class="view-all-link">Verify All</a>
+                </div>
+                
+                <div class="reservations-grid">
+                    <div th:if="${activeReservations != null and !activeReservations.empty}">
+                        <div th:each="reservation : ${activeReservations}" class="reservation-card">
+                            <div class="reservation-header">
+                                <h4 th:text="'Slot ' + ${reservation.parkingSlot?.id ?: 'N/A'}">Slot A1</h4>
+                                <span class="reservation-status" th:text="${reservation.status}">ACTIVE</span>
+                            </div>
+                            <div class="reservation-details">
+                                <p><i class="fas fa-car"></i> <span th:text="${reservation.vehicleNumber}">ABC-1234</span></p>
+                                <p><i class="fas fa-clock"></i> <span th:text="${#temporals.format(reservation.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(reservation.endTime, 'HH:mm')}">14:00 - 16:00</span></p>
+                                <p><i class="fas fa-user"></i> <span th:text="${reservation.user?.firstName + ' ' + reservation.user?.lastName}">Customer Name</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${activeReservations == null or activeReservations.empty}" class="empty-state">
+                        <i class="fas fa-car"></i>
+                        <h3>No Active Reservations</h3>
+                        <p>There are currently no active parking reservations.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
 </body>
 </html>

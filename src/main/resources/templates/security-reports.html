@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Security Reports</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard">Dashboard</a></li>
+                    <li><a href="/security/reports" class="active">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-list-alt"></i> Suspicious Reports</h1>
+                    <p>View and manage all your submitted suspicious activity reports</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/report/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <!-- Reports Summary -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 th:text="${totalReports}">0</h3>
+                        <p>Total Reports</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 th:text="${pendingCount != null ? pendingCount : 0}">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 th:text="${resolvedCount != null ? resolvedCount : 0}">0</h3>
+                        <p>Resolved</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 th:text="${investigatingCount != null ? investigatingCount : 0}">0</h3>
+                        <p>Investigating</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports List -->
+            <div class="reports-section">
+                <div class="section-header">
+                    <h2>All Reports</h2>
+                    <div class="filter-controls">
+                        <select id="statusFilter" class="form-control" style="width: auto; display: inline-block;">
+                            <option value="">All Status</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="INVESTIGATING">Investigating</option>
+                            <option value="RESOLVED">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="reports-list">
+                    <div th:if="${reports != null and !reports.empty}">
+                        <div th:each="report : ${reports}" class="report-card" th:data-status="${report.status}">
+                            <div class="report-header">
+                                <div class="report-id">
+                                    <h3 th:text="'Report #' + ${report.suspiciousID}">Report #1</h3>
+                                    <span class="report-date" th:text="${#temporals.format(report.date, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
+                                </div>
+                                <div class="report-status">
+                                    <span class="status-badge" 
+                                          th:text="${report.status}"
+                                          th:classappend="${report.status.equals('PENDING')} ? 'status-pending' : 
+                                                         ${report.status.equals('RESOLVED')} ? 'status-resolved' : 
+                                                         ${report.status.equals('INVESTIGATING')} ? 'status-investigating' : 'status-closed'">PENDING</span>
+                                </div>
+                            </div>
+                            
+                            <div class="report-content">
+                                <p class="report-description" th:text="${#strings.abbreviate(report.description, 150)}">
+                                    Suspicious activity reported in parking area...
+                                </p>
+                            </div>
+                            
+                            <div class="report-footer">
+                                <div class="report-meta">
+                                    <span class="report-officer">
+                                        <i class="fas fa-user-shield"></i>
+                                        <span th:text="${report.securityOfficer?.firstName + ' ' + report.securityOfficer?.lastName ?: 'Security Officer'}">Officer Name</span>
+                                    </span>
+                                    <span class="report-time">
+                                        <i class="fas fa-clock"></i>
+                                        <span th:text="${#temporals.format(report.created_at, 'MMM dd, HH:mm')}">Oct 18, 14:30</span>
+                                    </span>
+                                </div>
+                                <div class="report-actions">
+                                    <a th:href="@{/security/report/{id}(id=${report.suspiciousID})}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <a th:href="@{/security/report/{id}/edit(id=${report.suspiciousID})}" class="btn btn-sm btn-secondary">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${reports == null or reports.empty}" class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No Reports Found</h3>
+                        <p>You haven't submitted any suspicious activity reports yet.</p>
+                        <a href="/security/report/new" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create First Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        // Filter functionality
+        document.getElementById('statusFilter').addEventListener('change', function() {
+            const selectedStatus = this.value;
+            const reportCards = document.querySelectorAll('.report-card');
+            
+            reportCards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                if (selectedStatus === '' || cardStatus === selectedStatus) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        .reports-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .report-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #e74c3c;
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .report-id h3 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        
+        .report-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .report-description {
+            color: #2c3e50;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .report-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .report-meta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .report-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .report-meta i {
+            color: #95a5a6;
+        }
+    </style>
+</body>
+</html>

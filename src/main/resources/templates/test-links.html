@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Links</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .link-group { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .link-group h3 { margin-top: 0; color: #333; }
+        a { display: block; margin: 5px 0; padding: 8px; background: #007bff; color: white; text-decoration: none; border-radius: 3px; }
+        a:hover { background: #0056b3; }
+        .status { padding: 5px; margin: 5px 0; border-radius: 3px; }
+        .working { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test Links for Suspicious Report System</h1>
+    
+    <div class="link-group">
+        <h3>🔓 Public Test Endpoints (No Authentication Required)</h3>
+        <a href="/public/test">Public Test Controller</a>
+        <a href="/public/check-users">🔍 Check Database Users (Debug)</a>
+        <a href="/public/check-reports">📊 Check Suspicious Reports (Debug)</a>
+        <a href="/public/validate-foreign-keys">🔗 Validate Foreign Key Constraints</a>
+        <a href="/public/report-db-only">🎯 Database-Only Form (Fixed Foreign Key Issue)</a>
+        <a href="/public/report-basic">✅ Basic Report Form (Fixed - No Template Errors)</a>
+        <a href="/public/report-form">Public Report Form (Advanced)</a>
+        <a href="/debug/test">Debug Controller Test</a>
+        <a href="/debug/template-test">Debug Template Test</a>
+    </div>
+    
+    <div class="link-group">
+        <h3>🔒 Security Endpoints (Require SECURITY_OFFICER Role)</h3>
+        <a href="/security/test-report">Security Test (Simple HTML)</a>
+        <a href="/security/debug-dashboard">🔧 Debug Dashboard (Troubleshoot Reports)</a>
+        <a href="/security/dashboard">🎯 Security Officer Dashboard</a>
+        <a href="/security/reports">Security Reports List</a>
+        <a href="/security/report/new">Create New Report</a>
+        <a href="/security/verify">Vehicle Verification</a>
+        <a href="/security/scanner">QR Scanner</a>
+    </div>
+    
+    <div class="link-group">
+        <h3>📋 Instructions</h3>
+        <div class="status working">
+            <strong>✅ Working:</strong> Public endpoints should work without login
+        </div>
+        <div class="status error">
+            <strong>❌ 403 Error:</strong> Security endpoints require SECURITY_OFFICER role
+        </div>
+        <p><strong>To test security endpoints:</strong></p>
+        <ol>
+            <li>Go to <a href="/login" style="display: inline;">/login</a></li>
+            <li>Login with a user that has role "SECURITY_OFFICER"</li>
+            <li>Then try the security endpoints</li>
+        </ol>
+    </div>
+    
+    <div class="link-group">
+        <h3>🔧 Troubleshooting</h3>
+        <p><strong>If you get 403 errors:</strong></p>
+        <ul>
+            <li>Make sure you're logged in</li>
+            <li>Check your user has role "SECURITY_OFFICER" (not "SECURITY" or other)</li>
+            <li>Try the public endpoints first to test the form functionality</li>
+        </ul>
+        
+        <p><strong>Test the form functionality:</strong></p>
+        <ol>
+            <li>Use <a href="/public/report-form" style="display: inline;">Public Report Form</a> to test form submission</li>
+            <li>Fill out the form and submit</li>
+            <li>Check if the report is created in the database</li>
+        </ol>
+    </div>
+</body>
+</html>

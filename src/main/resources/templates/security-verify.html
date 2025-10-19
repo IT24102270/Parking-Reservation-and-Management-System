@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Vehicle Verification</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard">Dashboard</a></li>
+                    <li><a href="/security/reports">Reports</a></li>
+                    <li><a href="/security/verify" class="active">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-shield-alt"></i> Vehicle Verification</h1>
+                    <p>Verify vehicles and booking details at entry and exit points</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/report/new" class="btn btn-primary">
+                        <i class="fas fa-exclamation-triangle"></i> Report Issue
+                    </a>
+                </div>
+            </div>
+
+            <!-- Verification Search -->
+            <div class="verification-search">
+                <div class="search-card">
+                    <h2><i class="fas fa-search"></i> Vehicle Lookup</h2>
+                    <p>Search for vehicle by license plate or booking ID</p>
+                    
+                    <div class="search-form">
+                        <div class="search-inputs">
+                            <input type="text" id="vehicleSearch" placeholder="Enter vehicle number (e.g., ABC-1234)" class="form-control">
+                            <input type="text" id="bookingSearch" placeholder="Enter booking ID (optional)" class="form-control">
+                        </div>
+                        <button type="button" onclick="searchVehicle()" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            <div id="searchResults" class="search-results" style="display: none;">
+                <div class="results-card">
+                    <div class="result-header">
+                        <h3>Verification Results</h3>
+                        <span class="result-status" id="resultStatus">Valid</span>
+                    </div>
+                    
+                    <div class="result-content" id="resultContent">
+                        <!-- Results will be populated here -->
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button type="button" onclick="approveEntry()" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Approve Entry
+                        </button>
+                        <button type="button" onclick="denyEntry()" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Deny Entry
+                        </button>
+                        <button type="button" onclick="reportSuspicious()" class="btn" style="background: #e74c3c; color: white;">
+                            <i class="fas fa-exclamation-triangle"></i> Report Suspicious
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Reservations -->
+            <div class="active-reservations">
+                <div class="section-header">
+                    <h2>Active Reservations</h2>
+                    <span class="reservation-count" th:text="${activeReservations != null ? activeReservations.size() : 0} + ' active'">0 active</span>
+                </div>
+                
+                <div class="reservations-grid">
+                    <div th:if="${activeReservations != null and !activeReservations.empty}">
+                        <div th:each="reservation : ${activeReservations}" class="reservation-card">
+                            <div class="reservation-header">
+                                <h4 th:text="'Slot ' + ${reservation.parkingSlot?.id ?: 'N/A'}">Slot A1</h4>
+                                <span class="reservation-status" th:text="${reservation.status}">ACTIVE</span>
+                            </div>
+                            
+                            <div class="reservation-details">
+                                <div class="detail-row">
+                                    <i class="fas fa-car"></i>
+                                    <span th:text="${reservation.vehicleNumber}">ABC-1234</span>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-user"></i>
+                                    <span th:text="${reservation.user?.firstName + ' ' + reservation.user?.lastName}">Customer Name</span>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${#temporals.format(reservation.startTime, 'HH:mm')} + ' - ' + ${#temporals.format(reservation.endTime, 'HH:mm')}">14:00 - 16:00</span>
+                                </div>
+                                <div class="detail-row">
+                                    <i class="fas fa-calendar"></i>
+                                    <span th:text="${#temporals.format(reservation.startTime, 'MMM dd, yyyy')}">Oct 18, 2024</span>
+                                </div>
+                            </div>
+                            
+                            <div class="reservation-actions">
+                                <button type="button" th:onclick="'verifyReservation(' + ${reservation.reservationID} + ')'" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-check"></i> Verify
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${activeReservations == null or activeReservations.empty}" class="empty-state">
+                        <i class="fas fa-car"></i>
+                        <h3>No Active Reservations</h3>
+                        <p>There are currently no active parking reservations to verify.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="actions-grid">
+                    <div class="action-card" onclick="location.href='/security/scanner'">
+                        <div class="action-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>QR Scanner</h3>
+                            <p>Scan QR codes for quick verification</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" onclick="showEmergencyContact()">
+                        <div class="action-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Emergency Contact</h3>
+                            <p>Contact security or management</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-card" onclick="location.href='/security/report/new'">
+                        <div class="action-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="action-content">
+                            <h3>Report Incident</h3>
+                            <p>Report suspicious activity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        function searchVehicle() {
+            const vehicleNumber = document.getElementById('vehicleSearch').value.trim();
+            const bookingId = document.getElementById('bookingSearch').value.trim();
+            
+            if (!vehicleNumber && !bookingId) {
+                SecurityDashboard.showNotification('Please enter a vehicle number or booking ID', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const searchBtn = document.querySelector('.search-form button');
+            SecurityDashboard.setLoadingState(searchBtn, true);
+            
+            // Use vehicle number for verification (prioritize vehicle number over booking ID)
+            const searchTerm = vehicleNumber || bookingId;
+            
+            // Make API call to verify vehicle
+            fetch('/security/verify/vehicle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'vehicleNumber=' + encodeURIComponent(searchTerm)
+            })
+            .then(response => response.json())
+            .then(data => {
+                SecurityDashboard.setLoadingState(searchBtn, false);
+                showSearchResults(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                SecurityDashboard.setLoadingState(searchBtn, false);
+                SecurityDashboard.showNotification('Error occurred during verification', 'error');
+            });
+        }
+        
+        function showSearchResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const statusSpan = document.getElementById('resultStatus');
+            const contentDiv = document.getElementById('resultContent');
+            
+            resultsDiv.style.display = 'block';
+            
+            if (data.authorized) {
+                statusSpan.textContent = 'Valid Booking';
+                statusSpan.className = 'result-status status-valid';
+                
+                // Format start and end times
+                const startTime = data.startTime ? new Date(data.startTime).toLocaleString() : 'N/A';
+                const endTime = data.endTime ? new Date(data.endTime).toLocaleString() : 'N/A';
+                
+                contentDiv.innerHTML = `
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <strong>Vehicle Number:</strong> ${data.vehicleNumber || 'N/A'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Customer:</strong> ${data.customerName || 'N/A'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Email:</strong> ${data.customerEmail || 'N/A'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Slot:</strong> ${data.slotId || data.id || 'N/A'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Start Time:</strong> ${startTime}
+                        </div>
+                        <div class="detail-item">
+                            <strong>End Time:</strong> ${endTime}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Status:</strong> ${data.reservationStatus || 'N/A'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Reservation ID:</strong> #${data.reservationId || 'N/A'}
+                        </div>
+                    </div>
+                `;
+            } else {
+                statusSpan.textContent = 'Invalid/Not Found';
+                statusSpan.className = 'result-status status-invalid';
+                contentDiv.innerHTML = `
+                    <div class="result-details">
+                        <div class="detail-item">
+                            <strong>Vehicle Number:</strong> ${data.vehicleNumber || 'N/A'}
+                        </div>
+                        <div class="detail-item error">
+                            <strong>Status:</strong> ${data.message || 'No valid booking found'}
+                        </div>
+                        <div class="detail-item">
+                            <strong>Action Required:</strong> Verify with customer or deny entry
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function approveEntry() {
+            SecurityDashboard.showNotification('Entry approved successfully', 'success');
+            document.getElementById('searchResults').style.display = 'none';
+            clearSearchFields();
+        }
+        
+        function denyEntry() {
+            SecurityDashboard.showNotification('Entry denied', 'error');
+            document.getElementById('searchResults').style.display = 'none';
+            clearSearchFields();
+        }
+        
+        function reportSuspicious() {
+            const vehicleNumber = document.getElementById('vehicleSearch').value.trim();
+            if (vehicleNumber) {
+                window.location.href = `/security/report/new?vehicle=${vehicleNumber}`;
+            } else {
+                window.location.href = '/security/report/new';
+            }
+        }
+        
+        function clearSearchFields() {
+            document.getElementById('vehicleSearch').value = '';
+            document.getElementById('bookingSearch').value = '';
+        }
+        
+        function verifyReservation(reservationId) {
+            SecurityDashboard.showNotification(`Verifying reservation #${reservationId}`, 'info');
+            // In real implementation, this would verify the specific reservation
+        }
+        
+        function showEmergencyContact() {
+            alert('Emergency Contacts:\n\nSecurity: +1-555-0123\nManagement: +1-555-0456\nEmergency: 911');
+        }
+        
+        // Auto-focus on vehicle search input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('vehicleSearch').focus();
+        });
+        
+        // Enter key support for search
+        document.getElementById('vehicleSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchVehicle();
+            }
+        });
+        
+        document.getElementById('bookingSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchVehicle();
+            }
+        });
+    </script>
+    
+    <style>
+        .verification-search {
+            margin-bottom: 30px;
+        }
+        
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-card h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .search-card p {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .search-inputs {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+        }
+        
+        .search-results {
+            margin-bottom: 30px;
+        }
+        
+        .results-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-header h3 {
+            color: #2c3e50;
+        }
+        
+        .result-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .status-valid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .result-details {
+            margin-bottom: 25px;
+        }
+        
+        .detail-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-item.error {
+            color: #e74c3c;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .active-reservations {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .reservation-count {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .reservations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .reservation-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .reservation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .reservation-header h4 {
+            color: #2c3e50;
+            font-size: 16px;
+        }
+        
+        .reservation-status {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .reservation-details {
+            margin-bottom: 15px;
+        }
+        
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .detail-row i {
+            width: 16px;
+            color: #95a5a6;
+        }
+        
+        .reservation-actions {
+            text-align: right;
+        }
+        
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quick-actions h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .search-inputs {
+                flex-direction: column;
+            }
+            
+            .result-actions {
+                flex-direction: column;
+            }
+            
+            .reservations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>

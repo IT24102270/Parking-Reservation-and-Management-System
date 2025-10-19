@@ -11,6 +11,9 @@ public class ParkingSlot {
     @Column(name = "SlotID")
     private Long id;
     
+    // Only use columns that exist in database: SlotID, Location, Status
+    // Removed Name/SlotNumber as they don't exist in database
+    
     @Column(name = "Location")
     private String location;
     
@@ -33,6 +36,8 @@ public class ParkingSlot {
     public void setId(Long id) {
         this.id = id;
     }
+    
+    // Name field removed - doesn't exist in database
     
     public String getLocation() {
         return location;

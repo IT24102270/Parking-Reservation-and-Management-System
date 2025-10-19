@@ -36,6 +36,15 @@ public class Reservation {
     @Column(name = "VehicleNumber")
     private String vehicleNumber;
     
+    // Relationship mappings
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UserID", insertable = false, updatable = false)
+    private User user;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SlotID", insertable = false, updatable = false)
+    private ParkingSlot parkingSlot;
+    
     // Constructors
     public Reservation() {
         this.createdAt = LocalDateTime.now();
@@ -70,6 +79,11 @@ public class Reservation {
     
     public void setId(Long id) {
         this.id = id;
+    }
+    
+    // Alias for template compatibility
+    public Long getReservationID() {
+        return id;
     }
     
     public Long getUserId() {
@@ -138,6 +152,23 @@ public class Reservation {
         this.vehicleNumber = vehicleNumber;
     }
     
+    
+    // Relationship getters and setters
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public ParkingSlot getParkingSlot() {
+        return parkingSlot;
+    }
+    
+    public void setParkingSlot(ParkingSlot parkingSlot) {
+        this.parkingSlot = parkingSlot;
+    }
     
     // Helper method to generate booking ID
     public String getBookingId() {

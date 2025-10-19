@@ -436,9 +436,21 @@
                             <div class="cost-value">$5.00/hour</div>
                         </div>
                         <div class="cost-item">
-                            <div class="cost-label">Total Amount</div>
+                            <div class="cost-label">Current Amount</div>
+                            <div class="cost-value" id="currentAmount">
+                                <span th:if="${payment != null}">$<span th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}">15.00</span></span>
+                                <span th:if="${payment == null}">$0.00</span>
+                            </div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-label">New Total</div>
                             <div class="cost-value" id="totalCost">$10.00</div>
                         </div>
+                    </div>
+                    
+                    <!-- Payment Adjustment Notice -->
+                    <div id="paymentAdjustmentNotice" style="display: none; margin-top: 15px; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div id="adjustmentMessage"></div>
                     </div>
                 </div>
 
@@ -462,6 +474,13 @@
             const endTimeInput = document.getElementById('endTime');
             const durationElement = document.getElementById('duration');
             const totalCostElement = document.getElementById('totalCost');
+            const currentAmountElement = document.getElementById('currentAmount');
+            const paymentNotice = document.getElementById('paymentAdjustmentNotice');
+            const adjustmentMessage = document.getElementById('adjustmentMessage');
+            
+            // Get current amount from the page
+            const currentAmountText = currentAmountElement.textContent.trim();
+            const currentAmount = parseFloat(currentAmountText.replace('$', '')) || 0;
             
             function updateCostSummary() {
                 const startTime = new Date(startTimeInput.value);
@@ -474,9 +493,40 @@
                     
                     durationElement.textContent = durationHours + ' hour' + (durationHours !== 1 ? 's' : '');
                     totalCostElement.textContent = '$' + totalCost.toFixed(2);
+                    
+                    // Calculate payment adjustment
+                    const difference = totalCost - currentAmount;
+                    
+                    if (Math.abs(difference) > 0.01) { // Show notice if difference is more than 1 cent
+                        paymentNotice.style.display = 'block';
+                        
+                        if (difference > 0) {
+                            // Additional payment required
+                            paymentNotice.style.background = 'rgba(243, 156, 18, 0.1)';
+                            paymentNotice.style.border = '1px solid rgba(243, 156, 18, 0.3)';
+                            paymentNotice.style.color = '#f39c12';
+                            adjustmentMessage.innerHTML = 
+                                '<i class="fas fa-exclamation-triangle"></i> ' +
+                                '<strong>Additional Payment Required:</strong> $' + difference.toFixed(2) + 
+                                '<br><small>You will be redirected to complete the additional payment after updating.</small>';
+                        } else {
+                            // Refund due
+                            paymentNotice.style.background = 'rgba(39, 174, 96, 0.1)';
+                            paymentNotice.style.border = '1px solid rgba(39, 174, 96, 0.3)';
+                            paymentNotice.style.color = '#27ae60';
+                            adjustmentMessage.innerHTML = 
+                                '<i class="fas fa-check-circle"></i> ' +
+                                '<strong>Refund Due:</strong> $' + Math.abs(difference).toFixed(2) + 
+                                '<br><small>The refund will be processed automatically after updating.</small>';
+                        }
+                    } else {
+                        // No payment change
+                        paymentNotice.style.display = 'none';
+                    }
                 } else {
                     durationElement.textContent = '0 hours';
                     totalCostElement.textContent = '$0.00';
+                    paymentNotice.style.display = 'none';
                 }
             }
             

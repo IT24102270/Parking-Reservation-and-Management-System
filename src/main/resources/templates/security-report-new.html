@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Create Suspicious Report</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard">Dashboard</a></li>
+                    <li><a href="/security/reports" class="active">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-exclamation-triangle"></i> Create Suspicious Report</h1>
+                    <p>Report suspicious activity, unauthorized vehicles, or security incidents</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Report created successfully!</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error creating report!</span>
+            </div>
+
+            <!-- Report Form -->
+            <div class="form-container">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2>Incident Report Details</h2>
+                        <p>Please provide detailed information about the suspicious activity or incident</p>
+                    </div>
+
+                    <form th:action="@{/security/report/create}" th:object="${suspiciousReport}" method="post" class="report-form">
+                        <!-- Report Information -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-info-circle"></i> Report Information</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="reportDate">Date & Time</label>
+                                    <input type="datetime-local" id="reportDate" name="reportDate" 
+                                           th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd\'T\'HH:mm')}" 
+                                           readonly class="form-control">
+                                    <small class="form-help">Current date and time</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="reporterName">Reporting Officer</label>
+                                    <input type="text" id="reporterName" 
+                                           th:value="${user.firstName + ' ' + user.lastName}" 
+                                           readonly class="form-control">
+                                    <small class="form-help">Your name as the reporting officer</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Incident Details -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-clipboard-list"></i> Incident Details</h3>
+                            
+                            <div class="form-group">
+                                <label for="incidentType">Incident Type</label>
+                                <select id="incidentType" name="incidentType" class="form-control" required>
+                                    <option value="">Select incident type...</option>
+                                    <option value="UNAUTHORIZED_PARKING">Unauthorized Parking</option>
+                                    <option value="SUSPICIOUS_VEHICLE">Suspicious Vehicle</option>
+                                    <option value="SUSPICIOUS_PERSON">Suspicious Person</option>
+                                    <option value="VANDALISM">Vandalism</option>
+                                    <option value="THEFT">Theft</option>
+                                    <option value="SAFETY_HAZARD">Safety Hazard</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" name="location" 
+                                       placeholder="e.g., Parking Slot A1, Entrance Gate, Level 2" 
+                                       class="form-control" required>
+                                <small class="form-help">Specific location where the incident occurred</small>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="vehicleNumber">Vehicle Number (if applicable)</label>
+                                    <input type="text" id="vehicleNumber" name="vehicleNumber" 
+                                           placeholder="e.g., ABC-1234" 
+                                           class="form-control">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="priority">Priority Level</label>
+                                    <select id="priority" name="priority" class="form-control" required>
+                                        <option value="LOW">Low</option>
+                                        <option value="MEDIUM" selected>Medium</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="CRITICAL">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-section">
+                            <h3><i class="fas fa-edit"></i> Detailed Description</h3>
+                            
+                            <div class="form-group">
+                                <label for="description">Description *</label>
+                                <textarea id="description" name="description" th:field="*{description}" 
+                                          placeholder="Provide a detailed description of the suspicious activity or incident. Include what you observed, when it happened, and any other relevant details..."
+                                          class="form-control" rows="6" required maxlength="500"></textarea>
+                                <div class="character-count">
+                                    <span id="charCount">0</span>/500 characters
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Guidelines -->
+                        <div class="guidelines-section">
+                            <h3><i class="fas fa-lightbulb"></i> Reporting Guidelines</h3>
+                            <div class="guidelines-grid">
+                                <div class="guideline-item">
+                                    <i class="fas fa-eye"></i>
+                                    <div>
+                                        <h4>Be Observant</h4>
+                                        <p>Include specific details about what you observed</p>
+                                    </div>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div>
+                                        <h4>Be Timely</h4>
+                                        <p>Report incidents as soon as possible</p>
+                                    </div>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <div>
+                                        <h4>Stay Safe</h4>
+                                        <p>Do not confront suspicious individuals directly</p>
+                                    </div>
+                                </div>
+                                <div class="guideline-item">
+                                    <i class="fas fa-file-alt"></i>
+                                    <div>
+                                        <h4>Be Accurate</h4>
+                                        <p>Provide factual information only</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <button type="button" onclick="history.back()" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Submit Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        // Character counter for description
+        document.getElementById('description').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('charCount').textContent = charCount;
+            
+            if (charCount > 450) {
+                document.getElementById('charCount').style.color = '#e74c3c';
+            } else {
+                document.getElementById('charCount').style.color = '#666';
+            }
+        });
+
+        // Form validation
+        document.querySelector('.report-form').addEventListener('submit', function(e) {
+            const description = document.getElementById('description').value.trim();
+            const incidentType = document.getElementById('incidentType').value;
+            const location = document.getElementById('location').value.trim();
+            
+            if (!description || !incidentType || !location) {
+                e.preventDefault();
+                alert('Please fill in all required fields.');
+                return false;
+            }
+            
+            if (description.length < 10) {
+                e.preventDefault();
+                alert('Please provide a more detailed description (at least 10 characters).');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

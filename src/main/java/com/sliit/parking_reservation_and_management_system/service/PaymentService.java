@@ -88,6 +88,14 @@ public class PaymentService {
     
     // Get payment by reservation ID
     public Optional<Payment> getPaymentByReservationId(Long reservationID) {
+        if (reservationID == null) {
+            return Optional.empty();
+        }
+        
+        if (paymentRepository == null) {
+            return Optional.empty();
+        }
+        
         try {
             return paymentRepository.findByReservationID(reservationID);
         } catch (Exception e) {
@@ -295,6 +303,233 @@ public class PaymentService {
         } catch (Exception e) {
             System.err.println("Error cancelling payment: " + e.getMessage());
             return false;
+        }
+    }
+    
+    // Calculate payment adjustment for booking time changes
+    public PaymentAdjustment calculatePaymentAdjustment(Long reservationID, BigDecimal newAmount) {
+        // Validate inputs
+        if (reservationID == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
+        if (newAmount == null) {
+            throw new IllegalArgumentException("New amount cannot be null");
+        }
+        if (paymentRepository == null) {
+            throw new IllegalStateException("PaymentRepository is not initialized");
+        }
+        
+        try {
+            Optional<Payment> paymentOpt = getPaymentByReservationId(reservationID);
+            
+            // Handle case where no payment exists - create a default adjustment
+            BigDecimal currentAmount = BigDecimal.ZERO;
+            Payment currentPayment = null;
+            
+            if (paymentOpt.isPresent()) {
+                currentPayment = paymentOpt.get();
+                currentAmount = currentPayment.getAmount();
+            } else {
+                // Create a dummy payment for calculation purposes
+                currentPayment = new Payment();
+                currentPayment.setReservationID(reservationID);
+                currentPayment.setAmount(BigDecimal.ZERO);
+                currentPayment.setStatus("PENDING");
+            }
+            
+            BigDecimal difference = newAmount.subtract(currentAmount);
+            
+            PaymentAdjustment adjustment = new PaymentAdjustment();
+            adjustment.setReservationID(reservationID);
+            adjustment.setOriginalAmount(currentAmount);
+            adjustment.setNewAmount(newAmount);
+            adjustment.setAdjustmentAmount(difference);
+            adjustment.setCurrentPaymentId(currentPayment != null ? currentPayment.getPaymentID() : null);
+            
+            if (difference.compareTo(BigDecimal.ZERO) > 0) {
+                adjustment.setAdjustmentType("ADDITIONAL_PAYMENT");
+                adjustment.setRequiresPayment(true);
+            } else if (difference.compareTo(BigDecimal.ZERO) < 0) {
+                adjustment.setAdjustmentType("REFUND");
+                adjustment.setRequiresPayment(false);
+            } else {
+                adjustment.setAdjustmentType("NO_CHANGE");
+                adjustment.setRequiresPayment(false);
+            }
+            
+            System.out.println("Payment adjustment calculated:");
+            System.out.println("- Reservation ID: " + reservationID);
+            System.out.println("- Original: $" + currentAmount);
+            System.out.println("- New: $" + newAmount);
+            System.out.println("- Difference: $" + difference);
+            System.out.println("- Type: " + adjustment.getAdjustmentType());
+            
+            return adjustment;
+            
+        } catch (Exception e) {
+            System.err.println("Error calculating payment adjustment: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Return a safe default adjustment to prevent 500 errors
+            PaymentAdjustment safeAdjustment = new PaymentAdjustment();
+            safeAdjustment.setReservationID(reservationID);
+            safeAdjustment.setOriginalAmount(BigDecimal.ZERO);
+            safeAdjustment.setNewAmount(newAmount);
+            safeAdjustment.setAdjustmentAmount(newAmount);
+            safeAdjustment.setAdjustmentType("ADDITIONAL_PAYMENT");
+            safeAdjustment.setRequiresPayment(true);
+            
+            return safeAdjustment;
+        }
+    }
+    
+    // Create additional payment for booking modifications
+    public Payment createAdditionalPayment(Long reservationID, BigDecimal additionalAmount, String reason) {
+        try {
+            // Check if payment already exists for this reservation
+            Optional<Payment> existingPaymentOpt = getPaymentByReservationId(reservationID);
+            
+            if (existingPaymentOpt.isPresent()) {
+                // Update existing payment by adding the additional amount
+                Payment existingPayment = existingPaymentOpt.get();
+                BigDecimal newTotalAmount = existingPayment.getAmount().add(additionalAmount);
+                
+                existingPayment.setAmount(newTotalAmount);
+                existingPayment.setUpdatedAt(LocalDateTime.now());
+                // Keep status as is, will be updated by completePayment method
+                
+                Payment savedPayment = paymentRepository.save(existingPayment);
+                System.out.println("Payment updated with additional amount: " + savedPayment.getPaymentID() + 
+                                 " - New total: $" + newTotalAmount + " (Added: $" + additionalAmount + ")");
+                System.out.println("Reason: " + reason);
+                
+                return savedPayment;
+            } else {
+                // Create new payment if none exists
+                Payment newPayment = new Payment();
+                newPayment.setReservationID(reservationID);
+                newPayment.setAmount(additionalAmount);
+                newPayment.setMethod("ONLINE");
+                newPayment.setStatus("PENDING"); // Will be updated by completePayment method
+                newPayment.setDate(LocalDateTime.now());
+                newPayment.setCreatedAt(LocalDateTime.now());
+                
+                Payment savedPayment = paymentRepository.save(newPayment);
+                System.out.println("New payment created: " + savedPayment.getPaymentID() + " for $" + additionalAmount);
+                System.out.println("Reason: " + reason);
+                
+                return savedPayment;
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error creating additional payment: " + e.getMessage());
+            throw new RuntimeException("Failed to create additional payment", e);
+        }
+    }
+    
+    // Process refund for booking modifications
+    public boolean processRefund(Long reservationID, BigDecimal refundAmount, String reason) {
+        try {
+            Optional<Payment> paymentOpt = getPaymentByReservationId(reservationID);
+            if (!paymentOpt.isPresent()) {
+                System.err.println("No payment found for refund processing");
+                return false;
+            }
+            
+            Payment payment = paymentOpt.get();
+            
+            // Update existing payment by subtracting the refund amount
+            BigDecimal newAmount = payment.getAmount().subtract(refundAmount);
+            
+            // Ensure the amount doesn't go below zero
+            if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
+                newAmount = BigDecimal.ZERO;
+            }
+            
+            payment.setAmount(newAmount);
+            payment.setUpdatedAt(LocalDateTime.now());
+            payment.setStatus("REFUNDED");
+            
+            Payment savedPayment = paymentRepository.save(payment);
+            System.out.println("Refund processed: Payment " + savedPayment.getPaymentID() + 
+                             " - New amount: $" + newAmount + " (Refunded: $" + refundAmount + ")");
+            System.out.println("Reason: " + reason);
+            
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("Error processing refund: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    // Update original payment amount after adjustment
+    public boolean updatePaymentAmount(Long reservationID, BigDecimal newAmount) {
+        try {
+            Optional<Payment> paymentOpt = getPaymentByReservationId(reservationID);
+            if (!paymentOpt.isPresent()) {
+                return false;
+            }
+            
+            Payment payment = paymentOpt.get();
+            payment.setAmount(newAmount);
+            payment.setUpdatedAt(LocalDateTime.now());
+            
+            paymentRepository.save(payment);
+            System.out.println("Payment amount updated to: $" + newAmount);
+            
+            return true;
+            
+        } catch (Exception e) {
+            System.err.println("Error updating payment amount: " + e.getMessage());
+            return false;
+        }
+    }
+    
+    // Inner class for payment adjustment details
+    public static class PaymentAdjustment implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
+        private Long reservationID;
+        private BigDecimal originalAmount;
+        private BigDecimal newAmount;
+        private BigDecimal adjustmentAmount;
+        private String adjustmentType;
+        private boolean requiresPayment;
+        // Store payment ID instead of the entire Payment object to avoid serialization issues
+        private Long currentPaymentId;
+        
+        // Getters and setters
+        public Long getReservationID() { return reservationID; }
+        public void setReservationID(Long reservationID) { this.reservationID = reservationID; }
+        
+        public BigDecimal getOriginalAmount() { return originalAmount; }
+        public void setOriginalAmount(BigDecimal originalAmount) { this.originalAmount = originalAmount; }
+        
+        public BigDecimal getNewAmount() { return newAmount; }
+        public void setNewAmount(BigDecimal newAmount) { this.newAmount = newAmount; }
+        
+        public BigDecimal getAdjustmentAmount() { return adjustmentAmount; }
+        public void setAdjustmentAmount(BigDecimal adjustmentAmount) { this.adjustmentAmount = adjustmentAmount; }
+        
+        public String getAdjustmentType() { return adjustmentType; }
+        public void setAdjustmentType(String adjustmentType) { this.adjustmentType = adjustmentType; }
+        
+        public boolean isRequiresPayment() { return requiresPayment; }
+        public void setRequiresPayment(boolean requiresPayment) { this.requiresPayment = requiresPayment; }
+        
+        public Long getCurrentPaymentId() { return currentPaymentId; }
+        public void setCurrentPaymentId(Long currentPaymentId) { this.currentPaymentId = currentPaymentId; }
+        
+        public boolean isAdditionalPaymentRequired() {
+            return "ADDITIONAL_PAYMENT".equals(adjustmentType) && requiresPayment;
+        }
+        
+        public boolean isRefundDue() {
+            return "REFUND".equals(adjustmentType);
+        }
+        
+        public BigDecimal getAbsoluteAdjustmentAmount() {
+            return adjustmentAmount != null ? adjustmentAmount.abs() : BigDecimal.ZERO;
         }
     }
 }

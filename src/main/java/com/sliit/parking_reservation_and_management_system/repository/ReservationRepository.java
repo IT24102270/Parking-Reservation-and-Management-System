@@ -29,6 +29,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r WHERE r.slotId = :slotId AND r.status = 'ACTIVE' AND r.endTime > :currentTime")
     List<Reservation> findActiveBySlotId(@Param("slotId") Long slotId, @Param("currentTime") LocalDateTime currentTime);
     
+    @Query("SELECT r FROM Reservation r WHERE r.status = 'ACTIVE' AND r.endTime > :currentTime ORDER BY r.startTime ASC")
+    List<Reservation> findActiveReservations(@Param("currentTime") LocalDateTime currentTime);
+    
+    // Additional queries for security officer needs
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.parkingSlot LEFT JOIN FETCH r.user WHERE (r.status = 'ACTIVE' OR r.status = 'CONFIRMED') AND r.startTime <= :currentTime AND r.endTime > :currentTime ORDER BY r.startTime ASC")
+    List<Reservation> findCurrentActiveReservations(@Param("currentTime") LocalDateTime currentTime);
+    
+    @Query("SELECT r FROM Reservation r LEFT JOIN FETCH r.parkingSlot LEFT JOIN FETCH r.user WHERE r.vehicleNumber = :vehicleNumber AND (r.status = 'ACTIVE' OR r.status = 'CONFIRMED') AND r.endTime > :currentTime")
+    List<Reservation> findActiveReservationsByVehicleNumber(@Param("vehicleNumber") String vehicleNumber, @Param("currentTime") LocalDateTime currentTime);
+    
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.status = 'ACTIVE' AND r.endTime > :currentTime")
+    Long countActiveReservations(@Param("currentTime") LocalDateTime currentTime);
+    
     // Notification scheduler queries
     @Query("SELECT r FROM Reservation r WHERE r.startTime BETWEEN :startTime AND :endTime AND r.status = 'CONFIRMED'")
     List<Reservation> findUpcomingReservations(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);

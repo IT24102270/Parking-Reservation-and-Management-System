@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - QR Scanner</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard">Dashboard</a></li>
+                    <li><a href="/security/reports">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner" class="active">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-qrcode"></i> QR Code Scanner</h1>
+                    <p>Scan QR codes at entry and exit gates for vehicle verification</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/dashboard" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+
+            <!-- Scanner Section -->
+            <div class="scanner-container">
+                <div class="scanner-card">
+                    <div class="scanner-header">
+                        <h2><i class="fas fa-camera"></i> QR Code Scanner</h2>
+                        <p>Position the QR code within the scanner frame</p>
+                    </div>
+
+                    <!-- Scanner Placeholder -->
+                    <div class="scanner-area">
+                        <div class="scanner-frame">
+                            <div class="scanner-corners">
+                                <div class="corner top-left"></div>
+                                <div class="corner top-right"></div>
+                                <div class="corner bottom-left"></div>
+                                <div class="corner bottom-right"></div>
+                            </div>
+                            <div class="scanner-line"></div>
+                            <div class="scanner-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>Position QR code here</p>
+                                <small>Camera access required</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual Entry -->
+                    <div class="manual-entry">
+                        <h3>Manual Entry</h3>
+                        <p>Enter booking ID or vehicle number manually if QR code is not available</p>
+                        <div class="manual-form">
+                            <input type="text" id="manualCode" placeholder="Enter booking ID or vehicle number" class="form-control">
+                            <button type="button" onclick="verifyManualEntry()" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Verify
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Scanner Controls -->
+                    <div class="scanner-controls">
+                        <button type="button" id="startScanner" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Start Scanner
+                        </button>
+                        <button type="button" id="stopScanner" class="btn btn-secondary" style="display: none;">
+                            <i class="fas fa-stop"></i> Stop Scanner
+                        </button>
+                        <button type="button" id="toggleFlash" class="btn btn-secondary">
+                            <i class="fas fa-flashlight"></i> Toggle Flash
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Scans -->
+                <div class="recent-scans">
+                    <h3><i class="fas fa-history"></i> Recent Scans</h3>
+                    <div class="scans-list">
+                        <div class="scan-item">
+                            <div class="scan-icon">
+                                <i class="fas fa-check-circle text-success"></i>
+                            </div>
+                            <div class="scan-content">
+                                <h4>Booking #12345</h4>
+                                <p>Vehicle: ABC-1234 | Slot: A1</p>
+                                <small>2 minutes ago</small>
+                            </div>
+                            <div class="scan-status">
+                                <span class="status-badge status-resolved">Verified</span>
+                            </div>
+                        </div>
+                        
+                        <div class="scan-item">
+                            <div class="scan-icon">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                            </div>
+                            <div class="scan-content">
+                                <h4>Vehicle: XYZ-9876</h4>
+                                <p>No valid booking found</p>
+                                <small>5 minutes ago</small>
+                            </div>
+                            <div class="scan-status">
+                                <span class="status-badge status-pending">Invalid</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-section">
+                <h3><i class="fas fa-info-circle"></i> Scanner Instructions</h3>
+                <div class="instructions-grid">
+                    <div class="instruction-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <div>
+                            <h4>Position Device</h4>
+                            <p>Hold your device steady and position the QR code within the frame</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-sun"></i>
+                        <div>
+                            <h4>Good Lighting</h4>
+                            <p>Ensure adequate lighting or use the flash for better scanning</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-eye"></i>
+                        <div>
+                            <h4>Clear View</h4>
+                            <p>Make sure the QR code is clean and not damaged</p>
+                        </div>
+                    </div>
+                    <div class="instruction-item">
+                        <i class="fas fa-keyboard"></i>
+                        <div>
+                            <h4>Manual Entry</h4>
+                            <p>Use manual entry if QR code scanning is not possible</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        // QR Scanner functionality (placeholder)
+        let scannerActive = false;
+        
+        document.getElementById('startScanner').addEventListener('click', function() {
+            if (!scannerActive) {
+                startScanner();
+            }
+        });
+        
+        document.getElementById('stopScanner').addEventListener('click', function() {
+            if (scannerActive) {
+                stopScanner();
+            }
+        });
+        
+        function startScanner() {
+            scannerActive = true;
+            document.getElementById('startScanner').style.display = 'none';
+            document.getElementById('stopScanner').style.display = 'inline-flex';
+            
+            // Add scanning animation
+            document.querySelector('.scanner-line').style.animation = 'scan 2s linear infinite';
+            document.querySelector('.scanner-placeholder p').textContent = 'Scanning...';
+            
+            // Simulate camera access (in real implementation, use camera API)
+            setTimeout(() => {
+                SecurityDashboard.showNotification('Camera access granted. Ready to scan QR codes.', 'success');
+            }, 1000);
+        }
+        
+        function stopScanner() {
+            scannerActive = false;
+            document.getElementById('startScanner').style.display = 'inline-flex';
+            document.getElementById('stopScanner').style.display = 'none';
+            
+            // Remove scanning animation
+            document.querySelector('.scanner-line').style.animation = 'none';
+            document.querySelector('.scanner-placeholder p').textContent = 'Position QR code here';
+        }
+        
+        function verifyManualEntry() {
+            const code = document.getElementById('manualCode').value.trim();
+            if (!code) {
+                SecurityDashboard.showNotification('Please enter a booking ID or vehicle number', 'error');
+                return;
+            }
+            
+            // Simulate verification (in real implementation, make API call)
+            SecurityDashboard.showNotification('Verifying: ' + code, 'info');
+            
+            setTimeout(() => {
+                // Simulate random result
+                const isValid = Math.random() > 0.3;
+                if (isValid) {
+                    SecurityDashboard.showNotification('Valid booking found for: ' + code, 'success');
+                } else {
+                    SecurityDashboard.showNotification('No valid booking found for: ' + code, 'error');
+                }
+                document.getElementById('manualCode').value = '';
+            }, 2000);
+        }
+        
+        // Flash toggle
+        document.getElementById('toggleFlash').addEventListener('click', function() {
+            // In real implementation, toggle camera flash
+            SecurityDashboard.showNotification('Flash toggled', 'info');
+        });
+    </script>
+    
+    <style>
+        .scanner-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .scanner-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .scanner-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .scanner-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .scanner-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .scanner-frame {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .scanner-corners {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .corner {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e74c3c;
+        }
+        
+        .top-left {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .top-right {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .bottom-left {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            right: 10px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+        }
+        
+        @keyframes scan {
+            0% { top: 10px; }
+            100% { top: calc(100% - 10px); }
+        }
+        
+        .scanner-placeholder {
+            text-align: center;
+            color: #7f8c8d;
+        }
+        
+        .scanner-placeholder i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .manual-entry {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .manual-entry h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .manual-form {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .manual-form input {
+            flex: 1;
+        }
+        
+        .scanner-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .recent-scans {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .recent-scans h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .scan-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .scan-item:last-child {
+            border-bottom: none;
+        }
+        
+        .scan-icon {
+            font-size: 20px;
+        }
+        
+        .scan-content {
+            flex: 1;
+        }
+        
+        .scan-content h4 {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .scan-content p {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .scan-content small {
+            color: #95a5a6;
+            font-size: 11px;
+        }
+        
+        .instructions-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .instructions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .instruction-item i {
+            color: #e74c3c;
+            font-size: 24px;
+            margin-top: 5px;
+        }
+        
+        .instruction-item h4 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        
+        .instruction-item p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .scanner-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .scanner-frame {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</body>
+</html>

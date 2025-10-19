@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Suspicious Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .alert { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>Create Suspicious Report</h1>
+    
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="alert alert-success" th:text="${success}">Success message</div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}">Error message</div>
+    
+    <form th:action="@{/public/report-create}" th:object="${suspiciousReport}" method="post">
+        <!-- Report Information Section -->
+        <fieldset style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <legend style="font-weight: bold; color: #333;">Report Information</legend>
+            
+            <div class="form-group">
+                <label for="securityOfficerID">Security Officer ID</label>
+                <input type="number" id="securityOfficerID" th:field="*{securityOfficerID}" 
+                       th:value="${user != null ? user.userID : ''}" 
+                       readonly style="background-color: #f5f5f5;">
+                <small>Your officer ID (auto-filled)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="date">Report Date & Time *</label>
+                <input type="datetime-local" id="date" th:field="*{date}" required>
+                <small>When the incident occurred</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="status">Status *</label>
+                <select id="status" th:field="*{status}" required>
+                    <option value="">Select Status...</option>
+                    <option value="PENDING" selected>Pending</option>
+                    <option value="INVESTIGATING">Investigating</option>
+                    <option value="RESOLVED">Resolved</option>
+                    <option value="CLOSED">Closed</option>
+                </select>
+                <small>Current status of the report</small>
+            </div>
+        </fieldset>
+        
+        
+        <!-- Description Section -->
+        <fieldset style="border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
+            <legend style="font-weight: bold; color: #333;">Detailed Description</legend>
+            
+            <div class="form-group">
+                <label for="description">Description *</label>
+                <textarea id="description" th:field="*{description}" 
+                          placeholder="Provide a detailed description of the suspicious activity or incident. Include what you observed, when it happened, any people or vehicles involved, and any other relevant details..."
+                          rows="6" required maxlength="500"></textarea>
+                <div style="text-align: right; font-size: 12px; color: #666;">
+                    <span id="charCount">0</span>/500 characters
+                </div>
+            </div>
+            
+        </fieldset>
+        
+        <!-- Form Actions -->
+        <div class="form-group" style="text-align: center; margin-top: 30px;">
+            <button type="submit" style="background: #28a745; margin-right: 10px;">
+                <i class="fas fa-save"></i> Create Report
+            </button>
+            <a href="/security/dashboard" class="btn" style="background: #6c757d; color: white; text-decoration: none; padding: 10px 20px; border-radius: 4px;">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+    
+    <hr>
+    <p><strong>Debug Info:</strong></p>
+    <p>User: <span th:text="${user != null ? user.firstName + ' ' + user.lastName : 'No user'}">No user</span></p>
+    <p>User ID: <span th:text="${user != null ? user.userID : 'No ID'}">No ID</span></p>
+    <p>User Role: <span th:text="${user != null ? user.role : 'No role'}">No role</span></p>
+    
+    <script>
+        // Character counter for description
+        document.getElementById('description').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('charCount').textContent = charCount;
+            
+            if (charCount > 450) {
+                document.getElementById('charCount').style.color = '#dc3545';
+            } else {
+                document.getElementById('charCount').style.color = '#666';
+            }
+        });
+        
+        
+        // Form validation
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const description = document.getElementById('description').value.trim();
+            const status = document.getElementById('status').value;
+            const date = document.getElementById('date').value;
+            
+            if (!description) {
+                e.preventDefault();
+                alert('Please provide a description for the report.');
+                return false;
+            }
+            
+            if (description.length < 10) {
+                e.preventDefault();
+                alert('Please provide a more detailed description (at least 10 characters).');
+                return false;
+            }
+            
+            if (!status) {
+                e.preventDefault();
+                alert('Please select a status for the report.');
+                return false;
+            }
+            
+            if (!date) {
+                e.preventDefault();
+                alert('Please select the date and time of the incident.');
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Initialize character count and date on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const description = document.getElementById('description');
+            if (description.value) {
+                document.getElementById('charCount').textContent = description.value.length;
+            }
+            
+            // Set current date and time
+            const dateInput = document.getElementById('date');
+            if (!dateInput.value) {
+                const now = new Date();
+                // Format: YYYY-MM-DDTHH:MM
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                
+                const dateTimeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+                dateInput.value = dateTimeString;
+            }
+        });
+    </script>
+</body>
+</html>

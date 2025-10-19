@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking - Report Details</title>
+    <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard">Dashboard</a></li>
+                    <li><a href="/security/reports" class="active">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="profile-dropdown" id="profileToggle">
+                    <div class="profile-info">
+                        <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
+                        <span class="profile-role">Security Officer</span>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                    
+                    <!-- Profile Dropdown -->
+                    <div class="profile-dropdown-menu" id="profileDropdown">
+                        <a href="/security/profile"><i class="fas fa-user"></i> Profile</a>
+                        <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1><i class="fas fa-file-alt"></i> Report Details</h1>
+                    <p>Suspicious activity report information</p>
+                </div>
+                <div class="page-actions">
+                    <a href="/security/reports" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Reports
+                    </a>
+                </div>
+            </div>
+
+            <!-- Alert Messages -->
+            <div th:if="${success}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}">Success message</span>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error message</span>
+            </div>
+
+            <!-- Report Details -->
+            <div class="report-details-container">
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-title">
+                            <h2 th:text="'Report #' + ${report.suspiciousID}">Report #1</h2>
+                            <span class="report-status" 
+                                  th:text="${report.status}"
+                                  th:classappend="${report.status == 'PENDING'} ? 'status-pending' : 
+                                                 ${report.status == 'RESOLVED'} ? 'status-resolved' : 
+                                                 ${report.status == 'INVESTIGATING'} ? 'status-investigating' : 'status-closed'">PENDING</span>
+                        </div>
+                        <div class="report-actions">
+                            <a th:href="@{/security/report/{id}/edit(id=${report.suspiciousID})}" class="btn btn-primary">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <button type="button" onclick="confirmDelete()" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="report-content">
+                        <!-- Basic Information -->
+                        <div class="info-section">
+                            <h3><i class="fas fa-info-circle"></i> Basic Information</h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>Report ID:</label>
+                                    <span th:text="'#' + ${report.suspiciousID}">#1</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Status:</label>
+                                    <span class="status-badge" 
+                                          th:text="${report.status}"
+                                          th:classappend="${report.status == 'PENDING'} ? 'status-pending' : 
+                                                         ${report.status == 'RESOLVED'} ? 'status-resolved' : 
+                                                         ${report.status == 'INVESTIGATING'} ? 'status-investigating' : 'status-closed'">PENDING</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Reporting Officer:</label>
+                                    <span th:text="${report.securityOfficer?.firstName + ' ' + report.securityOfficer?.lastName ?: 'Security Officer'}">Officer Name</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Officer ID:</label>
+                                    <span th:text="${report.securityOfficerID}">1</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Report Date:</label>
+                                    <span th:text="${#temporals.format(report.date, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Created:</label>
+                                    <span th:text="${#temporals.format(report.created_at, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>Last Updated:</label>
+                                    <span th:text="${#temporals.format(report.updated_at, 'MMM dd, yyyy HH:mm')}">Oct 18, 2024 14:30</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="info-section">
+                            <h3><i class="fas fa-file-text"></i> Description</h3>
+                            <div class="description-content">
+                                <p th:text="${report.description}">Detailed description of the suspicious activity...</p>
+                            </div>
+                        </div>
+
+                        <!-- Status Update -->
+                        <div class="info-section">
+                            <h3><i class="fas fa-tasks"></i> Update Status</h3>
+                            <form th:action="@{/security/report/{id}/status(id=${report.suspiciousID})}" method="post" class="status-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="newStatus">Change Status:</label>
+                                        <select id="newStatus" name="status" class="form-control">
+                                            <option value="PENDING" th:selected="${report.status == 'PENDING'}">Pending</option>
+                                            <option value="INVESTIGATING" th:selected="${report.status == 'INVESTIGATING'}">Investigating</option>
+                                            <option value="RESOLVED" th:selected="${report.status == 'RESOLVED'}">Resolved</option>
+                                            <option value="CLOSED" th:selected="${report.status == 'CLOSED'}">Closed</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Update Status
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <span class="modal-close" onclick="closeDeleteModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this report? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeDeleteModal()" class="btn btn-secondary">Cancel</button>
+                <form th:action="@{/security/report/{id}/delete(id=${report.suspiciousID})}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete Report</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/security-dashboard.js}"></script>
+    <script>
+        function confirmDelete() {
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+    
+    <style>
+        .report-details-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .report-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .report-title h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .report-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .info-section {
+            margin-bottom: 30px;
+        }
+        
+        .info-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .info-item label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .info-item span {
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        
+        .description-content {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .description-content p {
+            color: #2c3e50;
+            line-height: 1.6;
+            margin: 0;
+        }
+        
+        .status-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+    </style>
+</body>
+</html>
