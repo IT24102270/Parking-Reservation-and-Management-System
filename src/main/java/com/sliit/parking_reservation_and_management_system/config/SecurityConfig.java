@@ -26,46 +26,25 @@ public class SecurityConfig {
     }
 
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final CustomSuccessHandler customSuccessHandler; // Inject the success handler
 
-    public SecurityConfig(CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
+    // Updated constructor to inject both handlers
+    public SecurityConfig(CustomAuthenticationFailureHandler customAuthenticationFailureHandler, CustomSuccessHandler customSuccessHandler) {
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
+        this.customSuccessHandler = customSuccessHandler;
     }
 
-    // Success handler: redirects users based on their role
+    // The @Bean definition for customSuccessHandler has been removed from here.
+
+    // Security filter chain
     @Bean
-    public AuthenticationSuccessHandler customSuccessHandler() {
-        return (request, response, authentication) -> {
-            var authorities = authentication.getAuthorities();
-            String redirectUrl = "/";
-
-            if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                redirectUrl = "/admin/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
-                redirectUrl = "/customer/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_PARKING_SLOT_MANAGER"))) {
-                redirectUrl = "/slotmanager/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_FINANCE_EXECUTIVE"))) {
-                redirectUrl = "/finance/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_SECURITY_OFFICER"))) {
-                redirectUrl = "/security/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER_SUPPORT_OFFICER"))) {
-                redirectUrl = "/support/dashboard";
-            }
-
-            response.sendRedirect(redirectUrl);
-        };
-    }
-
-    // Main security filter chain configuration
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Public pages
-                        .requestMatchers("/", "/index", "/login", "/register", "/css/**", "/js/**").permitAll()
+                        // ✅ Public access for static resources, login, registration, and index
+                        .requestMatchers("/", "/css/**", "/js/**", "/images/**", "/login", "/register").permitAll()
 
-                        // Protected dashboards
+                        // ✅ Role-protected dashboards
                         // ✅ Admin has access to everything
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasAnyRole("CUSTOMER", "ADMIN")
@@ -78,7 +57,7 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .successHandler(customSuccessHandler())
+                        .successHandler(customSuccessHandler) // Use the injected instance
                         .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
                 )
@@ -94,7 +73,5 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-
-
 }
+

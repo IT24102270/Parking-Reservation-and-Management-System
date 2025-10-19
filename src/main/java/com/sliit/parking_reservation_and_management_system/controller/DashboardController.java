@@ -16,10 +16,9 @@ public class DashboardController {
         return "slotmanager-dashboard";
     }
 
-    @GetMapping("/finance/dashboard")
-    public String financeDashboard() {
-        return "finance-dashboard";
-    }
+    // 🟢 DELETED the conflicting method that was here:
+    // @GetMapping("/finance/dashboard")
+    // public String financeDashboard() { ... }
 
     @GetMapping("/security/dashboard")
     public String securityDashboard() {
