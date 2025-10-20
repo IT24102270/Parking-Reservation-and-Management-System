@@ -26,14 +26,40 @@ public class CustomUserDetailsService implements UserDetailsService {
         boolean credentialsNonExpired = true;
         boolean accountNonLocked = true;
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPasswordHash())
-                .roles(user.getRole().toUpperCase())
-                .disabled(!enabled) // 👈 disable if status != ACTIVE
-                .accountExpired(!accountNonExpired)
-                .credentialsExpired(!credentialsNonExpired)
-                .accountLocked(!accountNonLocked)
-                .build();
+        // Handle role properly - check if it already has ROLE_ prefix
+        String role = user.getRole().toUpperCase();
+        
+        // Debug logging
+        System.out.println("=== USER LOADING DEBUG ===");
+        System.out.println("Email: " + user.getEmail());
+        System.out.println("Raw Role from DB: '" + user.getRole() + "'");
+        System.out.println("Processed Role: '" + role + "'");
+        System.out.println("Status: " + user.getStatus());
+        System.out.println("Enabled: " + enabled);
+        System.out.println("========================");
+        
+        if (role.startsWith("ROLE_")) {
+            // Role already has ROLE_ prefix, use authorities() instead of roles()
+            return org.springframework.security.core.userdetails.User
+                    .withUsername(user.getEmail())
+                    .password(user.getPasswordHash())
+                    .authorities(role)
+                    .disabled(!enabled)
+                    .accountExpired(!accountNonExpired)
+                    .credentialsExpired(!credentialsNonExpired)
+                    .accountLocked(!accountNonLocked)
+                    .build();
+        } else {
+            // Role doesn't have ROLE_ prefix, use roles() to add it
+            return org.springframework.security.core.userdetails.User
+                    .withUsername(user.getEmail())
+                    .password(user.getPasswordHash())
+                    .roles(role)
+                    .disabled(!enabled)
+                    .accountExpired(!accountNonExpired)
+                    .credentialsExpired(!credentialsNonExpired)
+                    .accountLocked(!accountNonLocked)
+                    .build();
+        }
     }
 }

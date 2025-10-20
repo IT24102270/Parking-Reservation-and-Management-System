@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reports - Finance Executive</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    <!-- Dashboard CSS -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    
+    <style>
+        .report-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .stat-icon.primary { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .stat-icon.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .stat-icon.warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .stat-icon.info { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        
+        .reports-table {
+            background: var(--color-surface);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-generate {
+            background: var(--gradient-button-primary);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+        
+        .btn-view {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-view:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+        
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        
+        .report-type-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .type-daily { background: #e3f2fd; color: #1976d2; }
+        .type-weekly { background: #f3e5f5; color: #7b1fa2; }
+        .type-monthly { background: #e8f5e8; color: #388e3c; }
+        .type-custom { background: #fff3e0; color: #f57c00; }
+        
+        .quick-actions {
+            background: var(--gradient-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .quick-action-btn {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-light);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--color-text-primary);
+            display: block;
+        }
+        
+        .quick-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.15);
+            color: var(--color-text-primary);
+            text-decoration: none;
+        }
+        
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="cps-header">
+        <div class="cps-header-content">
+            <div class="cps-logo">
+                <div class="cps-logo-icon">CPS</div>
+                <span>City Park Solutions</span>
+            </div>
+            <nav class="cps-nav">
+                <a th:href="@{/finance/dashboard}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a th:href="@{/finance/payments}">
+                    <i class="fas fa-credit-card"></i> Payments
+                </a>
+                <a th:href="@{/finance/refunds}">
+                    <i class="fas fa-undo-alt"></i> Refunds
+                </a>
+                <a th:href="@{/finance/reports/financial}" class="active">
+                    <i class="fas fa-chart-line"></i> Financial Reports
+                </a>
+                <a th:href="@{/finance/reports/export}">
+                    <i class="fas fa-file-export"></i> Income Reports
+                </a>
+                <a th:href="@{/logout}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/finance/dashboard}">Finance Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Financial Reports</li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-chart-line text-primary me-2"></i>
+                            Financial Reports Management
+                        </h2>
+                        <p class="text-muted mb-0">Generate, view, and manage daily, weekly, and monthly financial reports</p>
+                    </div>
+                    <a th:href="@{/finance/reports/financial/generate}" class="btn btn-generate">
+                        <i class="fas fa-plus me-1"></i> Generate New Report
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success alert-custom mb-4">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <div th:if="${generatedReportId}" class="mt-2">
+                <a th:href="@{/finance/reports/financial/{id}(id=${generatedReportId})}" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-eye me-1"></i> View Generated Report
+                </a>
+            </div>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-custom mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h4 th:text="${totalReports}">0</h4>
+                    <p class="text-muted mb-0">Total Reports</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <h4 th:text="${dailyReports}">0</h4>
+                    <p class="text-muted mb-0">Daily Reports</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <h4 th:text="${weeklyReports}">0</h4>
+                    <p class="text-muted mb-0">Weekly Reports</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h4 th:text="${monthlyReports}">0</h4>
+                    <p class="text-muted mb-0">Monthly Reports</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h5 class="mb-3">
+                <i class="fas fa-bolt text-warning me-2"></i>
+                Quick Report Generation
+            </h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <form th:action="@{/finance/reports/financial/generate/today}" method="post" class="d-inline">
+                        <button type="submit" class="quick-action-btn w-100">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <strong>Today's Report</strong>
+                            <small class="d-block text-muted">Generate today's financial summary</small>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-3">
+                    <form th:action="@{/finance/reports/financial/generate/this-week}" method="post" class="d-inline">
+                        <button type="submit" class="quick-action-btn w-100">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-calendar-week"></i>
+                            </div>
+                            <strong>This Week</strong>
+                            <small class="d-block text-muted">Generate current week's report</small>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-3">
+                    <form th:action="@{/finance/reports/financial/generate/this-month}" method="post" class="d-inline">
+                        <button type="submit" class="quick-action-btn w-100">
+                            <div class="quick-action-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <strong>This Month</strong>
+                            <small class="d-block text-muted">Generate current month's report</small>
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-3">
+                    <a th:href="@{/finance/reports/financial/generate}" class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <strong>Custom Report</strong>
+                        <small class="d-block text-muted">Generate custom date range</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Reports Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="report-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-list text-primary me-2"></i>
+                        All Financial Reports
+                    </h5>
+                    
+                    <div class="reports-table">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Report ID</th>
+                                        <th>Type</th>
+                                        <th>Generated Date</th>
+                                        <th>Generated By</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(financialReports)}">
+                                        <td colspan="5" class="text-center py-4 text-muted">
+                                            <i class="fas fa-inbox fa-2x mb-2"></i>
+                                            <br>No financial reports generated yet
+                                            <br>
+                                            <a th:href="@{/finance/reports/financial/generate}" class="btn btn-sm btn-primary mt-2">
+                                                <i class="fas fa-plus me-1"></i> Generate Your First Report
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="report : ${financialReports}">
+                                        <td>
+                                            <strong th:text="'#' + ${report.reportID}">Report ID</strong>
+                                        </td>
+                                        <td>
+                                            <span th:class="'report-type-badge type-' + ${#strings.toLowerCase(report.reportType)}"
+                                                  th:text="${report.reportType}">Type</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(report.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="'User #' + ${report.generatedBy}">Generated By</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a th:href="@{/finance/reports/financial/{id}(id=${report.reportID})}" 
+                                                   class="btn btn-view btn-sm">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    View
+                                                </a>
+                                                <form th:action="@{/finance/reports/financial/{id}/delete(id=${report.reportID})}" 
+                                                      method="post" class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to delete this financial report? This action cannot be undone.')">
+                                                    <button type="submit" class="btn btn-delete btn-sm">
+                                                        <i class="fas fa-trash me-1"></i>
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reports (if different from all reports) -->
+        <div class="row mt-4" th:if="${!#lists.isEmpty(recentReports) && #lists.size(recentReports) < #lists.size(financialReports)}">
+            <div class="col-12">
+                <div class="report-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-clock text-warning me-2"></i>
+                        Recent Reports (Last 30 Days)
+                    </h5>
+                    
+                    <div class="reports-table">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Report ID</th>
+                                        <th>Type</th>
+                                        <th>Generated Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="report : ${recentReports}">
+                                        <td>
+                                            <strong th:text="'#' + ${report.reportID}">Report ID</strong>
+                                        </td>
+                                        <td>
+                                            <span th:class="'report-type-badge type-' + ${#strings.toLowerCase(report.reportType)}"
+                                                  th:text="${report.reportType}">Type</span>
+                                        </td>
+                                        <td>
+                                            <span th:text="${#temporals.format(report.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span>
+                                        </td>
+                                        <td>
+                                            <a th:href="@{/finance/reports/financial/{id}(id=${report.reportID})}" 
+                                               class="btn btn-view btn-sm">
+                                                <i class="fas fa-eye me-1"></i>
+                                                View Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

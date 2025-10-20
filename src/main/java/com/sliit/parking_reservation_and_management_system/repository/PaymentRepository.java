@@ -60,4 +60,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Check if payment exists for reservation
     @Query("SELECT COUNT(p) > 0 FROM Payment p WHERE p.reservationID = ?1")
     boolean existsByReservationID(Long reservationID);
+    
+    // Sum total revenue by date range for reports
+    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.date BETWEEN ?1 AND ?2 AND p.status = 'COMPLETED'")
+    java.util.Optional<java.math.BigDecimal> sumCompletedPaymentsByDateRange(LocalDateTime startDate, LocalDateTime endDate);
 }

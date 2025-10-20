@@ -1,12 +1,16 @@
 package com.sliit.parking_reservation_and_management_system.service;
 
+import com.sliit.parking_reservation_and_management_system.dto.PaymentDetailsDTO;
 import com.sliit.parking_reservation_and_management_system.entity.Payment;
+import com.sliit.parking_reservation_and_management_system.entity.Reservation;
+import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -587,5 +591,48 @@ public class PaymentService {
         public BigDecimal getAbsoluteAdjustmentAmount() {
             return adjustmentAmount != null ? adjustmentAmount.abs() : BigDecimal.ZERO;
         }
+    }
+    
+    // Get all payments with customer details
+    public List<PaymentDetailsDTO> getAllPaymentDetails() {
+        List<Payment> payments = paymentRepository.findAll();
+        List<PaymentDetailsDTO> paymentDetails = new ArrayList<>();
+        
+        for (Payment payment : payments) {
+            String customerName = "N/A";
+            String customerEmail = "N/A";
+            
+            if (payment.getReservationID() != null) {
+                try {
+                    Optional<Reservation> reservationOpt = reservationRepository.findById(payment.getReservationID());
+                    if (reservationOpt.isPresent()) {
+                        Reservation reservation = reservationOpt.get();
+                        if (reservation.getUser() != null) {
+                            User user = reservation.getUser();
+                            customerName = user.getFirstName() + " " + user.getLastName();
+                            customerEmail = user.getEmail();
+                        }
+                    }
+                } catch (Exception e) {
+                    // If reservation lookup fails, keep default values
+                    System.out.println("Could not fetch reservation details for payment " + payment.getPaymentID());
+                }
+            }
+            
+            PaymentDetailsDTO dto = new PaymentDetailsDTO(
+                payment.getPaymentID(),
+                payment.getReservationID(),
+                payment.getAmount(),
+                payment.getMethod(),
+                payment.getDate(),
+                payment.getStatus(),
+                customerName,
+                customerEmail
+            );
+            
+            paymentDetails.add(dto);
+        }
+        
+        return paymentDetails;
     }
 }

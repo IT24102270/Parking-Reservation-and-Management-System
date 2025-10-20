@@ -249,22 +249,31 @@
                         Review all payment transactions
                     </p>
                 </a>
-                <a href="/finance/refunds" class="action-card">
+                <a th:href="@{/finance/refunds}" class="action-card">
                     <div class="action-icon">
                         <i class="fas fa-undo-alt"></i>
                     </div>
                     <h4>Process Refunds</h4>
                     <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
-                        Handle refund requests
+                        Handle refund requests and manage refunds
                     </p>
                 </a>
-                <a href="/finance/reports" class="action-card">
+                <a th:href="@{/finance/reports/financial}" class="action-card">
                     <div class="action-icon">
-                        <i class="fas fa-chart-bar"></i>
+                        <i class="fas fa-chart-line"></i>
                     </div>
                     <h4>Financial Reports</h4>
                     <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
-                        Generate detailed reports
+                        Generate daily, weekly, and monthly financial reports
+                    </p>
+                </a>
+                <a th:href="@{/finance/reports/export}" class="action-card">
+                    <div class="action-icon">
+                        <i class="fas fa-file-export"></i>
+                    </div>
+                    <h4>Export Income Reports</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        Export payment reports to database
                     </p>
                 </a>
                 <a href="/finance/analytics" class="action-card">

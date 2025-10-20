@@ -97,6 +97,11 @@ public class SupportIssueService {
         return null;
     }
     
+    // Update support issue
+    public SupportIssue updateSupportIssue(SupportIssue supportIssue) {
+        return supportIssueRepository.save(supportIssue);
+    }
+    
     // Delete support issue
     public boolean deleteSupportIssue(Long issueId) {
         if (supportIssueRepository.existsById(issueId)) {

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details - City Park Solutions Pvt Ltd</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    
+    <style>
+        body {
+            background: var(--gradient-background);
+            font-family: var(--font-family-primary);
+            color: var(--color-text-primary);
+        }
+        
+        .sidebar {
+            min-height: 100vh;
+            background: var(--gradient-card);
+            color: var(--color-text-primary);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius-lg);
+            margin-right: var(--spacing-lg);
+        }
+        
+        .sidebar .nav-link {
+            color: var(--color-text-secondary);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            margin: var(--spacing-xs) 0;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            background: var(--gradient-button-primary);
+            color: var(--color-text-inverse);
+            transform: translateX(5px);
+            border-color: var(--color-interactive-primary);
+        }
+        
+        .main-content {
+            background: var(--color-surface);
+            min-height: 100vh;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .ticket-header {
+            background: var(--gradient-primary);
+            color: var(--color-text-inverse);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-2xl);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb-item a {
+            color: var(--color-interactive-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--color-interactive-primary-hover);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: var(--color-text-muted);
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-open { background: #fff3cd; color: #856404; }
+        .status-in_progress { background: #d1ecf1; color: #0c5460; }
+        .status-resolved { background: #d4edda; color: #155724; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+        
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .description-box {
+            background: var(--color-surface-elevated);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            border-left: 4px solid var(--color-interactive-primary);
+            white-space: pre-wrap;
+            font-family: var(--font-family-primary);
+        }
+        
+        .cps-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .cps-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-button-primary);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            color: var(--color-text-inverse);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-4">
+                    <div class="cps-logo text-center mb-4">
+                        <div class="cps-logo-icon mx-auto mb-2">CPS</div>
+                        <h5 class="mb-0">Support Center</h5>
+                        <small class="text-muted">Customer Support Portal</small>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        <a class="nav-link" href="/support/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Dashboard
+                        </a>
+                        <a class="nav-link active" href="/support/tickets">
+                            <i class="fas fa-ticket-alt me-2"></i>
+                            Support Tickets
+                        </a>
+                        <a class="nav-link" href="/support/bookings">
+                            <i class="fas fa-calendar-check me-2"></i>
+                            Booking Management
+                        </a>
+                        <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                        <a class="nav-link" href="/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Breadcrumb Navigation -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/support/dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/support/tickets">
+                                <i class="fas fa-ticket-alt"></i> Support Tickets
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-eye"></i> Ticket Details
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- CPS Ticket Header -->
+                <div class="ticket-header">
+                    <div class="cps-logo">
+                        <div class="cps-logo-icon">CPS</div>
+                        <div>
+                            <h2 class="mb-1">Ticket Details</h2>
+                            <p class="mb-0 opacity-75">View and manage support ticket information</p>
+                            <span th:class="'status-badge status-' + ${#strings.toLowerCase(ticket.status)}"
+                                  th:text="${ticket.status}">
+                                OPEN
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div class="row">
+                    <!-- Ticket Information -->
+                    <div class="col-md-8">
+                        <!-- Ticket Details -->
+                        <div class="info-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Ticket Information
+                            </h5>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Ticket ID:</strong>
+                                    <span th:text="${ticket.ticketId}">SUP-001</span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Status:</strong>
+                                    <span th:class="'status-badge status-' + ${#strings.toLowerCase(ticket.status)}"
+                                          th:text="${ticket.status}">OPEN</span>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>Raised Date:</strong>
+                                    <span th:text="${#temporals.format(ticket.raisedDate, 'MMM dd, yyyy HH:mm')}">
+                                        Jan 15, 2024 10:30
+                                    </span>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Last Updated:</strong>
+                                    <span th:text="${#temporals.format(ticket.updatedAt, 'MMM dd, yyyy HH:mm')}">
+                                        Jan 15, 2024 11:45
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <strong>Description:</strong>
+                                <div class="description-box mt-2" th:text="${ticket.description}">
+                                    Ticket description goes here...
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Customer Information -->
+                        <div class="info-card" th:if="${customer}">
+                            <h5 class="mb-3">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                Customer Information
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> 
+                                        <span th:text="${customer.firstName + ' ' + customer.lastName}">John Doe</span>
+                                    </p>
+                                    <p><strong>Email:</strong> 
+                                        <span th:text="${customer.email}">john@example.com</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Customer ID:</strong> 
+                                        <span th:text="${customer.userID}">123</span>
+                                    </p>
+                                    <p><strong>Phone:</strong> 
+                                        <span th:text="${customer.phoneNumber ?: 'Not provided'}">+1234567890</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions Panel -->
+                    <div class="col-md-4">
+                        <div class="action-card">
+                            <h5 class="mb-3">
+                                <i class="fas fa-cogs text-primary me-2"></i>
+                                Actions
+                            </h5>
+                            
+                            <!-- Status Update Form -->
+                            <form th:action="@{/support/ticket/{id}/update(id=${ticket.issueId})}" method="post">
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Update Status</label>
+                                    <select class="form-select" id="status" name="status" th:value="${ticket.status}">
+                                        <option value="OPEN" th:selected="${ticket.status == 'OPEN'}">Open</option>
+                                        <option value="IN_PROGRESS" th:selected="${ticket.status == 'IN_PROGRESS'}">In Progress</option>
+                                        <option value="RESOLVED" th:selected="${ticket.status == 'RESOLVED'}">Resolved</option>
+                                        <option value="CLOSED" th:selected="${ticket.status == 'CLOSED'}">Closed</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="response" class="form-label">Support Response</label>
+                                    <textarea class="form-control" id="response" name="response" rows="4" 
+                                              placeholder="Add your response or notes..."></textarea>
+                                    <div class="form-text">This will be appended to the ticket description.</div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-2"></i>Update Ticket
+                                </button>
+                            </form>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- Quick Actions -->
+                            <div class="d-grid gap-2">
+                                <a href="/support/tickets" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Tickets
+                                </a>
+                                
+                                <a th:href="@{/support/bookings?search={customerId}(customerId=${ticket.customerId})}" 
+                                   class="btn btn-outline-info">
+                                    <i class="fas fa-calendar-check me-2"></i>View Customer Bookings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

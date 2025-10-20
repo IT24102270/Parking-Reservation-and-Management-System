@@ -87,4 +87,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     
     @Query("SELECT r FROM Reservation r WHERE r.endTime BETWEEN :startTime AND :endTime AND r.status = 'ACTIVE'")
     List<Reservation> findReservationsEndingBetween(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    
+    // Report generation queries
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.createdAt BETWEEN :startDate AND :endDate")
+    Integer countByReservationDateBetween(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 }

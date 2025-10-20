@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Report Details - Finance Executive</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    <!-- Dashboard CSS -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    
+    <style>
+        .report-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .report-id {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-period {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon.revenue { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .stat-icon.refunds { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .stat-icon.net { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .stat-icon.transactions { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .stat-icon.completed { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .stat-icon.pending { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .details-card {
+            background: var(--gradient-card);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .btn-update {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-update:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+        
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+        
+        .progress-custom {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--color-border-light);
+        }
+        
+        .progress-bar-custom {
+            border-radius: 4px;
+        }
+        
+        .rate-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .rate-percentage {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .rate-bar {
+            flex: 1;
+        }
+        
+        .report-type-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .type-daily { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: #1976d2; }
+        .type-weekly { background: linear-gradient(135deg, #f3e5f5, #e1bee7); color: #7b1fa2; }
+        .type-monthly { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); color: #388e3c; }
+        .type-custom { background: linear-gradient(135deg, #fff3e0, #ffe0b2); color: #f57c00; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="cps-header">
+        <div class="cps-header-content">
+            <div class="cps-logo">
+                <div class="cps-logo-icon">CPS</div>
+                <span>City Park Solutions</span>
+            </div>
+            <nav class="cps-nav">
+                <a th:href="@{/finance/dashboard}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a th:href="@{/finance/payments}">
+                    <i class="fas fa-credit-card"></i> Payments
+                </a>
+                <a th:href="@{/finance/refunds}">
+                    <i class="fas fa-undo-alt"></i> Refunds
+                </a>
+                <a th:href="@{/finance/reports/financial}">
+                    <i class="fas fa-chart-line"></i> Financial Reports
+                </a>
+                <a th:href="@{/finance/reports/export}">
+                    <i class="fas fa-file-export"></i> Income Reports
+                </a>
+                <a th:href="@{/logout}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/finance/dashboard}">Finance Dashboard</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/finance/reports/financial}">Financial Reports</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Report Details</li>
+            </ol>
+        </nav>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${success}" class="alert alert-success alert-custom mb-4">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-custom mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
+
+        <!-- Report Header -->
+        <div class="report-header">
+            <div class="report-id">Report ID: #<span th:text="${report.reportID}">1</span></div>
+            <div class="report-title">
+                <span th:class="'report-type-badge type-' + ${#strings.toLowerCase(report.reportType)}"
+                      th:text="${report.reportType}">DAILY</span>
+                Financial Report
+            </div>
+            <div class="report-period">
+                <i class="fas fa-calendar me-2"></i>
+                <span th:text="${#temporals.format(startDate, 'MMM dd, yyyy')}">Start Date</span>
+                <span th:if="${!startDate.equals(endDate)}">
+                    to <span th:text="${#temporals.format(endDate, 'MMM dd, yyyy')}">End Date</span>
+                </span>
+            </div>
+            <div class="mt-3">
+                <small>Generated on <span th:text="${#temporals.format(report.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span></small>
+            </div>
+        </div>
+
+        <!-- Financial Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon revenue">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-value text-success" th:text="'$' + ${#numbers.formatDecimal(financialData.totalRevenue, 1, 2)}">$0.00</div>
+                    <div class="stat-label">Total Revenue</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon refunds">
+                        <i class="fas fa-undo-alt"></i>
+                    </div>
+                    <div class="stat-value text-danger" th:text="'$' + ${#numbers.formatDecimal(financialData.totalRefunds, 1, 2)}">$0.00</div>
+                    <div class="stat-label">Total Refunds</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon net">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value text-primary" th:text="'$' + ${#numbers.formatDecimal(financialData.netIncome, 1, 2)}">$0.00</div>
+                    <div class="stat-label">Net Income</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon transactions">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="stat-value text-info" th:text="${financialData.totalTransactions}">0</div>
+                    <div class="stat-label">Total Transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transaction Breakdown -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value text-success" th:text="${financialData.completedTransactions}">0</div>
+                    <div class="stat-label">Completed Transactions</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon refunds">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-value text-danger" th:text="${financialData.refundedTransactions}">0</div>
+                    <div class="stat-label">Refunded Transactions</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value text-warning" th:text="${financialData.pendingTransactions}">0</div>
+                    <div class="stat-label">Pending Transactions</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Report Details -->
+            <div class="col-md-6">
+                <div class="details-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        Report Details
+                    </h5>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Report ID:</span>
+                        <span class="detail-value" th:text="'#' + ${report.reportID}">ID</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Report Type:</span>
+                        <span class="detail-value">
+                            <span th:class="'report-type-badge type-' + ${#strings.toLowerCase(report.reportType)}"
+                                  th:text="${report.reportType}">Type</span>
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Period Start:</span>
+                        <span class="detail-value" th:text="${#temporals.format(startDate, 'MMM dd, yyyy')}">Start Date</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Period End:</span>
+                        <span class="detail-value" th:text="${#temporals.format(endDate, 'MMM dd, yyyy')}">End Date</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Generated Date:</span>
+                        <span class="detail-value" th:text="${#temporals.format(report.createdAt, 'MMM dd, yyyy HH:mm')}">Generated Date</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Generated By:</span>
+                        <span class="detail-value" th:text="'User #' + ${report.generatedBy}">User</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Last Updated:</span>
+                        <span class="detail-value" th:text="${#temporals.format(report.updatedAt, 'MMM dd, yyyy HH:mm')}">Updated Date</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Analysis -->
+            <div class="col-md-6">
+                <div class="details-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-chart-bar text-success me-2"></i>
+                        Financial Analysis
+                    </h5>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Total Revenue:</span>
+                        <span class="detail-value text-success fw-bold" th:text="'$' + ${#numbers.formatDecimal(financialData.totalRevenue, 1, 2)}">Revenue</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Total Refunds:</span>
+                        <span class="detail-value text-danger fw-bold" th:text="'$' + ${#numbers.formatDecimal(financialData.totalRefunds, 1, 2)}">Refunds</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Net Income:</span>
+                        <span class="detail-value text-primary fw-bold" th:text="'$' + ${#numbers.formatDecimal(financialData.netIncome, 1, 2)}">Net Income</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Completion Rate:</span>
+                        <div class="rate-display">
+                            <span class="rate-percentage text-success" th:text="${#numbers.formatDecimal(financialData.completionRate, 1, 1)} + '%'">Rate</span>
+                            <div class="rate-bar">
+                                <div class="progress progress-custom">
+                                    <div class="progress-bar bg-success progress-bar-custom" 
+                                         th:style="'width: ' + ${financialData.completionRate} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Refund Rate:</span>
+                        <div class="rate-display">
+                            <span class="rate-percentage text-danger" th:text="${#numbers.formatDecimal(financialData.refundRate, 1, 1)} + '%'">Rate</span>
+                            <div class="rate-bar">
+                                <div class="progress progress-custom">
+                                    <div class="progress-bar bg-danger progress-bar-custom" 
+                                         th:style="'width: ' + ${financialData.refundRate} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Average Transaction:</span>
+                        <span class="detail-value" 
+                              th:text="'$' + ${financialData.totalTransactions > 0 ? #numbers.formatDecimal(financialData.totalRevenue / financialData.totalTransactions, 1, 2) : '0.00'}">Average</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a th:href="@{/finance/reports/financial}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Reports
+                    </a>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-update" data-bs-toggle="modal" data-bs-target="#updateModal">
+                            <i class="fas fa-edit me-1"></i> Update Report
+                        </button>
+                        <button type="button" class="btn btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-1"></i> Delete Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Modal -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="updateModalLabel">Update Financial Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/finance/reports/financial/{id}/update(id=${report.reportID})}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="reportType" class="form-label">Report Type</label>
+                            <select class="form-select" id="reportType" name="reportType" th:value="${report.reportType}">
+                                <option value="DAILY" th:selected="${report.reportType == 'DAILY'}">Daily</option>
+                                <option value="WEEKLY" th:selected="${report.reportType == 'WEEKLY'}">Weekly</option>
+                                <option value="MONTHLY" th:selected="${report.reportType == 'MONTHLY'}">Monthly</option>
+                                <option value="FINANCIAL_CUSTOM" th:selected="${report.reportType == 'FINANCIAL_CUSTOM'}">Custom</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" 
+                                      placeholder="Enter updated description for this report..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-update">
+                            <i class="fas fa-save me-1"></i> Update Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Delete Financial Report</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    <p>Are you sure you want to delete this financial report?</p>
+                    <ul>
+                        <li><strong>Report ID:</strong> #<span th:text="${report.reportID}">ID</span></li>
+                        <li><strong>Type:</strong> <span th:text="${report.reportType}">Type</span></li>
+                        <li><strong>Generated:</strong> <span th:text="${#temporals.format(report.createdAt, 'MMM dd, yyyy HH:mm')}">Date</span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form th:action="@{/finance/reports/financial/{id}/delete(id=${report.reportID})}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-delete">
+                            <i class="fas fa-trash me-1"></i> Delete Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

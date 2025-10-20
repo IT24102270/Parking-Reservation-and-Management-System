@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Tickets Management - City Park Solutions Pvt Ltd</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    
+    <style>
+        body {
+            background: var(--gradient-background);
+            font-family: var(--font-family-primary);
+            color: var(--color-text-primary);
+        }
+        
+        .sidebar {
+            background: var(--color-surface);
+            min-height: 100vh;
+            border-right: 1px solid var(--color-border-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-content {
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            background: var(--gradient-primary);
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .cps-logo-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .cps-logo-container .cps-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--color-text-inverse);
+            color: var(--color-interactive-primary);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            flex-shrink: 0;
+        }
+
+        .cps-text h4 {
+            color: var(--color-text-inverse);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 2px;
+        }
+
+        .cps-text p {
+            color: var(--color-text-inverse);
+            opacity: 0.8;
+            font-size: var(--font-size-sm);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: var(--spacing-lg) 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-xl);
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .nav-item:hover {
+            background: var(--color-surface-hover);
+            color: var(--color-interactive-primary);
+            border-left-color: var(--color-interactive-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-interactive-primary);
+            color: var(--color-text-inverse);
+            border-left-color: var(--color-interactive-primary-hover);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: var(--font-size-md);
+        }
+
+        .nav-item span {
+            font-size: var(--font-size-sm);
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--color-border-light);
+            margin: var(--spacing-md) var(--spacing-xl);
+        }
+
+        .nav-item.logout {
+            margin-top: auto;
+            color: var(--color-status-error);
+        }
+
+        .nav-item.logout:hover {
+            background: var(--color-status-error-bg);
+            color: var(--color-status-error);
+            border-left-color: var(--color-status-error);
+        }
+        
+        .main-content {
+            background: var(--color-surface);
+            min-height: 100vh;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .ticket-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--color-interactive-primary);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .ticket-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .status-badge {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-semibold);
+            text-transform: uppercase;
+        }
+        
+        .status-open { background: var(--color-status-warning-bg); color: var(--color-status-warning); }
+        .status-in_progress { background: var(--color-status-info-bg); color: var(--color-status-info); }
+        .status-resolved { background: var(--color-status-success-bg); color: var(--color-status-success); }
+        .status-closed { background: var(--color-status-error-bg); color: var(--color-status-error); }
+        
+        .filter-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-2xl);
+            backdrop-filter: blur(10px);
+        }
+        
+        .page-header {
+            background: var(--gradient-primary);
+            color: var(--color-text-inverse);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-2xl);
+            backdrop-filter: blur(10px);
+        }
+        
+        .cps-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+        
+        .cps-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-button-primary);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            color: var(--color-text-inverse);
+        }
+        
+        .btn-primary {
+            background: var(--gradient-button-primary);
+            border: none;
+            color: var(--color-text-inverse);
+        }
+        
+        .btn-outline-primary {
+            border: 1px solid var(--color-interactive-primary);
+            color: var(--color-interactive-primary);
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: var(--gradient-button-primary);
+            color: var(--color-text-inverse);
+        }
+        
+        .btn-outline-secondary {
+            border: 1px solid var(--color-interactive-secondary);
+            color: var(--color-interactive-secondary);
+            background: transparent;
+        }
+        
+        .form-control, .form-select {
+            background: var(--color-surface-elevated);
+            border: 1px solid var(--color-border-light);
+            color: var(--color-text-primary);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--color-interactive-primary);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb-item a {
+            color: var(--color-interactive-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--color-interactive-primary-hover);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: var(--color-text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Unified Sidebar -->
+            <div class="col-md-3 col-lg-3 sidebar p-0">
+                <div class="sidebar-content">
+                    <!-- CPS Header -->
+                    <div class="sidebar-header">
+                        <div class="cps-logo-container">
+                            <div class="cps-logo-icon">CPS</div>
+                            <div class="cps-text">
+                                <h4 class="mb-0">Support Center</h4>
+                                <p class="mb-0">Customer Support Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <nav class="sidebar-nav">
+                        <a class="nav-item" href="/support/dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-item active" href="/support/tickets">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span>Support Tickets</span>
+                        </a>
+                        <a class="nav-item" href="/support/bookings">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Booking Management</span>
+                        </a>
+                        <a class="nav-item" href="/support/feedback">
+                            <i class="fas fa-comments"></i>
+                            <span>Customer Feedback</span>
+                        </a>
+                        
+                        <div class="nav-divider"></div>
+                        
+                        <a class="nav-item logout" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-9 main-content">
+                <!-- Breadcrumb Navigation -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/support/dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-ticket-alt"></i> Support Tickets
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- CPS Page Header -->
+                <div class="cps-header mb-4">
+                    <div class="cps-logo">
+                        <div class="cps-logo-icon">CPS</div>
+                        <div>
+                            <h2 class="mb-1">Support Tickets Management</h2>
+                            <p class="mb-0 opacity-75">Manage and track all customer support tickets</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h2 class="mb-2">
+                                <i class="fas fa-ticket-alt me-2"></i>
+                                Support Tickets Management
+                            </h2>
+                            <p class="mb-0 opacity-75">View and manage all customer support tickets</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="badge bg-light text-dark fs-6">
+                                <span th:text="${tickets.size()}">0</span> Tickets
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Flash Messages -->
+                <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span th:text="${success}">Success message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                
+                <!-- Filters -->
+                <div class="filter-card">
+                    <form method="get" action="/support/tickets">
+                        <div class="row align-items-end">
+                            <div class="col-md-3">
+                                <label for="status" class="form-label">Filter by Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="ALL" th:selected="${selectedStatus == null or selectedStatus == 'ALL'}">All Statuses</option>
+                                    <option value="OPEN" th:selected="${selectedStatus == 'OPEN'}">Open</option>
+                                    <option value="IN_PROGRESS" th:selected="${selectedStatus == 'IN_PROGRESS'}">In Progress</option>
+                                    <option value="RESOLVED" th:selected="${selectedStatus == 'RESOLVED'}">Resolved</option>
+                                    <option value="CLOSED" th:selected="${selectedStatus == 'CLOSED'}">Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="search" class="form-label">Search Tickets</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${searchTerm}" placeholder="Search by ticket ID or description...">
+                            </div>
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Tickets List -->
+                <div class="row">
+                    <div class="col-12">
+                        <div th:if="${tickets.empty}" class="text-center py-5">
+                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No tickets found</h4>
+                            <p class="text-muted">No support tickets match your current filters.</p>
+                        </div>
+                        
+                        <div th:each="ticket : ${tickets}" class="ticket-card">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <h5 class="mb-0 me-3">
+                                            <a th:href="@{/support/ticket/{id}(id=${ticket.issueId})}" 
+                                               class="text-decoration-none">
+                                                Ticket #<span th:text="${ticket.ticketId}">SUP-001</span>
+                                            </a>
+                                        </h5>
+                                        <span th:class="'status-badge status-' + ${#strings.toLowerCase(ticket.status)}"
+                                              th:text="${ticket.status}">
+                                            OPEN
+                                        </span>
+                                    </div>
+                                    
+                                    <p class="text-muted mb-2" th:text="${#strings.abbreviate(ticket.description, 150)}">
+                                        Support ticket description goes here...
+                                    </p>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-1"></i>
+                                                Customer ID: <span th:text="${ticket.customerId}">123</span>
+                                            </small>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                <span th:text="${#temporals.format(ticket.raisedDate, 'MMM dd, yyyy HH:mm')}">
+                                                    Jan 15, 2024 10:30
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 text-end">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/support/ticket/{id}(id=${ticket.issueId})}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>View
+                                        </a>
+                                        
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="fas fa-cog me-1"></i>Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li th:if="${ticket.status == 'OPEN'}">
+                                                    <form th:action="@{/support/ticket/{id}/update(id=${ticket.issueId})}" 
+                                                          method="post" style="display: inline;">
+                                                        <input type="hidden" name="status" value="IN_PROGRESS">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-play text-info me-2"></i>Start Progress
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li th:if="${ticket.status == 'IN_PROGRESS'}">
+                                                    <form th:action="@{/support/ticket/{id}/update(id=${ticket.issueId})}" 
+                                                          method="post" style="display: inline;">
+                                                        <input type="hidden" name="status" value="RESOLVED">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-check text-success me-2"></i>Mark Resolved
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li th:if="${ticket.status == 'RESOLVED'}">
+                                                    <form th:action="@{/support/ticket/{id}/update(id=${ticket.issueId})}" 
+                                                          method="post" style="display: inline;">
+                                                        <input type="hidden" name="status" value="CLOSED">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-times text-danger me-2"></i>Close Ticket
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li th:if="${ticket.status != 'OPEN'}">
+                                                    <form th:action="@{/support/ticket/{id}/update(id=${ticket.issueId})}" 
+                                                          method="post" style="display: inline;">
+                                                        <input type="hidden" name="status" value="OPEN">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-undo text-warning me-2"></i>Reopen
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" id="darkModeToggle">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
+</body>
+</html>

@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Feedback Management - City Park Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    
+    <style>
+        body {
+            background: var(--gradient-background);
+            font-family: var(--font-family-primary);
+            color: var(--color-text-primary);
+        }
+        
+        .sidebar {
+            background: var(--color-surface);
+            min-height: 100vh;
+            border-right: 1px solid var(--color-border-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-content {
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            background: var(--gradient-primary);
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        .cps-logo-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .cps-logo-container .cps-logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--color-text-inverse);
+            color: var(--color-interactive-primary);
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-lg);
+            flex-shrink: 0;
+        }
+
+        .cps-text h4 {
+            color: var(--color-text-inverse);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 2px;
+        }
+
+        .cps-text p {
+            color: var(--color-text-inverse);
+            opacity: 0.8;
+            font-size: var(--font-size-sm);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: var(--spacing-lg) 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) var(--spacing-xl);
+            color: var(--color-text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-weight: var(--font-weight-medium);
+        }
+
+        .nav-item:hover {
+            background: var(--color-surface-hover);
+            color: var(--color-interactive-primary);
+            border-left-color: var(--color-interactive-primary);
+        }
+
+        .nav-item.active {
+            background: var(--color-interactive-primary);
+            color: var(--color-text-inverse);
+            border-left-color: var(--color-interactive-primary-hover);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: var(--font-size-md);
+        }
+
+        .nav-item span {
+            font-size: var(--font-size-sm);
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: var(--color-border-light);
+            margin: var(--spacing-md) var(--spacing-xl);
+        }
+
+        .nav-item.logout {
+            margin-top: auto;
+            color: var(--color-status-error);
+        }
+
+        .nav-item.logout:hover {
+            background: var(--color-status-error-bg);
+            color: var(--color-status-error);
+            border-left-color: var(--color-status-error);
+        }
+        
+        .main-content {
+            background: var(--color-surface);
+            min-height: 100vh;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+        }
+        
+        .feedback-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border-light);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .feedback-rating {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .star {
+            color: var(--color-status-warning);
+            font-size: var(--font-size-sm);
+        }
+
+        .star.empty {
+            color: var(--color-text-muted);
+        }
+
+        .feedback-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .feedback-content {
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-action {
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-respond {
+            background: var(--gradient-button-primary);
+            color: var(--color-text-inverse);
+        }
+
+        .btn-respond:hover {
+            background: var(--color-interactive-primary-hover);
+            color: var(--color-text-inverse);
+        }
+
+        .btn-resolve {
+            background: var(--color-status-success);
+            color: var(--color-text-inverse);
+        }
+
+        .btn-resolve:hover {
+            background: var(--color-status-success-hover);
+            color: var(--color-text-inverse);
+        }
+
+        .filter-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--spacing-2xl);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--color-border-light);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--border-radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xl);
+            margin: 0 auto var(--spacing-md);
+            color: var(--color-text-inverse);
+        }
+
+        .stat-icon.total { background: var(--gradient-button-primary); }
+        .stat-icon.positive { background: var(--color-status-success); }
+        .stat-icon.negative { background: var(--color-status-error); }
+        .stat-icon.pending { background: var(--color-status-warning); }
+
+        .stat-number {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* Breadcrumb Navigation */
+        .breadcrumb {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .breadcrumb-item a {
+            color: var(--color-interactive-primary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: var(--color-interactive-primary-hover);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: var(--color-text-muted);
+        }
+
+        .form-control, .form-select {
+            background: var(--color-surface-elevated);
+            border: 1px solid var(--color-border-light);
+            color: var(--color-text-primary);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--color-interactive-primary);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Unified Sidebar -->
+            <div class="col-md-3 col-lg-3 sidebar p-0">
+                <div class="sidebar-content">
+                    <!-- CPS Header -->
+                    <div class="sidebar-header">
+                        <div class="cps-logo-container">
+                            <div class="cps-logo-icon">CPS</div>
+                            <div class="cps-text">
+                                <h4 class="mb-0">Support Center</h4>
+                                <p class="mb-0">Customer Support Portal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Menu -->
+                    <nav class="sidebar-nav">
+                        <a class="nav-item" href="/support/dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="nav-item" href="/support/tickets">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span>Support Tickets</span>
+                        </a>
+                        <a class="nav-item" href="/support/bookings">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Booking Management</span>
+                        </a>
+                        <a class="nav-item active" href="/support/feedback">
+                            <i class="fas fa-comments"></i>
+                            <span>Customer Feedback</span>
+                        </a>
+                        
+                        <div class="nav-divider"></div>
+                        
+                        <a class="nav-item logout" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-9 main-content">
+                <!-- Breadcrumb Navigation -->
+                <nav aria-label="breadcrumb" class="mb-4">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/support/dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-comments"></i> Customer Feedback
+                        </li>
+                    </ol>
+                </nav>
+
+                <!-- CPS Page Header -->
+                <div class="cps-header mb-4">
+                    <div class="cps-logo">
+                        <div class="cps-logo-icon">CPS</div>
+                        <div>
+                            <h2 class="mb-1">Customer Feedback Management</h2>
+                            <p class="mb-0 opacity-75">Review and respond to customer feedback and ratings</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon total">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-number" th:text="${totalFeedback ?: 24}">24</div>
+                        <div class="stat-label">Total Feedback</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon positive">
+                            <i class="fas fa-thumbs-up"></i>
+                        </div>
+                        <div class="stat-number" th:text="${positiveFeedback ?: 18}">18</div>
+                        <div class="stat-label">Positive Reviews</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon negative">
+                            <i class="fas fa-thumbs-down"></i>
+                        </div>
+                        <div class="stat-number" th:text="${negativeFeedback ?: 3}">3</div>
+                        <div class="stat-label">Negative Reviews</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-number" th:text="${#numbers.formatDecimal(averageRating ?: 0, 1, 1)}">4.2</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-card">
+                    <h5 class="mb-3">
+                        <i class="fas fa-filter text-primary me-2"></i>
+                        Filter Feedback
+                    </h5>
+                    <form method="get" action="/support/feedback">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <select class="form-select" id="rating" name="rating">
+                                    <option value="">All Ratings</option>
+                                    <option value="5" th:selected="${selectedRating == '5'}">5 Stars</option>
+                                    <option value="4" th:selected="${selectedRating == '4'}">4 Stars</option>
+                                    <option value="3" th:selected="${selectedRating == '3'}">3 Stars</option>
+                                    <option value="2" th:selected="${selectedRating == '2'}">2 Stars</option>
+                                    <option value="1" th:selected="${selectedRating == '1'}">1 Star</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="">All Status</option>
+                                    <option value="PENDING" th:selected="${selectedStatus == 'PENDING'}">Pending Response</option>
+                                    <option value="RESPONDED" th:selected="${selectedStatus == 'RESPONDED'}">Responded</option>
+                                    <option value="RESOLVED" th:selected="${selectedStatus == 'RESOLVED'}">Resolved</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="search" class="form-label">Search</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       th:value="${searchQuery}" placeholder="Search feedback content...">
+                            </div>
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Feedback List -->
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Real Feedback Items from Database -->
+                        <div th:each="feedback : ${feedbackList}" class="feedback-card">
+                            <div class="feedback-header">
+                                <div>
+                                    <!-- Find customer name by customerID -->
+                                    <h6 class="mb-1">
+                                        <span th:each="user : ${allUsers}" 
+                                              th:if="${user.userID == feedback.customerID}"
+                                              th:text="${user.firstName + ' ' + user.lastName}">
+                                        </span>
+                                        <span th:if="${#lists.isEmpty(allUsers)}"
+                                              th:text="'Customer #' + ${feedback.customerID}">
+                                            Customer Name
+                                        </span>
+                                    </h6>
+                                    <div class="feedback-rating">
+                                        <!-- Dynamic star rating -->
+                                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                                            <i th:class="${i <= feedback.rating ? 'fas fa-star star' : 'fas fa-star star empty'}"></i>
+                                        </th:block>
+                                        <span class="ms-2 text-muted" th:text="'(' + feedback.rating + '.0)'">
+                                            (5.0)
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- Status badge based on rating -->
+                                <span th:class="${feedback.rating >= 4 ? 'badge bg-success' : 
+                                               (feedback.rating >= 3 ? 'badge bg-info' : 'badge bg-warning')}"
+                                      th:text="${feedback.rating >= 4 ? 'Positive' : 
+                                               (feedback.rating >= 3 ? 'Neutral' : 'Needs Attention')}">
+                                    Status
+                                </span>
+                            </div>
+                            <div class="feedback-meta">
+                                <span>
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span th:text="${#temporals.format(feedback.date, 'MMM dd, yyyy')}">Oct 20, 2025</span>
+                                </span>
+                                <span>
+                                    <i class="fas fa-user me-1"></i>
+                                    <span th:text="'Customer ID: ' + feedback.customerID">Customer ID: 1</span>
+                                </span>
+                                <span th:each="user : ${allUsers}" 
+                                      th:if="${user.userID == feedback.customerID}">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    <span th:text="${user.email}">customer@email.com</span>
+                                </span>
+                            </div>
+                            <div class="feedback-content" th:text="${feedback.comment ?: 'No comment provided'}">
+                                Feedback content here...
+                            </div>
+                            <div class="feedback-actions">
+                                <button class="btn btn-action btn-respond" 
+                                        th:onclick="'respondToFeedback(' + ${feedback.feedbackID} + ')'">
+                                    <i class="fas fa-reply me-1"></i>Respond
+                                </button>
+                                <button class="btn btn-action btn-resolve"
+                                        th:onclick="'resolveFeedback(' + ${feedback.feedbackID} + ')'">
+                                    <i class="fas fa-check me-1"></i>Mark Resolved
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div th:if="${feedbackList == null or #lists.isEmpty(feedbackList)}" class="text-center py-5">
+                            <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No feedback found</h4>
+                            <p class="text-muted">No customer feedback matches your current filters.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" id="darkModeToggle">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
+    
+    <!-- Feedback Management JavaScript -->
+    <script>
+        function respondToFeedback(feedbackId) {
+            // For now, show an alert. In a real implementation, this would open a modal or redirect to a response page
+            alert('Responding to feedback ID: ' + feedbackId + '\n\nThis feature would open a response form or modal.');
+        }
+        
+        function resolveFeedback(feedbackId) {
+            if (confirm('Are you sure you want to mark this feedback as resolved?')) {
+                // For now, show an alert. In a real implementation, this would make an AJAX call to update the status
+                alert('Feedback ID ' + feedbackId + ' has been marked as resolved.\n\nThis would update the database status.');
+                // Optionally reload the page to reflect changes
+                // window.location.reload();
+            }
+        }
+        
+        // Auto-submit form when filters change (optional enhancement)
+        document.addEventListener('DOMContentLoaded', function() {
+            const ratingSelect = document.getElementById('rating');
+            const statusSelect = document.getElementById('status');
+            
+            if (ratingSelect) {
+                ratingSelect.addEventListener('change', function() {
+                    // Auto-submit on rating change (optional)
+                    // this.form.submit();
+                });
+            }
+            
+            if (statusSelect) {
+                statusSelect.addEventListener('change', function() {
+                    // Auto-submit on status change (optional)
+                    // this.form.submit();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

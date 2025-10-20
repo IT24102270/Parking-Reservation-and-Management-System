@@ -8,7 +8,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
@@ -26,34 +25,12 @@ public class SecurityConfig {
     }
 
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+    private final CustomSuccessHandler customSuccessHandler;
 
-    public SecurityConfig(CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
+    public SecurityConfig(CustomAuthenticationFailureHandler customAuthenticationFailureHandler, 
+                         CustomSuccessHandler customSuccessHandler) {
         this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
-    }
-
-    // Success handler: redirects users based on their role
-    @Bean
-    public AuthenticationSuccessHandler customSuccessHandler() {
-        return (request, response, authentication) -> {
-            var authorities = authentication.getAuthorities();
-            String redirectUrl = "/";
-
-            if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-                redirectUrl = "/admin/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER"))) {
-                redirectUrl = "/customer/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_PARKING_SLOT_MANAGER"))) {
-                redirectUrl = "/slotmanager/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_FINANCE_EXECUTIVE"))) {
-                redirectUrl = "/finance/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_SECURITY_OFFICER"))) {
-                redirectUrl = "/security/dashboard";
-            } else if (authorities.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CUSTOMER_SUPPORT_OFFICER"))) {
-                redirectUrl = "/support/dashboard";
-            }
-
-            response.sendRedirect(redirectUrl);
-        };
+        this.customSuccessHandler = customSuccessHandler;
     }
 
     // Main security filter chain configuration
@@ -78,7 +55,7 @@ public class SecurityConfig {
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .successHandler(customSuccessHandler())
+                        .successHandler(customSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
                         .permitAll()
                 )

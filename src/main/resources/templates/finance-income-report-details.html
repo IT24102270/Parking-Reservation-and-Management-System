@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Report Details - Finance Executive</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    <!-- Dashboard CSS -->
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    
+    <style>
+        .report-header {
+            background: var(--gradient-card);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.15);
+        }
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .stat-icon.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .stat-icon.warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .stat-icon.danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .stat-icon.info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        
+        .report-summary {
+            background: var(--gradient-card);
+            border: 1px solid var(--color-border-light);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+        
+        .total-income {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="cps-header">
+        <div class="cps-header-content">
+            <div class="cps-logo">
+                <div class="cps-logo-icon">CPS</div>
+                <span>City Park Solutions</span>
+            </div>
+            <nav class="cps-nav">
+                <a th:href="@{/finance/dashboard}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a th:href="@{/finance/payments}">
+                    <i class="fas fa-credit-card"></i> Payments
+                </a>
+                <a th:href="@{/finance/reports/export}">
+                    <i class="fas fa-file-export"></i> Export Reports
+                </a>
+                <a th:href="@{/logout}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a th:href="@{/finance/dashboard}">Finance Dashboard</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/finance/reports/export}">Export Reports</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Income Report Details</li>
+            </ol>
+        </nav>
+
+        <!-- Report Header -->
+        <div class="report-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2 class="mb-2">
+                        <i class="fas fa-chart-line text-success me-2"></i>
+                        Income Report #<span th:text="${report.reportID}">ID</span>
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Generated on <span th:text="${report.createdAt != null ? #temporals.format(report.createdAt, 'MMMM dd, yyyy') : 'N/A'}">Date</span>
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="total-income" th:text="'$' + ${#numbers.formatDecimal(report.totalIncome, 1, 2)}">$0.00</div>
+                    <small class="text-muted">Total Income</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <h4 th:text="${statistics.totalTransactions}">0</h4>
+                    <p class="text-muted mb-0">Total Transactions</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 th:text="${statistics.completedPayments}">0</h4>
+                    <p class="text-muted mb-0">Completed Payments</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <h4 th:text="${statistics.refundedPayments}">0</h4>
+                    <p class="text-muted mb-0">Refunded Payments</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h4 th:text="'$' + ${#numbers.formatDecimal(statistics.netIncome, 1, 2)}">$0.00</h4>
+                    <p class="text-muted mb-0">Net Income</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Report Details -->
+            <div class="col-md-6">
+                <div class="report-summary">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        Report Details
+                    </h5>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Report ID:</span>
+                        <span class="detail-value" th:text="'#' + ${report.reportID}">ID</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Report Period:</span>
+                        <span class="detail-value">
+                            <span th:text="${#temporals.format(report.startDate, 'MMM dd')}">Start</span> - 
+                            <span th:text="${#temporals.format(report.endDate, 'MMM dd, yyyy')}">End</span>
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Generated Date:</span>
+                        <span class="detail-value" th:text="${report.createdAt != null ? #temporals.format(report.createdAt, 'MMM dd, yyyy') : 'N/A'}">Date</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Total Income:</span>
+                        <span class="detail-value text-success fw-bold" th:text="'$' + ${#numbers.formatDecimal(report.totalIncome, 1, 2)}">Amount</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Breakdown -->
+            <div class="col-md-6">
+                <div class="report-summary">
+                    <h5 class="mb-3">
+                        <i class="fas fa-chart-pie text-success me-2"></i>
+                        Financial Breakdown
+                    </h5>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Total Revenue:</span>
+                        <span class="detail-value text-success" th:text="'$' + ${#numbers.formatDecimal(statistics.totalRevenue, 1, 2)}">Revenue</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Total Refunds:</span>
+                        <span class="detail-value text-danger" th:text="'$' + ${#numbers.formatDecimal(statistics.totalRefunds, 1, 2)}">Refunds</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Net Income:</span>
+                        <span class="detail-value text-success fw-bold" th:text="'$' + ${#numbers.formatDecimal(statistics.netIncome, 1, 2)}">Net</span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Completion Rate:</span>
+                        <span class="detail-value">
+                            <span th:text="${statistics.totalTransactions > 0 ? #numbers.formatDecimal((statistics.completedPayments * 100.0 / statistics.totalTransactions), 1, 1) : '0.0'}">Rate</span>%
+                        </span>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Refund Rate:</span>
+                        <span class="detail-value">
+                            <span th:text="${statistics.totalTransactions > 0 ? #numbers.formatDecimal((statistics.refundedPayments * 100.0 / statistics.totalTransactions), 1, 1) : '0.0'}">Rate</span>%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a th:href="@{/finance/reports/export}" class="btn btn-primary me-3">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Back to Export Reports
+                </a>
+                <a th:href="@{/finance/dashboard}" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Finance Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

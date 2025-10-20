@@ -37,6 +37,11 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
     
+    public Reservation updateReservation(Reservation reservation) {
+        reservation.setUpdatedAt(LocalDateTime.now());
+        return reservationRepository.save(reservation);
+    }
+    
     public void deleteReservation(Long id) {
         reservationRepository.deleteById(id);
     }
