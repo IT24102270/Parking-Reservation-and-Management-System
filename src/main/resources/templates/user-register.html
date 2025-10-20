@@ -2,85 +2,427 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - Register New User</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Register New User - City Park Solutions</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(to right, #8e44ad, #3498db);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            /* Unified Color Palette */
+            --color-primary: #3498db;
+            --color-primary-dark: #2c3e50;
+            --color-primary-darker: #1a252f;
+            --color-primary-light: #5dade2;
+            --color-primary-lightest: #aed6f1;
+            
+            --color-secondary: #95a5a6;
+            --color-secondary-dark: #7f8c8d;
+            --color-secondary-light: #bdc3c7;
+            
+            --color-success: #27ae60;
+            --color-warning: #f39c12;
+            --color-danger: #e74c3c;
+            --color-info: #17a2b8;
+            
+            --color-background: #f8f9fb;
+            --color-surface: #ffffff;
+            --color-surface-elevated: #f1f3f4;
+            --color-surface-hover: rgba(52, 152, 219, 0.05);
+            
+            --color-text-primary: #1a2332;
+            --color-text-secondary: #4a5f7a;
+            --color-text-muted: #7f8c8d;
+            --color-text-inverse: #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            --gradient-background: linear-gradient(135deg, #f8f9fb 0%, #e8f4f8 50%, #d5e8f3 100%);
+            --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(250, 251, 252, 0.9));
+            
+            --shadow-sm: 0 2px 4px rgba(26, 35, 50, 0.05);
+            --shadow-md: 0 4px 12px rgba(26, 35, 50, 0.1);
+            --shadow-lg: 0 8px 24px rgba(26, 35, 50, 0.15);
+            --shadow-xl: 0 16px 48px rgba(26, 35, 50, 0.2);
+            
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 24px;
         }
-        .register-container {
-            height: 100vh;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-background);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 2rem 1rem;
         }
-        .card {
+
+        .register-container {
             width: 100%;
-            max-width: 500px;
-            border-radius: 15px;
-            box-shadow: 0px 8px 15px rgba(0,0,0,0.2);
+            max-width: 600px;
+            position: relative;
+        }
+
+        .register-card {
+            background: var(--gradient-card);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius-xl);
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(52, 152, 219, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .brand-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            color: white;
+            border-radius: var(--border-radius-lg);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .brand-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label i {
+            margin-right: 0.5rem;
+            color: var(--color-primary);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid rgba(52, 152, 219, 0.1);
+            border-radius: var(--border-radius-md);
+            padding: 0.875rem 1rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.15);
+            background: var(--color-surface);
+            outline: none;
+        }
+
+        .btn-register {
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: var(--border-radius-md);
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-darker) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: white;
+        }
+
+        .btn-register:disabled {
+            background: var(--color-secondary);
+            transform: none;
+            box-shadow: var(--shadow-sm);
+            cursor: not-allowed;
+        }
+
+        .alert {
+            border-radius: var(--border-radius-md);
+            border: none;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1));
+            color: var(--color-danger);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(52, 152, 219, 0.1);
+        }
+
+        .back-link a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .back-link a:hover {
+            color: var(--color-primary-dark);
+            text-decoration: underline;
+        }
+
+        .back-link a i {
+            margin-right: 0.5rem;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .floating-shape:nth-child(1) {
+            top: 15%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            top: 60%;
+            right: 10%;
+            animation-delay: 3s;
+        }
+
+        .floating-shape:nth-child(3) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .register-card {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+
+            .brand-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
 
+<!-- Floating Background Shapes -->
+<div class="floating-shapes">
+    <div class="floating-shape">
+        <i class="bi bi-person-plus" style="font-size: 3rem; color: var(--color-primary-light);"></i>
+    </div>
+    <div class="floating-shape">
+        <i class="bi bi-shield-check" style="font-size: 2.5rem; color: var(--color-primary-light);"></i>
+    </div>
+    <div class="floating-shape">
+        <i class="bi bi-gear" style="font-size: 2rem; color: var(--color-primary-light);"></i>
+    </div>
+</div>
+
 <div class="register-container">
-    <div class="card p-4 bg-light">
-        <h2 class="text-center mb-4">👤 Admin - Register User</h2>
+    <div class="register-card">
+        <!-- Brand Header -->
+        <div class="brand-header">
+            <div class="brand-logo">CPS</div>
+            <h1 class="brand-title">Register New User</h1>
+            <p class="brand-subtitle">Create a new account for City Park Solutions</p>
+        </div>
 
         <!-- Error Alert -->
-        <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            <span th:text="${error}"></span>
+        </div>
 
         <!-- Register Form -->
         <form th:action="@{/admin/register}" method="post" th:object="${user}">
-            <div class="mb-3">
-                <label class="form-label">First Name</label>
-                <input type="text" th:field="*{firstName}" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Last Name</label>
-                <input type="text" th:field="*{lastName}" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" th:field="*{email}" class="form-control"
-                       pattern="^[^@]+@[^@]+\.[^@]+$"
-                       title="Must be a valid email with @ and ." required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Password</label>
-                <input type="password" th:field="*{passwordHash}" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+            <!-- Name Fields Row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-person"></i>First Name
+                    </label>
+                    <input type="text" th:field="*{firstName}" class="form-control" 
+                           placeholder="Enter first name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-person"></i>Last Name
+                    </label>
+                    <input type="text" th:field="*{lastName}" class="form-control" 
+                           placeholder="Enter last name" required>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Phone Number</label>
-                <input type="text" th:field="*{phoneNumber}" class="form-control"
-                       pattern="^0\d{9}$" title="Phone must be 10 digits starting with 0" required>
+            <!-- Email Field -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="bi bi-envelope"></i>Email Address
+                </label>
+                <input type="email" th:field="*{email}" class="form-control"
+                       pattern="^[^@]+@[^@]+\.[^@]+$"
+                       placeholder="Enter email address"
+                       title="Must be a valid email with @ and ." required>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Role</label>
-                <select th:field="*{role}" class="form-select" required>
-                    <option value="CUSTOMER">Customer</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="PARKING_SLOT_MANAGER">Parking Slot Manager</option>
-                    <option value="FINANCE_EXECUTIVE">Finance Executive</option>
-                    <option value="SECURITY_OFFICER">Security Officer</option>
-                    <option value="CUSTOMER_SUPPORT_OFFICER">Customer Support Officer</option>
-                </select>
+
+            <!-- Password Fields Row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-lock"></i>Password
+                    </label>
+                    <input type="password" th:field="*{passwordHash}" class="form-control" 
+                           placeholder="Create password" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-lock-fill"></i>Confirm Password
+                    </label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" 
+                           placeholder="Confirm password" required>
+                </div>
             </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary">Register User</button>
+
+            <!-- Phone and Role Row -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-telephone"></i>Phone Number
+                    </label>
+                    <input type="text" th:field="*{phoneNumber}" class="form-control"
+                           pattern="^0\d{9}$" 
+                           placeholder="0771234567"
+                           title="Phone must be 10 digits starting with 0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="bi bi-person-badge"></i>Role
+                    </label>
+                    <select th:field="*{role}" class="form-select" required>
+                        <option value="CUSTOMER">Customer</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="PARKING_SLOT_MANAGER">Parking Slot Manager</option>
+                        <option value="FINANCE_EXECUTIVE">Finance Executive</option>
+                        <option value="SECURITY_OFFICER">Security Officer</option>
+                        <option value="CUSTOMER_SUPPORT_OFFICER">Customer Support Officer</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group">
+                <button type="submit" class="btn-register">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Register User
+                </button>
             </div>
         </form>
 
-        <p class="text-center mt-3">
-            <a th:href="@{/admin/dashboard}" class="btn btn-link">⬅ Back to Dashboard</a>
-        </p>
+        <!-- Back Link -->
+        <div class="back-link">
+            <p class="mb-0">
+                <a th:href="@{/admin/dashboard}">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Admin Dashboard
+                </a>
+            </p>
+        </div>
     </div>
 </div>
 

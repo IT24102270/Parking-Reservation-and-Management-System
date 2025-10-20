@@ -3,9 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Details - City Park Solutions Pvt Ltd</title>
+    <title>Payment Details - City Park Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            /* Enhanced Color Palette */
+            --color-navy-darkest: #1e2a3a;
+            --color-navy-dark: #2c3e50;
+            --color-navy-medium: #34495e;
+            --color-slate-blue: #4a5f7a;
+            --color-blue-gray: #7f8c8d;
+            --color-gray-medium: #95a5a6;
+            --color-gray-light: #bdc3c7;
+            --color-gray-lightest: #ecf0f1;
+            
+            /* UI Colors */
+            --primary-blue: #4a5f7a;
+            --dark-blue: #2c3e50;
+            --text-color: #1e2a3a;
+            --text-light: #7f8c8d;
+            --shadow: 0 4px 6px rgba(30, 42, 58, 0.1);
+            --shadow-md: 0 8px 16px rgba(30, 42, 58, 0.1);
+            --shadow-lg: 0 16px 32px rgba(30, 42, 58, 0.15);
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,10 +40,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-navy-darkest) 0%, var(--color-navy-dark) 25%, var(--color-navy-medium) 50%, var(--color-blue-gray) 75%, var(--color-gray-lightest) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-color);
         }
 
         .container {
@@ -27,12 +54,13 @@
 
         /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .header-content {
@@ -44,9 +72,14 @@
         }
 
         .header-title {
-            color: white;
+            color: var(--color-navy-dark);
             font-size: 28px;
             font-weight: 700;
+        }
+
+        .header-title i {
+            color: var(--color-slate-blue);
+            margin-right: 10px;
         }
 
         .header-actions {
@@ -58,7 +91,7 @@
         .btn {
             padding: 12px 20px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -67,53 +100,65 @@
             align-items: center;
             gap: 8px;
             transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
         }
 
         .btn-primary {
-            background: #3498db;
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             color: white;
+            box-shadow: var(--shadow);
         }
 
         .btn-primary:hover {
-            background: #2980b9;
+            background: linear-gradient(135deg, var(--color-navy-medium), var(--color-navy-dark));
             transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(74, 95, 122, 0.1);
+            color: var(--color-slate-blue);
+            border: 2px solid var(--color-slate-blue);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--color-slate-blue);
+            color: white;
+            transform: translateY(-2px);
         }
 
         .btn-success {
-            background: #27ae60;
+            background: linear-gradient(135deg, var(--success-color), #219a52);
             color: white;
+            box-shadow: var(--shadow);
         }
 
         .btn-success:hover {
-            background: #229954;
+            background: linear-gradient(135deg, #219a52, #1e8449);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-warning {
-            background: #f39c12;
+            background: linear-gradient(135deg, var(--warning-color), #e67e22);
             color: white;
+            box-shadow: var(--shadow);
         }
 
         .btn-warning:hover {
-            background: #e67e22;
+            background: linear-gradient(135deg, #e67e22, #d35400);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         /* Payment Details Card */
         .payment-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
             padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(74, 95, 122, 0.1);
+            box-shadow: var(--shadow-lg);
             margin-bottom: 30px;
         }
 
@@ -125,8 +170,13 @@
         .payment-id {
             font-size: 32px;
             font-weight: 700;
-            color: white;
+            color: var(--color-navy-dark);
             margin-bottom: 10px;
+        }
+
+        .payment-id i {
+            color: var(--color-slate-blue);
+            margin-right: 10px;
         }
 
         .payment-status {
@@ -140,25 +190,25 @@
         }
 
         .status-pending {
-            background: rgba(243, 156, 18, 0.2);
-            color: #f39c12;
-            border: 1px solid #f39c12;
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning-color);
+            border: 1px solid var(--warning-color);
         }
 
         .status-completed {
-            background: rgba(39, 174, 96, 0.2);
-            color: #27ae60;
-            border: 1px solid #27ae60;
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
         }
 
         .status-cancelled {
-            background: rgba(231, 76, 60, 0.2);
-            color: #e74c3c;
-            border: 1px solid #e74c3c;
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
         }
 
         .status-failed {
-            background: rgba(192, 57, 43, 0.2);
+            background: rgba(192, 57, 43, 0.15);
             color: #c0392b;
             border: 1px solid #c0392b;
         }
@@ -171,55 +221,67 @@
         }
 
         .detail-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(74, 95, 122, 0.05);
+            border-radius: 12px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(74, 95, 122, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: rgba(74, 95, 122, 0.08);
+            transform: translateY(-2px);
         }
 
         .detail-icon {
             font-size: 24px;
-            color: #3498db;
+            color: var(--color-slate-blue);
             margin-bottom: 15px;
         }
 
         .detail-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light);
             font-size: 12px;
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: 500;
         }
 
         .detail-value {
-            color: white;
+            color: var(--color-navy-dark);
             font-size: 16px;
             font-weight: 600;
         }
 
         .amount-value {
             font-size: 24px;
-            color: #2ecc71;
+            color: var(--success-color);
             font-weight: 700;
         }
 
         /* Reservation Details */
         .reservation-details {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(74, 95, 122, 0.05);
+            border-radius: 16px;
             padding: 25px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(74, 95, 122, 0.1);
+            box-shadow: var(--shadow);
         }
 
         .reservation-title {
-            color: white;
+            color: var(--color-navy-dark);
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .reservation-title i {
+            color: var(--color-slate-blue);
         }
 
         .reservation-grid {
@@ -233,36 +295,41 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .reservation-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light);
             font-size: 14px;
         }
 
         .reservation-value {
-            color: white;
+            color: var(--color-navy-dark);
             font-weight: 600;
         }
 
         /* Payment Timeline */
         .payment-timeline {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(74, 95, 122, 0.05);
+            border-radius: 16px;
             padding: 25px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(74, 95, 122, 0.1);
+            box-shadow: var(--shadow);
         }
 
         .timeline-title {
-            color: white;
+            color: var(--color-navy-dark);
             font-size: 18px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .timeline-title i {
+            color: var(--color-slate-blue);
         }
 
         .timeline-item {
@@ -271,20 +338,22 @@
             gap: 15px;
             margin-bottom: 15px;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            background: rgba(74, 95, 122, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .timeline-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #3498db;
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 16px;
+            box-shadow: var(--shadow);
         }
 
         .timeline-content {
@@ -292,13 +361,13 @@
         }
 
         .timeline-label {
-            color: white;
+            color: var(--color-navy-dark);
             font-weight: 600;
             margin-bottom: 5px;
         }
 
         .timeline-time {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-light);
             font-size: 14px;
         }
 
@@ -312,20 +381,24 @@
         /* Alert Messages */
         .alert {
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             margin-bottom: 20px;
             font-weight: 500;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .alert-error {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger-color);
             border: 1px solid rgba(231, 76, 60, 0.3);
         }
 
         .alert-success {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--success-color);
             border: 1px solid rgba(39, 174, 96, 0.3);
         }
 

@@ -3,30 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slot Management Dashboard - City Park Solutions Pvt Ltd</title>
-    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Comprehensive Slot Management Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Dark Mode Support -->
-    <script th:src="@{/js/dark-mode.js}"></script>
     <style>
         :root {
-            --primary-blue: #3498db;
-            --dark-blue: #2980b9;
-            --darker-blue: #21618c;
-            --navy-blue: #1a2332;
-            --slate-blue: #2c3e50;
-            --medium-blue: #34495e;
-            --gray-blue: #7f8c8d;
-            --light-gray: #d4d8dd;
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
+            /* Color Palette from Image */
+            --color-navy-darkest: #1e2a3a;
+            --color-navy-dark: #2c3e50;
+            --color-navy-medium: #34495e;
+            --color-slate-blue: #4a5f7a;
+            --color-blue-gray: #7f8c8d;
+            --color-gray-medium: #95a5a6;
+            --color-gray-light: #bdc3c7;
+            --color-gray-lightest: #ecf0f1;
+            
+            /* UI Colors */
+            --primary-blue: #4a5f7a;
+            --dark-blue: #2c3e50;
+            --light-gray: #ecf0f1;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #34495e;
+            --text-color: #1e2a3a;
             --available-color: #27ae60;
             --occupied-color: #e74c3c;
             --maintenance-color: #f39c12;
-            --shadow-light: 0 4px 12px rgba(52, 152, 219, 0.1);
-            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow: 0 4px 6px rgba(30, 42, 58, 0.1);
+            --shadow-md: 0 8px 16px rgba(30, 42, 58, 0.1);
+            --shadow-lg: 0 16px 32px rgba(30, 42, 58, 0.15);
             --success-color: #27ae60;
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
@@ -36,25 +39,25 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, var(--navy-blue) 0%, var(--slate-blue) 25%, var(--medium-blue) 50%, var(--gray-blue) 75%, var(--light-gray) 100%);
-            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-navy-darkest) 0%, var(--color-navy-dark) 25%, var(--color-navy-medium) 50%, var(--color-blue-gray) 75%, var(--color-gray-lightest) 100%);
+            color: var(--text-color);
             line-height: 1.6;
             min-height: 100vh;
         }
 
         /* Header Styles */
         header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-medium);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .header-container {
@@ -77,7 +80,7 @@
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -85,6 +88,7 @@
             color: white;
             margin-right: 12px;
             font-weight: bold;
+            box-shadow: var(--shadow);
         }
 
         .user-profile {
@@ -136,16 +140,19 @@
         }
 
         .stat-card {
-            background: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(10px);
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             text-align: center;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .stat-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .stat-number {
@@ -168,11 +175,13 @@
 
         /* Filters and Controls */
         .controls-section {
-            background: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(10px);
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             margin-bottom: 30px;
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .controls-grid {
@@ -195,15 +204,19 @@
 
         .form-input, .form-select {
             padding: 12px;
-            border: 2px solid var(--medium-gray);
-            border-radius: 8px;
+            border: 2px solid rgba(74, 95, 122, 0.2);
+            border-radius: 12px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
         }
 
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--primary-blue);
+            border-color: var(--color-slate-blue);
+            box-shadow: 0 0 0 0.2rem rgba(74, 95, 122, 0.15);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .btn {
@@ -221,12 +234,15 @@
         }
 
         .btn-primary {
-            background: var(--primary-blue);
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             color: white;
+            box-shadow: var(--shadow);
         }
 
         .btn-primary:hover {
-            background: var(--dark-blue);
+            background: linear-gradient(135deg, var(--color-navy-medium), var(--color-navy-dark));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-success {
@@ -251,11 +267,13 @@
 
         /* Bulk Operations */
         .bulk-operations {
-            background: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(10px);
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             margin-bottom: 30px;
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .bulk-header {
@@ -273,8 +291,10 @@
 
         .bulk-section {
             padding: 20px;
-            border: 2px solid var(--medium-gray);
-            border-radius: 8px;
+            border: 2px solid rgba(74, 95, 122, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(5px);
         }
 
         .bulk-section h4 {
@@ -284,10 +304,12 @@
 
         /* Slots Grid */
         .slots-section {
-            background: white;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(10px);
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .slots-header {
@@ -304,22 +326,25 @@
         }
 
         .slot-card {
-            background: white;
-            border: 2px solid var(--medium-gray);
-            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(236, 240, 241, 0.8));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(74, 95, 122, 0.2);
+            border-radius: 16px;
             padding: 20px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             position: relative;
+            box-shadow: var(--shadow);
         }
 
         .slot-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-slate-blue);
         }
 
         .slot-card.selected {
-            border-color: var(--primary-blue);
-            background: #f8f9ff;
+            border-color: var(--color-slate-blue);
+            background: linear-gradient(135deg, rgba(74, 95, 122, 0.1), rgba(52, 73, 94, 0.05));
         }
 
         .slot-header {

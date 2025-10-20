@@ -24,6 +24,41 @@ public class SupportController {
     @Autowired
     private UserService userService;
     
+    // Support dashboard - redirect from Get Help button
+    @GetMapping("")
+    public String showSupportDashboard(Model model) {
+        try {
+            // Get current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = getCurrentUser(authentication);
+            
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            
+            // Get support statistics
+            long totalTickets = supportIssueService.countSupportIssuesByCustomerId(currentUser.getUserID());
+            long openTickets = supportIssueService.countOpenSupportIssuesByCustomerId(currentUser.getUserID());
+            List<SupportIssue> recentTickets = supportIssueService.getRecentSupportIssues(currentUser.getUserID(), 5);
+            
+            // Calculate other statistics
+            long resolvedTickets = supportIssueService.getSupportIssuesByStatus(currentUser.getUserID(), "RESOLVED").size();
+            long pendingTickets = supportIssueService.getSupportIssuesByStatus(currentUser.getUserID(), "PENDING").size();
+            
+            model.addAttribute("user", currentUser);
+            model.addAttribute("totalTickets", totalTickets);
+            model.addAttribute("openTickets", openTickets);
+            model.addAttribute("resolvedTickets", resolvedTickets);
+            model.addAttribute("pendingTickets", pendingTickets);
+            model.addAttribute("recentTickets", recentTickets);
+            
+            return "support-dashboard";
+            
+        } catch (Exception e) {
+            return "redirect:/customer/dashboard";
+        }
+    }
+    
     // Display support form
     @GetMapping("/help")
     public String showSupportForm(Model model) {

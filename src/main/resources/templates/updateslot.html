@@ -3,53 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Parking Slot - City Park Solutions Pvt Ltd</title>
-    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Update Parking Slot</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #3498db;
-            --dark-blue: #2980b9;
-            --darker-blue: #21618c;
-            --navy-blue: #1a2332;
-            --slate-blue: #2c3e50;
-            --medium-blue: #34495e;
-            --gray-blue: #7f8c8d;
-            --light-gray: #d4d8dd;
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
+            /* Color Palette from Image */
+            --color-navy-darkest: #1e2a3a;
+            --color-navy-dark: #2c3e50;
+            --color-navy-medium: #34495e;
+            --color-slate-blue: #4a5f7a;
+            --color-blue-gray: #7f8c8d;
+            --color-gray-medium: #95a5a6;
+            --color-gray-light: #bdc3c7;
+            --color-gray-lightest: #ecf0f1;
+            
+            /* UI Colors */
+            --primary-blue: #4a5f7a;
+            --dark-blue: #2c3e50;
+            --light-gray: #ecf0f1;
+            --medium-gray: #bdc3c7;
+            --dark-gray: #34495e;
+            --text-color: #1e2a3a;
             --success-color: #27ae60;
             --warning-color: #f39c12;
             --error-color: #e74c3c;
-            --shadow-light: 0 4px 12px rgba(52, 152, 219, 0.1);
-            --shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow: 0 4px 6px rgba(30, 42, 58, 0.1);
+            --shadow-md: 0 8px 16px rgba(30, 42, 58, 0.1);
+            --shadow-lg: 0 16px 32px rgba(30, 42, 58, 0.15);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, var(--navy-blue) 0%, var(--slate-blue) 25%, var(--medium-blue) 50%, var(--gray-blue) 75%, var(--light-gray) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-navy-darkest) 0%, var(--color-navy-dark) 25%, var(--color-navy-medium) 50%, var(--color-blue-gray) 75%, var(--color-gray-lightest) 100%);
+            color: var(--text-color);
             line-height: 1.6;
+            min-height: 100vh;
         }
 
         /* Header Styles */
         header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: var(--shadow-medium);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .header-container {
@@ -68,17 +73,17 @@
         }
 
         .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             font-size: 20px;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow);
         }
 
         .logo-text {
@@ -147,12 +152,12 @@
 
         /* Form Styles */
         .form-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: var(--shadow-medium);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
 
         .form-group {
@@ -169,15 +174,19 @@
         .form-input, .form-select {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 6px;
+            border: 2px solid rgba(74, 95, 122, 0.2);
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.3s;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
         }
 
         .form-input:focus, .form-select:focus {
             outline: none;
-            border-color: var(--primary-blue);
+            border-color: var(--color-slate-blue);
+            box-shadow: 0 0 0 0.2rem rgba(74, 95, 122, 0.15);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .form-row {
@@ -187,7 +196,7 @@
         }
 
         .submit-btn {
-            background: linear-gradient(135deg, var(--primary-blue), var(--dark-blue));
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             color: white;
             border: none;
             padding: 15px 30px;
@@ -197,13 +206,13 @@
             cursor: pointer;
             transition: all 0.3s ease;
             width: 100%;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow-md);
         }
 
         .submit-btn:hover {
-            background: linear-gradient(135deg, var(--dark-blue), var(--darker-blue));
+            background: linear-gradient(135deg, var(--color-navy-medium), var(--color-navy-dark));
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+            box-shadow: var(--shadow-lg);
         }
 
         /* Alert Styles */

@@ -1,41 +1,36 @@
-/* Security Officer Dashboard Styles - Using Global Design System */
+/* Security Officer Dashboard Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* Override body background for security portal */
 body {
-    background: var(--gradient-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     min-height: 100vh;
+    color: #333;
 }
 
 .dashboard-container {
-    min-height: 100vh;
-    padding: var(--spacing-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-/* Security Portal Specific Styles */
-.welcome-section {
-    margin-bottom: var(--spacing-2xl);
-}
-
-.welcome-content h1 {
-    color: var(--color-text-inverse);
-    margin-bottom: var(--spacing-md);
-}
-
-.welcome-content p {
-    color: var(--color-primary-lightest);
-    margin-bottom: var(--spacing-lg);
-}
-
-.current-time {
-    color: var(--color-primary-lightest);
-    font-size: var(--font-size-sm);
-    opacity: 0.8;
-}
-
-.welcome-actions {
+/* Header Styles */
+.header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 15px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     display: flex;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1000;
 }
 
 .logo {

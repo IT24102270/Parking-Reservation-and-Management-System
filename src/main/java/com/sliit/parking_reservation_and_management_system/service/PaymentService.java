@@ -16,6 +16,12 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
     
+    @Autowired
+    private SlotAvailabilityService slotAvailabilityService;
+    
+    @Autowired
+    private com.sliit.parking_reservation_and_management_system.repository.ReservationRepository reservationRepository;
+    
     // Create a new payment (or return existing one)
     public Payment createPayment(Long reservationID, BigDecimal amount, String method) {
         try {
@@ -157,12 +163,62 @@ public class PaymentService {
                 
                 paymentRepository.save(payment);
                 System.out.println("Payment processed successfully: " + payment);
+                
+                // CRITICAL: Trigger reservation confirmation and slot management when payment is completed
+                confirmReservationAfterPayment(payment.getReservationID());
+                
                 return true;
             }
             return false;
         } catch (Exception e) {
             System.err.println("Error processing payment: " + e.getMessage());
             return false;
+        }
+    }
+    
+    /**
+     * Confirm reservation and manage slot availability after successful payment
+     */
+    private void confirmReservationAfterPayment(Long reservationID) {
+        try {
+            Optional<com.sliit.parking_reservation_and_management_system.entity.Reservation> reservationOpt = 
+                reservationRepository.findById(reservationID);
+            
+            if (reservationOpt.isPresent()) {
+                com.sliit.parking_reservation_and_management_system.entity.Reservation reservation = reservationOpt.get();
+                
+                // Update reservation status from PENDING to CONFIRMED
+                reservation.setStatus("CONFIRMED");
+                reservation.setUpdatedAt(LocalDateTime.now());
+                reservationRepository.save(reservation);
+                
+                System.out.println("=== PAYMENT COMPLETED - ACTIVATING SLOT MANAGEMENT ===");
+                System.out.println("Reservation " + reservationID + " confirmed after payment");
+                System.out.println("Slot " + reservation.getSlotId() + " will be managed automatically");
+                System.out.println("Start time: " + reservation.getStartTime());
+                System.out.println("End time: " + reservation.getEndTime());
+                
+                // Check if reservation should start immediately (within 5 minutes)
+                LocalDateTime now = LocalDateTime.now();
+                if (reservation.getStartTime().isBefore(now.plusMinutes(5))) {
+                    System.out.println("Reservation starts soon - marking slot as occupied immediately");
+                    slotAvailabilityService.occupySlot(reservation.getSlotId(), reservation.getId());
+                    
+                    // Update reservation to ACTIVE if it should already be active
+                    if (reservation.getStartTime().isBefore(now) && reservation.getEndTime().isAfter(now)) {
+                        reservation.setStatus("ACTIVE");
+                        reservationRepository.save(reservation);
+                        System.out.println("Reservation " + reservationID + " activated immediately");
+                    }
+                }
+                
+                System.out.println("=== SLOT MANAGEMENT ACTIVATION COMPLETE ===");
+            } else {
+                System.err.println("Reservation not found for payment: " + reservationID);
+            }
+        } catch (Exception e) {
+            System.err.println("Error confirming reservation after payment: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

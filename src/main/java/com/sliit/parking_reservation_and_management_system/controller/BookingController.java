@@ -347,10 +347,15 @@ public class BookingController {
             reservation.setStatus("CANCELLED");
             notificationManager.notifyObservers(reservation, "CANCELLED");
             
-            // Free up the parking slot if it was occupied
-            if ("ACTIVE".equals(reservation.getStatus()) || "CONFIRMED".equals(reservation.getStatus())) {
-                parkingSlotService.updateSlotStatus(reservation.getSlotId(), "AVAILABLE");
-            }
+            // CRITICAL: Update slot availability immediately when booking is cancelled
+            // This uses the new SlotAvailabilityService for proper time-based slot management
+            System.out.println("=== UPDATING SLOT AVAILABILITY AFTER CANCELLATION ===");
+            System.out.println("Slot ID: " + reservation.getSlotId());
+            System.out.println("Original Status: " + reservation.getStatus());
+            
+            slotAvailabilityService.updateSlotAvailabilityNow(reservation.getSlotId());
+            
+            System.out.println("Slot availability updated for slot " + reservation.getSlotId());
             
             System.out.println("Booking cancelled successfully:");
             System.out.println("- Reservation ID: " + id);

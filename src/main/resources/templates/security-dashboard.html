@@ -3,34 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Park Solutions Pvt Ltd - Security Officer Dashboard</title>
-    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
+    <title>Smart Parking - Security Officer Dashboard</title>
     <link rel="stylesheet" th:href="@{/css/security-dashboard.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Dark Mode Support -->
-    <script th:src="@{/js/dark-mode.js}"></script>
 </head>
 <body>
     <div class="dashboard-container">
         <!-- Header -->
-        <header class="cps-header">
-            <div class="container">
-                <div class="cps-logo">
-                    <div class="cps-logo-icon">CPS</div>
-                    <span>City Park Solutions Pvt Ltd</span>
-                    <small style="display: block; font-size: var(--font-size-xs); opacity: 0.8;">Security Portal</small>
-                </div>
-                
-                <nav class="cps-nav">
-                    <a href="/security/dashboard" class="active">Dashboard</a>
-                    <a href="/security/reports">Reports</a>
-                    <a href="/security/verify">Verify Vehicles</a>
-                    <a href="/security/scanner">QR Scanner</a>
-                </nav>
-                
-                <div class="user-profile">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">SP</div>
+                <div class="logo-text">Smart Parking</div>
+                <span class="logo-subtitle">Security Portal</span>
+            </div>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="/security/dashboard" class="active">Dashboard</a></li>
+                    <li><a href="/security/reports">Reports</a></li>
+                    <li><a href="/security/verify">Verify Vehicles</a></li>
+                    <li><a href="/security/scanner">QR Scanner</a></li>
+                </ul>
+            </nav>
+            
+            <div class="user-profile">
                 <div class="profile-dropdown" id="profileToggle" title="Click to open profile menu">
                     <div class="profile-info">
                         <span class="profile-name" th:text="${user.firstName + ' ' + user.lastName}">Security Officer</span>
@@ -51,44 +49,40 @@
         </header>
 
         <!-- Main Content -->
-        <main class="main-content container">
+        <main class="main-content">
             <!-- Welcome Section -->
-            <section class="card welcome-section">
-                <div class="card-body">
-                    <div class="welcome-content">
-                        <h1>Welcome back, <span th:text="${user.firstName}">Security Officer</span>!</h1>
-                        <p>Monitor parking activities, verify vehicles, and maintain security protocols.</p>
-                        <div class="current-time" id="currentTime"></div>
-                    </div>
-                    <div class="welcome-actions">
-                        <a href="/security/report/new" class="btn btn-primary">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Report Incident
-                        </a>
-                        <a href="/security/scanner" class="btn btn-secondary">
-                            <i class="fas fa-qrcode"></i>
-                            QR Scanner
-                        </a>
-                    </div>
+            <section class="welcome-section">
+                <div class="welcome-content">
+                    <h1>Welcome back, <span th:text="${user.firstName}">Security Officer</span>!</h1>
+                    <p>Monitor parking activities, verify vehicles, and maintain security protocols.</p>
+                    <div class="current-time" id="currentTime"></div>
+                </div>
+                <div class="welcome-actions">
+                    <a href="/security/report/new" class="btn btn-primary">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Report Incident
+                    </a>
+                    <a href="/security/scanner" class="btn btn-secondary">
+                        <i class="fas fa-qrcode"></i>
+                        QR Scanner
+                    </a>
                 </div>
             </section>
 
             <!-- Quick Navigation -->
             <section class="navigation-section">
-                <div class="nav-title text-center">
+                <div class="nav-title">
                     <h2><i class="fas fa-compass"></i> Quick Navigation</h2>
-                    <p class="text-secondary">Access all security officer functions</p>
+                    <p>Access all security officer functions</p>
                 </div>
-                <div class="nav-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-xl);">
-                    <a href="/security/dashboard" class="card nav-card" style="text-decoration: none; border: 2px solid var(--color-interactive-primary);">
-                        <div class="card-body text-center">
-                            <div class="nav-icon" style="width: 60px; height: 60px; background: var(--gradient-primary); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--spacing-md); color: var(--color-text-inverse); font-size: var(--font-size-xl);">
-                                <i class="fas fa-tachometer-alt"></i>
-                            </div>
-                            <div class="nav-content">
-                                <h3>Dashboard</h3>
-                                <p class="text-muted">Overview & Statistics</p>
-                            </div>
+                <div class="nav-grid">
+                    <a href="/security/dashboard" class="nav-card active">
+                        <div class="nav-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="nav-content">
+                            <h3>Dashboard</h3>
+                            <p>Overview & Statistics</p>
                         </div>
                     </a>
                     <a href="/security/reports" class="nav-card">

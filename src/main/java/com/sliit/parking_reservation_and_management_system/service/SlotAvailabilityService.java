@@ -124,9 +124,9 @@ public class SlotAvailabilityService {
     
     /**
      * Scheduled task to automatically update slot statuses based on reservation times
-     * Runs every 5 minutes to check for reservations that should start or end
+     * Runs every 2 minutes to check for reservations that should start or end
      */
-    @Scheduled(fixedRate = 300000) // 5 minutes = 300,000 milliseconds
+    @Scheduled(fixedRate = 120000) // 2 minutes = 120,000 milliseconds
     public void updateSlotStatuses() {
         try {
             LocalDateTime now = LocalDateTime.now();
@@ -176,6 +176,54 @@ public class SlotAvailabilityService {
             
         } catch (Exception e) {
             System.err.println("Error in automatic slot status update: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Check and update slot availability for a specific slot immediately
+     * Called when reservations are created, modified, or cancelled
+     */
+    public void updateSlotAvailabilityNow(Long slotId) {
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            System.out.println("=== Immediate slot availability update for slot " + slotId + " ===");
+            
+            Optional<ParkingSlot> slotOpt = parkingSlotRepository.findById(slotId);
+            if (!slotOpt.isPresent()) {
+                System.err.println("Slot not found: " + slotId);
+                return;
+            }
+            
+            ParkingSlot slot = slotOpt.get();
+            
+            // Skip maintenance slots
+            if ("MAINTENANCE".equalsIgnoreCase(slot.getStatus())) {
+                System.out.println("Slot " + slotId + " is under maintenance - skipping update");
+                return;
+            }
+            
+            // Check if slot should be occupied right now
+            List<Reservation> activeReservations = reservationRepository.findActiveReservationsForSlot(slotId, now);
+            
+            if (!activeReservations.isEmpty()) {
+                // Slot should be occupied
+                if (!"OCCUPIED".equalsIgnoreCase(slot.getStatus())) {
+                    slot.setStatus("OCCUPIED");
+                    parkingSlotRepository.save(slot);
+                    System.out.println("Slot " + slotId + " updated to OCCUPIED (active reservations: " + activeReservations.size() + ")");
+                }
+            } else {
+                // Slot should be available
+                if (!"AVAILABLE".equalsIgnoreCase(slot.getStatus())) {
+                    slot.setStatus("AVAILABLE");
+                    parkingSlotRepository.save(slot);
+                    System.out.println("Slot " + slotId + " updated to AVAILABLE (no active reservations)");
+                }
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error updating slot availability for slot " + slotId + ": " + e.getMessage());
             e.printStackTrace();
         }
     }

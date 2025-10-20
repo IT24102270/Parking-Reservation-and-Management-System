@@ -3,9 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment - City Park Solutions Pvt Ltd</title>
+    <title>Payment - City Park Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            /* Enhanced Color Palette */
+            --color-navy-darkest: #1e2a3a;
+            --color-navy-dark: #2c3e50;
+            --color-navy-medium: #34495e;
+            --color-slate-blue: #4a5f7a;
+            --color-blue-gray: #7f8c8d;
+            --color-gray-medium: #95a5a6;
+            --color-gray-light: #bdc3c7;
+            --color-gray-lightest: #ecf0f1;
+            
+            /* UI Colors */
+            --primary-blue: #4a5f7a;
+            --dark-blue: #2c3e50;
+            --text-color: #1e2a3a;
+            --text-light: #7f8c8d;
+            --shadow: 0 4px 6px rgba(30, 42, 58, 0.1);
+            --shadow-md: 0 8px 16px rgba(30, 42, 58, 0.1);
+            --shadow-lg: 0 16px 32px rgba(30, 42, 58, 0.15);
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,10 +40,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-navy-darkest) 0%, var(--color-navy-dark) 25%, var(--color-navy-medium) 50%, var(--color-blue-gray) 75%, var(--color-gray-lightest) 100%);
             min-height: 100vh;
-            color: #333;
+            color: var(--text-color);
         }
 
         .container {

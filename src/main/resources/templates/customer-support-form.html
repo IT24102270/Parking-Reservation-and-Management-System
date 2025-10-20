@@ -3,12 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Help - Smart Parking</title>
+    <title>Get Help & Support - City Park Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/global-design-system.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            /* Enhanced Color Palette */
+            --color-navy-darkest: #1e2a3a;
+            --color-navy-dark: #2c3e50;
+            --color-navy-medium: #34495e;
+            --color-slate-blue: #4a5f7a;
+            --color-blue-gray: #7f8c8d;
+            --color-gray-medium: #95a5a6;
+            --color-gray-light: #bdc3c7;
+            --color-gray-lightest: #ecf0f1;
+            
+            /* UI Colors */
+            --primary-blue: #4a5f7a;
+            --dark-blue: #2c3e50;
+            --text-color: #1e2a3a;
+            --text-light: #7f8c8d;
+            --shadow: 0 4px 6px rgba(30, 42, 58, 0.1);
+            --shadow-md: 0 8px 16px rgba(30, 42, 58, 0.1);
+            --shadow-lg: 0 16px 32px rgba(30, 42, 58, 0.15);
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--color-navy-darkest) 0%, var(--color-navy-dark) 25%, var(--color-navy-medium) 50%, var(--color-blue-gray) 75%, var(--color-gray-lightest) 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+        }
         .support-container {
             max-width: 800px;
             margin: 2rem auto;
@@ -18,25 +53,37 @@
         .support-header {
             text-align: center;
             margin-bottom: 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
         
         .support-header h1 {
-            color: #1f2937;
+            color: var(--color-navy-dark);
             margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .support-header h1 i {
+            color: var(--color-slate-blue);
+            margin-right: 10px;
         }
         
         .support-header p {
-            color: #6b7280;
+            color: var(--text-light);
             font-size: 1.1rem;
         }
         
         .support-form {
-            background: rgba(255, 255, 255, 0.95);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 240, 241, 0.9));
             backdrop-filter: blur(20px);
             border-radius: 20px;
             padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(74, 95, 122, 0.1);
         }
         
         .form-group {
@@ -46,8 +93,13 @@
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
-            color: #374151;
+            color: var(--color-navy-dark);
             font-weight: 600;
+        }
+
+        .form-group label i {
+            color: var(--color-slate-blue);
+            margin-right: 8px;
         }
         
         .form-group select,
@@ -55,19 +107,22 @@
         .form-group input {
             width: 100%;
             padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            border: 2px solid var(--color-gray-light);
+            border-radius: 12px;
             font-size: 1rem;
+            font-family: 'Inter', sans-serif;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
         }
         
         .form-group select:focus,
         .form-group textarea:focus,
         .form-group input:focus {
             outline: none;
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            border-color: var(--color-slate-blue);
+            box-shadow: 0 0 0 3px rgba(74, 95, 122, 0.1);
+            background: white;
         }
         
         .form-group textarea {
@@ -93,22 +148,26 @@
             display: block;
             padding: 0.75rem;
             text-align: center;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            border: 2px solid var(--color-gray-light);
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-color);
+            font-weight: 500;
         }
         
         .priority-option input[type="radio"]:checked + label {
-            border-color: #8b5cf6;
-            background: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
+            border-color: var(--color-slate-blue);
+            background: rgba(74, 95, 122, 0.1);
+            color: var(--color-slate-blue);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
         
-        .priority-low label { border-left: 4px solid #10b981; }
-        .priority-medium label { border-left: 4px solid #f59e0b; }
-        .priority-high label { border-left: 4px solid #ef4444; }
+        .priority-low label { border-left: 4px solid var(--success-color); }
+        .priority-medium label { border-left: 4px solid var(--warning-color); }
+        .priority-high label { border-left: 4px solid var(--danger-color); }
         
         .form-actions {
             display: flex;
@@ -120,9 +179,10 @@
         .btn {
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
+            font-family: 'Inter', sans-serif;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
@@ -132,35 +192,47 @@
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
             color: white;
+            box-shadow: var(--shadow);
         }
         
         .btn-primary:hover {
+            background: linear-gradient(135deg, var(--color-navy-medium), var(--color-navy-dark));
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            box-shadow: var(--shadow-md);
         }
         
         .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
+            background: rgba(74, 95, 122, 0.1);
+            color: var(--color-slate-blue);
+            border: 2px solid var(--color-slate-blue);
         }
         
         .btn-secondary:hover {
-            background: #e5e7eb;
+            background: var(--color-slate-blue);
+            color: white;
+            transform: translateY(-2px);
         }
         
         .quick-help {
             margin-top: 2rem;
             padding: 1.5rem;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 15px;
-            border-left: 4px solid #3b82f6;
+            background: rgba(74, 95, 122, 0.1);
+            border-radius: 16px;
+            border-left: 4px solid var(--color-slate-blue);
+            box-shadow: var(--shadow);
         }
         
         .quick-help h3 {
-            color: #1e40af;
+            color: var(--color-navy-dark);
             margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .quick-help h3 i {
+            color: var(--color-slate-blue);
+            margin-right: 8px;
         }
         
         .quick-help-items {
@@ -173,25 +245,35 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #1e40af;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .quick-help-item i {
+            color: var(--color-slate-blue);
         }
         
         .alert {
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
         }
         
         .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #059669;
-            border: 1px solid rgba(16, 185, 129, 0.2);
+            background: rgba(39, 174, 96, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(39, 174, 96, 0.3);
         }
         
         .alert-error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger-color);
+            border: 1px solid rgba(231, 76, 60, 0.3);
         }
     </style>
 </head>
@@ -293,7 +375,7 @@
                 </div>
                 <div class="quick-help-item">
                     <i class="fas fa-envelope"></i>
-                    <span>Email: support@smartparking.lk</span>
+                    <span>Email: support@cityparksolutions.lk</span>
                 </div>
                 <div class="quick-help-item">
                     <i class="fas fa-clock"></i>

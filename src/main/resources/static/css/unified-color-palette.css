@@ -1,0 +1,199 @@
+/* 
+ * City Park Solutions Pvt Ltd - Unified Color Palette
+ * Comprehensive color system for consistent design across all pages
+ * Eliminates pure white areas and creates cohesive visual experience
+ */
+
+/* ===== UNIFIED COLOR PALETTE DOCUMENTATION ===== */
+
+/*
+BACKGROUND COLORS:
+- Primary Background: #f5f7fa (Soft blue-gray, replaces pure white)
+- Card Background: #ffffff (Clean white for content cards)
+- Elevated Surface: #fafbfc (Slightly elevated surfaces)
+- Hover State: #f0f3f7 (Interactive hover backgrounds)
+- Glass Surface: rgba(255, 255, 255, 0.95) (Glassmorphism effect)
+
+TEXT COLORS:
+- Primary Text: #1a2332 (Dark navy for main content)
+- Secondary Text: #4a5f7a (Medium blue for secondary content)
+- Muted Text: #7a8a9e (Light blue-gray for subtle text)
+- Inverse Text: #ffffff (White text on dark backgrounds)
+- Accent Text: #2980b9 (Blue accent for links and highlights)
+
+INTERACTIVE COLORS:
+- Primary Button: #3498db → #2980b9 (Blue gradient)
+- Secondary Button: #4a5f7a → #2d3e5f (Gray-blue gradient)
+- Accent Action: #e74c3c → #c0392b (Red for important actions)
+- Border Accent: #3498db (Blue for focused elements)
+
+BORDER COLORS:
+- Light Borders: #e8ecf0 (Subtle separation)
+- Medium Borders: #d1d9e0 (Standard borders)
+- Dark Borders: #b8c5d1 (Emphasized borders)
+- Accent Borders: #3498db (Interactive element borders)
+
+STATUS COLORS:
+- Success: #27ae60 (Green for positive actions)
+- Warning: #f39c12 (Orange for warnings)
+- Error: #e74c3c (Red for errors)
+- Info: #3498db (Blue for information)
+
+SHADOW SYSTEM:
+- Light Shadow: rgba(26, 35, 50, 0.08)
+- Medium Shadow: rgba(26, 35, 50, 0.12)
+- Dark Shadow: rgba(26, 35, 50, 0.16)
+- Card Shadow: rgba(26, 35, 50, 0.08)
+*/
+
+/* ===== IMPLEMENTATION CLASSES ===== */
+
+/* Background Classes */
+.cps-bg-primary { background: var(--color-background); }
+.cps-bg-surface { background: var(--color-surface); }
+.cps-bg-elevated { background: var(--color-surface-elevated); }
+.cps-bg-glass { background: var(--color-surface-glass); }
+
+/* Text Classes */
+.cps-text-primary { color: var(--color-text-primary); }
+.cps-text-secondary { color: var(--color-text-secondary); }
+.cps-text-muted { color: var(--color-text-muted); }
+.cps-text-inverse { color: var(--color-text-inverse); }
+.cps-text-accent { color: var(--color-text-accent); }
+
+/* Button Classes */
+.cps-btn-primary {
+    background: var(--gradient-button-primary);
+    color: var(--color-text-inverse);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cps-btn-primary:hover {
+    background: var(--color-interactive-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.cps-btn-secondary {
+    background: var(--gradient-button-secondary);
+    color: var(--color-text-inverse);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.cps-btn-secondary:hover {
+    background: var(--color-interactive-secondary-hover);
+    transform: translateY(-1px);
+}
+
+/* Card Classes */
+.cps-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--color-card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--color-card-shadow);
+    padding: var(--spacing-xl);
+    transition: all 0.3s ease;
+}
+
+.cps-card:hover {
+    background: var(--color-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Header Classes */
+.cps-header {
+    background: var(--gradient-header);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border-light);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+}
+
+/* Form Classes */
+.cps-input {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-medium);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    padding: var(--spacing-md);
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.cps-input:focus {
+    border-color: var(--color-interactive-primary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+/* Status Classes */
+.cps-status-success { color: var(--color-success); }
+.cps-status-warning { color: var(--color-warning); }
+.cps-status-error { color: var(--color-error); }
+.cps-status-info { color: var(--color-info); }
+
+/* Border Classes */
+.cps-border-light { border: 1px solid var(--color-border-light); }
+.cps-border-medium { border: 1px solid var(--color-border-medium); }
+.cps-border-dark { border: 1px solid var(--color-border-dark); }
+.cps-border-accent { border: 1px solid var(--color-border-accent); }
+
+/* Shadow Classes */
+.cps-shadow-sm { box-shadow: var(--shadow-sm); }
+.cps-shadow-md { box-shadow: var(--shadow-md); }
+.cps-shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* ===== USAGE EXAMPLES ===== */
+
+/*
+EXAMPLE 1: Customer Dashboard Card
+<div class="cps-card">
+    <h3 class="cps-text-primary">Total Bookings</h3>
+    <p class="cps-text-secondary">12 active reservations</p>
+    <button class="cps-btn-primary">View Details</button>
+</div>
+
+EXAMPLE 2: Form Container
+<div class="cps-header">
+    <h2 class="cps-text-primary">New Booking</h2>
+    <input type="text" class="cps-input" placeholder="Vehicle Number">
+    <button class="cps-btn-primary">Submit</button>
+</div>
+
+EXAMPLE 3: Status Indicators
+<span class="cps-status-success">Available</span>
+<span class="cps-status-warning">Maintenance</span>
+<span class="cps-status-error">Occupied</span>
+<span class="cps-status-info">Reserved</span>
+*/
+
+/* ===== MIGRATION GUIDE ===== */
+
+/*
+REPLACE THESE OLD STYLES:
+background: #ffffff → background: var(--color-surface)
+background: white → background: var(--color-surface)
+color: #000000 → color: var(--color-text-primary)
+color: black → color: var(--color-text-primary)
+border: 1px solid #ccc → border: 1px solid var(--color-border-medium)
+
+USE THESE NEW CLASSES:
+.white → .cps-bg-surface
+.bg-white → .cps-bg-surface
+.text-dark → .cps-text-primary
+.text-muted → .cps-text-muted
+.btn-primary → .cps-btn-primary
+.card → .cps-card
+*/
