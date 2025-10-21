@@ -1,0 +1,53 @@
+================================================================================
+ADMIN ACTION LOG - 2024-01-01 00:00:00
+================================================================================
+
+This file will contain all admin actions logged by the AdminActionLogger singleton.
+The log file is automatically created and managed by the AdminActionLogger class.
+
+Format: [TIMESTAMP] ADMIN: email | ACTION: action | TARGET: entity (ID: id) | DETAILS: details
+
+================================================================================
+================================================================================
+ADMIN ACTION LOG - 2025-10-21 19:17:57
+================================================================================
+
+[2025-10-21 19:18:24] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:18:32] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:19:41] ADMIN: rajika@parking.com | ACTION: USER_REGISTRATION | TARGET: User (ID: 39) | DETAILS: Registered new user: Email: prezi@parking.com, Role: ADMIN, Name: prezi Phezu
+[2025-10-21 19:19:41] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:19:45] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:19:46] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 19:20:40] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 19:22:27] ADMIN: rajika@parking.com | ACTION: OBSERVER_PATTERN_TEST | DETAILS: Tested observer pattern functionality with mock reservation
+[2025-10-21 19:22:36] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 19:23:17] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:23:36] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:23:40] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:23:41] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+================================================================================
+ADMIN ACTION LOG - 2025-10-21 19:24:39
+================================================================================
+
+[2025-10-21 19:24:43] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:24:55] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:25:00] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 19:25:02] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 19:25:36] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 1, Role: , Status: , Email: 
+[2025-10-21 19:25:39] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 2, Role: , Status: , Email: 
+[2025-10-21 19:25:46] ADMIN: rajika@parking.com | ACTION: USER_DEACTIVATE | TARGET: User (ID: 37) | DETAILS: Deactivated user: dasun@parking.com
+[2025-10-21 19:25:46] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+================================================================================
+ADMIN ACTION LOG - 2025-10-21 20:05:02
+================================================================================
+
+[2025-10-21 20:05:22] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 20:05:26] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 20:05:54] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 20:05:58] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 20:05:58] ADMIN: rajika@parking.com | ACTION: LOGGING_TEST | DETAILS: Tested admin logging functionality
+[2025-10-21 20:06:02] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 20:06:31] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 1, Role: , Status: , Email: 
+[2025-10-21 20:06:39] ADMIN: rajika@parking.com | ACTION: USER_DEACTIVATE | TARGET: User (ID: 31) | DETAILS: Deactivated user: janura@parking.com
+[2025-10-21 20:06:39] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
+[2025-10-21 20:06:59] ADMIN: rajika@parking.com | ACTION: DASHBOARD_ACCESS | DETAILS: Accessed admin dashboard with filters: Page: 0, Role: All, Status: All, Email: All
