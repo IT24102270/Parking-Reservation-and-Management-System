@@ -10,6 +10,8 @@
     
     <!-- Global Design System -->
     <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    <!-- Support Officer UI Fixes -->
+    <link th:href="@{/css/support-officer-fixes.css}" rel="stylesheet">
     
     <style>
         body {
@@ -600,5 +602,13 @@
             }
         });
     </script>
+    
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </div>
+    
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
 </body>
 </html>

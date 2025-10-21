@@ -11,6 +11,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Global Design System -->
     <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
+    <!-- Support Officer UI Fixes -->
+    <link th:href="@{/css/support-officer-fixes.css}" rel="stylesheet">
     
     <style>
         body {
@@ -22,16 +24,34 @@
         .cps-header {
             background: var(--gradient-primary);
             color: var(--color-text-inverse);
-            padding: var(--spacing-lg) 0;
+            padding: var(--spacing-xl) var(--spacing-lg);
             margin-bottom: var(--spacing-2xl);
             border-radius: var(--border-radius-lg);
             backdrop-filter: blur(10px);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
         }
         
         .cps-logo {
             display: flex;
             align-items: center;
             gap: var(--spacing-md);
+            width: 100%;
+        }
+        
+        .cps-logo h2 {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+        
+        .cps-logo p {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            opacity: 0.9;
+            margin-bottom: 0;
+            line-height: 1.3;
         }
         
         .cps-logo-icon {
@@ -91,12 +111,16 @@
             color: var(--color-text-inverse);
             font-weight: var(--font-weight-semibold);
             margin-bottom: 2px;
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            line-height: 1.2;
         }
 
         .cps-text p {
             color: var(--color-text-inverse);
             opacity: 0.8;
-            font-size: var(--font-size-sm);
+            font-size: clamp(0.75rem, 1.8vw, 0.875rem);
+            line-height: 1.3;
+            margin-bottom: 0;
         }
 
         .sidebar-nav {
@@ -235,6 +259,23 @@
             margin-bottom: var(--spacing-2xl);
             backdrop-filter: blur(10px);
             box-shadow: var(--shadow-lg);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .welcome-card h2 {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+        
+        .welcome-card p {
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            opacity: 0.9;
+            margin-bottom: 0;
+            line-height: 1.3;
         }
         
         .quick-actions {
@@ -443,6 +484,134 @@
             border-bottom: 1px solid var(--color-border-light);
             border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
         }
+        
+        /* Responsive Design Improvements */
+        @media (max-width: 768px) {
+            .cps-header {
+                padding: var(--spacing-md);
+                min-height: 100px;
+            }
+            
+            .cps-logo {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-sm);
+            }
+            
+            .cps-logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: var(--font-size-md);
+            }
+            
+            .welcome-card {
+                padding: var(--spacing-lg);
+                min-height: 100px;
+            }
+            
+            .welcome-card .row {
+                text-align: center;
+            }
+            
+            .welcome-card .col-md-4 {
+                margin-top: var(--spacing-md);
+            }
+            
+            .sidebar {
+                min-height: auto;
+            }
+            
+            .sidebar-header {
+                padding: var(--spacing-lg);
+            }
+            
+            .cps-logo-container {
+                flex-direction: column;
+                text-align: center;
+                gap: var(--spacing-sm);
+            }
+            
+            .cps-logo-container .cps-logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: var(--font-size-md);
+            }
+            
+            .main-content {
+                padding: var(--spacing-md);
+            }
+            
+            .stat-card {
+                padding: var(--spacing-lg);
+            }
+            
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                font-size: var(--font-size-lg);
+            }
+            
+            .section-title {
+                font-size: var(--font-size-md);
+            }
+            
+            .nav-item span {
+                font-size: var(--font-size-xs);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .cps-header {
+                padding: var(--spacing-sm);
+                min-height: 80px;
+            }
+            
+            .welcome-card {
+                padding: var(--spacing-md);
+                min-height: 80px;
+            }
+            
+            .stats-section,
+            .quick-actions,
+            .recent-activity {
+                padding: var(--spacing-md);
+            }
+            
+            .stat-card {
+                padding: var(--spacing-md);
+                text-align: center;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: var(--font-size-md);
+                margin: 0 auto var(--spacing-sm);
+            }
+            
+            .activity-item {
+                padding: var(--spacing-sm);
+            }
+            
+            .activity-icon {
+                width: 30px;
+                height: 30px;
+                font-size: var(--font-size-xs);
+            }
+        }
+        
+        /* Text Overflow Prevention */
+        .text-truncate-custom {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .text-wrap-custom {
+            word-wrap: break-word;
+            word-break: break-word;
+            hyphens: auto;
+        }
     </style>
 </head>
 <body>
@@ -455,7 +624,7 @@
                     <div class="sidebar-header">
                         <div class="cps-logo-container">
                             <div class="cps-logo-icon">CPS</div>
-                            <div class="cps-text">
+                            <div class="cps-text text-wrap-custom">
                                 <h4 class="mb-0">Support Center</h4>
                                 <p class="mb-0">Customer Support Portal</p>
                             </div>
@@ -497,9 +666,9 @@
                 <div class="cps-header mb-4">
                     <div class="cps-logo">
                         <div class="cps-logo-icon">CPS</div>
-                        <div>
-                            <h2 class="mb-1">Customer Support Officer Dashboard</h2>
-                            <p class="mb-0 opacity-75">City Park Solutions Pvt Ltd - Support Management Portal</p>
+                        <div class="text-wrap-custom">
+                            <h2 class="mb-1 support-title">Customer Support Officer Dashboard</h2>
+                            <p class="mb-0 opacity-75 text-responsive">City Park Solutions Pvt Ltd - Support Management Portal</p>
                         </div>
                     </div>
                 </div>
@@ -513,8 +682,8 @@
                         <div class="welcome-card mb-4">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
-                                    <h2 class="mb-2">Welcome back, <span th:text="${user.firstName}">Support Officer</span>!</h2>
-                                    <p class="mb-0 opacity-75">Manage support tickets and customer bookings efficiently</p>
+                                    <h2 class="mb-2 text-wrap-custom">Welcome back, <span th:text="${user.firstName}">Support Officer</span>!</h2>
+                                    <p class="mb-0 opacity-75 text-wrap-custom">Manage support tickets and customer bookings efficiently</p>
                                 </div>
                                 <div class="col-md-4 text-end">
                                     <i class="fas fa-user-tie fa-3x opacity-50"></i>
@@ -673,7 +842,7 @@
     </div>
     
     <!-- Dark Mode Toggle -->
-    <div class="dark-mode-toggle" id="darkModeToggle">
+    <div class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
         <i class="fas fa-moon" id="darkModeIcon"></i>
     </div>
     
