@@ -3,14 +3,18 @@ package com.sliit.parking_reservation_and_management_system.controller;
 import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.entity.Reservation;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
+import com.sliit.parking_reservation_and_management_system.logging.AdminActionLogger;
 import com.parking.observer.booking.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +26,9 @@ public class AdminController {
     
     @Autowired
     private NotificationManager notificationManager;
+    
+    @Autowired
+    private AdminActionLogger adminActionLogger;
 
     public AdminController(UserService userService) {
         this.userService = userService;
@@ -36,6 +43,52 @@ public class AdminController {
             "SECURITY_OFFICER",
             "CUSTOMER_SUPPORT_OFFICER"
     );
+    
+    /**
+     * Get current authenticated admin user
+     * @return Admin user email or "Unknown" if not authenticated
+     */
+    private String getCurrentAdminEmail() {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                return authentication.getName();
+            }
+        } catch (Exception e) {
+            System.err.println("Error getting current admin: " + e.getMessage());
+        }
+        return "Unknown";
+    }
+    
+    
+    /**
+     * Log admin action to file only
+     * @param action Action performed
+     * @param details Additional details
+     * @param targetEntity Target entity (optional)
+     * @param targetId Target entity ID (optional)
+     * @param request HttpServletRequest for IP address
+     */
+    private void logAdminAction(String action, String details, String targetEntity, String targetId, HttpServletRequest request) {
+        String adminEmail = getCurrentAdminEmail();
+        
+        // Log to file (singleton pattern)
+        if (targetEntity != null && targetId != null) {
+            adminActionLogger.logAction(adminEmail, action, details, targetEntity, targetId);
+        } else {
+            adminActionLogger.logAction(adminEmail, action, details);
+        }
+    }
+    
+    /**
+     * Log admin action without target entity
+     * @param action Action performed
+     * @param details Additional details
+     * @param request HttpServletRequest for IP address
+     */
+    private void logAdminAction(String action, String details, HttpServletRequest request) {
+        logAdminAction(action, details, null, null, request);
+    }
     // ---------------------------
     // Dashboard with pagination + filters
     // ---------------------------
@@ -45,7 +98,8 @@ public class AdminController {
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String email,
-            Model model
+            Model model,
+            HttpServletRequest request
     ) {
         int pageSize = 15;
 
@@ -62,6 +116,11 @@ public class AdminController {
 
         // provide dropdown role options
         model.addAttribute("roleOptions", ROLE_OPTIONS);
+        
+        // Log admin dashboard access
+        String filterDetails = String.format("Page: %d, Role: %s, Status: %s, Email: %s", 
+            page, role != null ? role : "All", status != null ? status : "All", email != null ? email : "All");
+        logAdminAction("DASHBOARD_ACCESS", "Accessed admin dashboard with filters: " + filterDetails, request);
 
         return "admin-dashboard";
     }
@@ -82,7 +141,8 @@ public class AdminController {
     public String registerUser(
             @ModelAttribute("user") User user,
             @RequestParam("confirmPassword") String confirmPassword,
-            Model model , RedirectAttributes redirectAttributes
+            Model model , RedirectAttributes redirectAttributes,
+            HttpServletRequest request
     ) {
         // 1. Check duplicate email
         if (userService.emailExists(user.getEmail())) {
@@ -116,7 +176,7 @@ public class AdminController {
             return "user-register"; // or "register" for customer
         }
 
-// Phone regex: must be 10 digits starting with 0
+        // Phone regex: must be 10 digits starting with 0
         String phoneRegex = "^0\\d{9}$";
         if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank() &&
                 !user.getPhoneNumber().matches(phoneRegex)) {
@@ -134,6 +194,12 @@ public class AdminController {
 
         // 6. Save user
         userService.saveUser(user);
+        
+        // Log user registration
+        String userDetails = String.format("Email: %s, Role: %s, Name: %s %s", 
+            user.getEmail(), user.getRole(), user.getFirstName(), user.getLastName());
+        logAdminAction("USER_REGISTRATION", "Registered new user: " + userDetails, "User", user.getUserID().toString(), request);
+        
         redirectAttributes.addFlashAttribute("success", "User registered successfully!");
         return "redirect:/admin/dashboard";
     }
@@ -145,10 +211,14 @@ public class AdminController {
 
     // Edit user form
     @GetMapping("/edit/{id}")
-    public String editUser(@PathVariable("id") int id, Model model) {
+    public String editUser(@PathVariable("id") int id, Model model, HttpServletRequest request) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
         model.addAttribute("user", user);
+        
+        // Log user edit access
+        logAdminAction("USER_EDIT_ACCESS", "Accessed edit form for user: " + user.getEmail(), "User", String.valueOf(id), request);
+        
         return "edit-user";
     }
 
@@ -156,7 +226,8 @@ public class AdminController {
     @PostMapping("/update/{id}")
     public String updateUser(@PathVariable("id") int id,
                              @ModelAttribute("user") User updatedUser,
-                             Model model , RedirectAttributes redirectAttributes) {
+                             Model model , RedirectAttributes redirectAttributes,
+                             HttpServletRequest request) {
         User user = userService.getUserById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 
@@ -185,6 +256,11 @@ public class AdminController {
         user.setStatus(updatedUser.getStatus());
 
         userService.saveUser(user);
+        
+        // Log user update
+        String updateDetails = String.format("Updated user %s: Name: %s %s, Role: %s, Status: %s", 
+            user.getEmail(), user.getFirstName(), user.getLastName(), user.getRole(), user.getStatus());
+        logAdminAction("USER_UPDATE", updateDetails, "User", String.valueOf(id), request);
 
         // Add success message for redirect
         redirectAttributes.addFlashAttribute("success", "User updated successfully!");
@@ -194,25 +270,49 @@ public class AdminController {
 
     // Delete user
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
+    public String deleteUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        // Get user details before deletion for logging
+        User userToDelete = userService.getUserById(id).orElse(null);
+        String userEmail = userToDelete != null ? userToDelete.getEmail() : "Unknown";
+        
         userService.deleteUser(id);
+        
+        // Log user deletion
+        logAdminAction("USER_DELETE", "Deleted user: " + userEmail, "User", String.valueOf(id), request);
+        
         redirectAttributes.addFlashAttribute("success", "User deleted successfully!");
         return "redirect:/admin/dashboard";
     }
 
     // Deactivate user
     @GetMapping("/deactivate/{id}")
-    public String deactivateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("success", "User deactivated successfully!");
+    public String deactivateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        // Get user details before deactivation for logging
+        User userToDeactivate = userService.getUserById(id).orElse(null);
+        String userEmail = userToDeactivate != null ? userToDeactivate.getEmail() : "Unknown";
+        
         userService.deactivateUser(id);
+        
+        // Log user deactivation
+        logAdminAction("USER_DEACTIVATE", "Deactivated user: " + userEmail, "User", String.valueOf(id), request);
+        
+        redirectAttributes.addFlashAttribute("success", "User deactivated successfully!");
         return "redirect:/admin/dashboard";
     }
 
     // Activate user
     @GetMapping("/activate/{id}")
-    public String activateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
-        redirectAttributes.addFlashAttribute("success", "User activated successfully!");
+    public String activateUser(@PathVariable("id") int id, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+        // Get user details before activation for logging
+        User userToActivate = userService.getUserById(id).orElse(null);
+        String userEmail = userToActivate != null ? userToActivate.getEmail() : "Unknown";
+        
         userService.activateUser(id);
+        
+        // Log user activation
+        logAdminAction("USER_ACTIVATE", "Activated user: " + userEmail, "User", String.valueOf(id), request);
+        
+        redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         return "redirect:/admin/dashboard";
     }
     
@@ -227,7 +327,7 @@ public class AdminController {
      */
     @GetMapping("/test-observer-pattern")
     @ResponseBody
-    public String testObserverPattern() {
+    public String testObserverPattern(HttpServletRequest request) {
         try {
             // Create a mock reservation for testing
             Reservation mockReservation = new Reservation();
@@ -257,6 +357,9 @@ public class AdminController {
             System.out.println("📊 Active observers: " + notificationManager.getObserverCount());
             System.out.println("📋 Observer types: " + notificationManager.getObserverNames());
             
+            // Log observer pattern test
+            logAdminAction("OBSERVER_PATTERN_TEST", "Tested observer pattern functionality with mock reservation", request);
+            
             return "<h1>✅ Observer Pattern Test Completed!</h1>" +
                    "<p><strong>Check your console/logs to see the Observer pattern in action!</strong></p>" +
                    "<ul>" +
@@ -283,13 +386,35 @@ public class AdminController {
      */
     @GetMapping("/observer-stats")
     @ResponseBody
-    public String getObserverStats() {
+    public String getObserverStats(HttpServletRequest request) {
+        // Log observer stats access
+        logAdminAction("OBSERVER_STATS_ACCESS", "Accessed observer pattern statistics", request);
         return "<h2>📊 Observer Pattern Statistics</h2>" +
                "<ul>" +
                "<li><strong>Total Observers:</strong> " + notificationManager.getObserverCount() + "</li>" +
                "<li><strong>Observer Types:</strong> " + notificationManager.getObserverNames() + "</li>" +
                "</ul>" +
                "<p><a href='/admin/test-observer-pattern'>🧪 Test Observer Pattern</a></p>" +
+               "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
+    }
+    
+    /**
+     * Test endpoint to verify admin logging functionality
+     */
+    @GetMapping("/test-logging")
+    @ResponseBody
+    public String testLogging(HttpServletRequest request) {
+        // Log test action
+        logAdminAction("LOGGING_TEST", "Tested admin logging functionality", request);
+        
+        return "<h1>✅ Admin Logging Test Completed!</h1>" +
+               "<p><strong>Check the following to verify logging is working:</strong></p>" +
+               "<ul>" +
+               "<li>📄 <a href='/admin/logs/database' target='_blank'>View Database Logs</a></li>" +
+               "<li>📁 <a href='/admin/logs/file' target='_blank'>View File Logs</a></li>" +
+               "<li>📊 <a href='/admin/logs/admin/" + getCurrentAdminEmail() + "' target='_blank'>View My Actions</a></li>" +
+               "</ul>" +
+               "<p><strong>Log file location:</strong> " + adminActionLogger.getLogFilePath() + "</p>" +
                "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
     }
 }

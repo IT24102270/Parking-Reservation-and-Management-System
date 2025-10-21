@@ -45,6 +45,7 @@ public class SecurityConfig {
                         // Protected dashboards
                         // ✅ Admin has access to everything
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/logs/**").hasRole("ADMIN")
                         .requestMatchers("/customer/**").hasAnyRole("CUSTOMER", "ADMIN")
                         .requestMatchers("/security/**").hasAnyRole("SECURITY_OFFICER", "ADMIN")
                         .requestMatchers("/finance/**").hasAnyRole("FINANCE_EXECUTIVE", "ADMIN")

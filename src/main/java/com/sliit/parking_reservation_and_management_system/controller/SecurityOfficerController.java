@@ -105,7 +105,6 @@ public class SecurityOfficerController {
                 model.addAttribute("activeReservations", List.of());
                 model.addAttribute("totalActiveReservations", 0);
             }
-            
             System.out.println("Security Officer Dashboard loaded successfully");
             return "security-dashboard";
             
