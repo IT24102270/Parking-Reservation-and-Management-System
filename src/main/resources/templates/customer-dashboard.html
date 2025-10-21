@@ -899,6 +899,7 @@
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             }
         }
+
     </style>
 </head>
 <body>
@@ -918,7 +919,6 @@
                     <li><a href="/customer/dashboard" class="active">Dashboard</a></li>
                     <li><a href="/customer/bookings">Bookings</a></li>
                     <li><a href="/customer/slots">Slots</a></li>
-                    <li><a href="/customer/support">Get Help</a></li>
                     <li><a href="/customer/feedback">Feedback</a></li>
                     <li><a href="/customer/profile">Profile</a></li>
                 </ul>
@@ -1005,10 +1005,6 @@
                             <a href="/customer/notifications">
                                 <i class="fas fa-bell"></i>
                                 Notifications
-                            </a>
-                            <a href="/customer/support">
-                                <i class="fas fa-life-ring"></i>
-                                Get Help
                             </a>
                             <div class="dropdown-divider"></div>
                             <a href="#" onclick="confirmLogout()" class="logout-link">
@@ -1133,11 +1129,11 @@
                         <div class="action-subtitle">Browse available</div>
                     </div>
 
-                    <div class="action-card get-help" data-action="get-help">
+                    <div class="action-card get-support" data-action="get-support">
                         <div class="action-icon">
-                            <i class="fas fa-question-circle"></i>
+                            <i class="fas fa-life-ring"></i>
                         </div>
-                        <div class="action-title">Get Help</div>
+                        <div class="action-title">Get Support</div>
                         <div class="action-subtitle">Need assistance?</div>
                     </div>
 
@@ -1244,8 +1240,8 @@
                             console.log('Navigating to view slots');
                             window.location.href = '/customer/slots';
                             break;
-                        case 'get-help':
-                            console.log('Navigating to support dashboard');
+                        case 'get-support':
+                            console.log('Navigating to support');
                             window.location.href = '/customer/support';
                             break;
                         case 'feedback':
@@ -1344,6 +1340,7 @@
                     day: 'numeric' 
                 });
             }
+
         });
 
         // Mark notification as read

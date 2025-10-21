@@ -24,46 +24,9 @@ public class SupportController {
     @Autowired
     private UserService userService;
     
-    // Support dashboard - redirect from Get Help button
+    // Support form - redirect from Get Help button
     @GetMapping("")
-    public String showSupportDashboard(Model model) {
-        try {
-            // Get current authenticated user
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            User currentUser = getCurrentUser(authentication);
-            
-            if (currentUser == null) {
-                return "redirect:/login";
-            }
-            
-            // Get support statistics
-            long totalTickets = supportIssueService.countSupportIssuesByCustomerId(currentUser.getUserID());
-            long openTickets = supportIssueService.countOpenSupportIssuesByCustomerId(currentUser.getUserID());
-            List<SupportIssue> recentTickets = supportIssueService.getRecentSupportIssues(currentUser.getUserID(), 5);
-            
-            // Calculate other statistics
-            long resolvedTickets = supportIssueService.getSupportIssuesByStatus(currentUser.getUserID(), "RESOLVED").size();
-            long pendingTickets = supportIssueService.getSupportIssuesByStatus(currentUser.getUserID(), "PENDING").size();
-            
-            model.addAttribute("user", currentUser);
-            model.addAttribute("totalTickets", totalTickets);
-            model.addAttribute("openTickets", openTickets);
-            model.addAttribute("resolvedTickets", resolvedTickets);
-            model.addAttribute("pendingTickets", pendingTickets);
-            model.addAttribute("recentTickets", recentTickets);
-            
-            return "support-dashboard";
-            
-        } catch (Exception e) {
-            return "redirect:/customer/dashboard";
-        }
-    }
-    
-    // Display support form
-    @GetMapping("/help")
     public String showSupportForm(Model model) {
-        System.out.println("=== Support Form Request ===");
-        
         try {
             // Get current authenticated user
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -72,9 +35,13 @@ public class SupportController {
             if (currentUser == null) {
                 return "redirect:/login";
             }
+            
+            // Get user's past support tickets
+            List<SupportIssue> supportIssues = supportIssueService.getSupportIssuesByCustomerId(currentUser.getUserID());
             
             model.addAttribute("user", currentUser);
             model.addAttribute("supportIssue", new SupportIssue());
+            model.addAttribute("supportIssues", supportIssues);
             
             System.out.println("Support form loaded for user: " + currentUser.getEmail());
             return "customer-support-form";
@@ -86,9 +53,10 @@ public class SupportController {
         }
     }
     
+    
     // Submit support issue
     @PostMapping("/submit")
-    public String submitSupportIssue(@RequestParam("issueType") String issueType,
+    public String submitSupportIssue(@RequestParam(value = "issueType", required = false) String issueType,
                                    @RequestParam("description") String description,
                                    @RequestParam(value = "priority", defaultValue = "MEDIUM") String priority,
                                    RedirectAttributes redirectAttributes) {
@@ -108,25 +76,32 @@ public class SupportController {
                 return "redirect:/login";
             }
             
-            // Create support issue based on type
+            // Create support issue
             SupportIssue supportIssue;
-            String fullDescription = "[Priority: " + priority + "] " + description;
             
-            switch (issueType.toUpperCase()) {
-                case "PAYMENT":
-                    supportIssue = supportIssueService.createPaymentIssue(currentUser.getUserID(), fullDescription);
-                    break;
-                case "BOOKING":
-                    supportIssue = supportIssueService.createBookingIssue(currentUser.getUserID(), fullDescription);
-                    break;
-                case "TECHNICAL":
-                    supportIssue = supportIssueService.createTechnicalIssue(currentUser.getUserID(), fullDescription);
-                    break;
-                case "GENERAL":
-                    supportIssue = supportIssueService.createGeneralInquiry(currentUser.getUserID(), fullDescription);
-                    break;
-                default:
-                    supportIssue = supportIssueService.createSupportIssue(currentUser.getUserID(), fullDescription);
+            // If issueType is not provided (from modal), create a general support issue
+            if (issueType == null || issueType.trim().isEmpty()) {
+                supportIssue = supportIssueService.createSupportIssue(currentUser.getUserID(), description);
+            } else {
+                // Handle full form submission with issue type
+                String fullDescription = "[Priority: " + priority + "] " + description;
+                
+                switch (issueType.toUpperCase()) {
+                    case "PAYMENT":
+                        supportIssue = supportIssueService.createPaymentIssue(currentUser.getUserID(), fullDescription);
+                        break;
+                    case "BOOKING":
+                        supportIssue = supportIssueService.createBookingIssue(currentUser.getUserID(), fullDescription);
+                        break;
+                    case "TECHNICAL":
+                        supportIssue = supportIssueService.createTechnicalIssue(currentUser.getUserID(), fullDescription);
+                        break;
+                    case "GENERAL":
+                        supportIssue = supportIssueService.createGeneralInquiry(currentUser.getUserID(), fullDescription);
+                        break;
+                    default:
+                        supportIssue = supportIssueService.createSupportIssue(currentUser.getUserID(), fullDescription);
+                }
             }
             
             System.out.println("Support issue created: " + supportIssue.getTicketId());
@@ -135,13 +110,44 @@ public class SupportController {
                 "Support ticket created successfully! Ticket ID: " + supportIssue.getTicketId() + 
                 ". We'll get back to you within 24 hours.");
             
-            return "redirect:/customer/support/tickets";
+            return "redirect:/customer/support";
             
         } catch (Exception e) {
             System.err.println("Error creating support issue: " + e.getMessage());
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Failed to create support ticket. Please try again.");
-            return "redirect:/customer/support/help";
+            return "redirect:/customer/support";
+        }
+    }
+    
+    // Submit support issue via AJAX (for modal form)
+    @PostMapping("/submit-ajax")
+    @ResponseBody
+    public String submitSupportIssueAjax(@RequestParam("description") String description) {
+        
+        System.out.println("=== AJAX Support Issue Submission ===");
+        System.out.println("Description: " + description);
+        
+        try {
+            // Get current authenticated user
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = getCurrentUser(authentication);
+            
+            if (currentUser == null) {
+                return "error";
+            }
+            
+            // Create support issue
+            SupportIssue supportIssue = supportIssueService.createSupportIssue(currentUser.getUserID(), description);
+            
+            System.out.println("Support issue created via AJAX: " + supportIssue.getTicketId());
+            
+            return "success";
+            
+        } catch (Exception e) {
+            System.err.println("Error creating support issue via AJAX: " + e.getMessage());
+            e.printStackTrace();
+            return "error";
         }
     }
     

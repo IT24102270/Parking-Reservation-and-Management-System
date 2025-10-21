@@ -97,21 +97,31 @@
         }
         
         .btn-confirm {
-            background: var(--gradient-button-success);
-            border: none;
-            border-radius: var(--border-radius-full);
-            padding: var(--spacing-md) var(--spacing-xl);
-            color: var(--color-text-inverse);
-            font-weight: var(--font-weight-semibold);
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 12px 30px !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
             transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3) !important;
+            text-decoration: none !important;
         }
         
         .btn-confirm:hover {
-            background: var(--color-status-success);
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%) !important;
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            color: var(--color-text-inverse);
+            box-shadow: 0 6px 25px rgba(39, 174, 96, 0.4) !important;
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+
+        .btn-confirm:focus,
+        .btn-confirm:active {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%) !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25) !important;
+            text-decoration: none !important;
         }
         
         .btn-cancel {
@@ -216,6 +226,36 @@
         /* Dark Mode Styles */
         [data-theme="dark"] .dark-mode-toggle {
             background: var(--gradient-button-warning);
+        }
+
+        /* Button Override for Better Visibility */
+        .btn-confirm,
+        .btn-confirm:visited,
+        .btn-confirm:link,
+        button.btn-confirm,
+        input[type="submit"].btn-confirm {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            text-decoration: none !important;
+            font-weight: 600 !important;
+            border-radius: 25px !important;
+            padding: 12px 30px !important;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3) !important;
+        }
+
+        .btn-confirm:hover,
+        .btn-confirm:focus,
+        .btn-confirm:active,
+        .btn-confirm.active,
+        button.btn-confirm:hover,
+        button.btn-confirm:focus,
+        button.btn-confirm:active {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            text-decoration: none !important;
+            box-shadow: 0 6px 25px rgba(39, 174, 96, 0.4) !important;
         }
 
         @media (max-width: 768px) {
