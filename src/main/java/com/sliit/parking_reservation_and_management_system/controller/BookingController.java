@@ -10,10 +10,6 @@ import com.sliit.parking_reservation_and_management_system.service.ParkingSlotSe
 import com.sliit.parking_reservation_and_management_system.service.ReservationService;
 import com.sliit.parking_reservation_and_management_system.service.SlotAvailabilityService;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
-import com.parking.observer.booking.NotificationManager;
-import com.parking.observer.booking.EmailNotifier;
-import com.parking.observer.booking.SMSNotifier;
-import com.parking.observer.booking.InAppNotifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,33 +44,6 @@ public class BookingController {
     
     @Autowired
     private SlotAvailabilityService slotAvailabilityService;
-    
-    /**
-     * Observer Pattern Implementation for Booking Notifications
-     * 
-     * NotificationManager acts as the Subject that maintains a list of observers.
-     * When booking events occur (create/cancel), it notifies all registered observers.
-     * This decouples the booking logic from notification logic, allowing multiple
-     * notification channels to operate independently.
-     */
-    private final NotificationManager notificationManager;
-    
-    /**
-     * Constructor - Initialize Observer Pattern components
-     * Sets up the NotificationManager (Subject) and registers all observers
-     */
-    public BookingController() {
-        // Initialize the Subject (NotificationManager)
-        this.notificationManager = new NotificationManager();
-        
-        // Register concrete observers for different notification channels
-        this.notificationManager.addObserver(new EmailNotifier());
-        this.notificationManager.addObserver(new SMSNotifier());
-        this.notificationManager.addObserver(new InAppNotifier());
-        
-        System.out.println("BookingController initialized with Observer Pattern");
-        System.out.println("Registered observers: " + notificationManager.getObserverNames());
-    }
 
     @GetMapping("/booking/new")
     public String newBookingForm(Model model) {
@@ -228,11 +197,6 @@ public class BookingController {
             // Save reservation with PENDING status
             Reservation savedReservation = reservationService.saveReservation(newReservation);
             
-            // Observer Pattern: Notify all observers about reservation creation
-            // This triggers notifications across all registered channels (Email, SMS, In-App)
-            System.out.println("=== Triggering Observer Pattern for Reservation Creation ===");
-            notificationManager.notifyObservers(savedReservation, "CREATED");
-            
             // Create payment record (mandatory for booking)
             Payment payment;
             try {
@@ -345,7 +309,6 @@ public class BookingController {
             System.out.println("=== Triggering Observer Pattern for Reservation Cancellation ===");
             // Update the reservation object status for accurate notification
             reservation.setStatus("CANCELLED");
-            notificationManager.notifyObservers(reservation, "CANCELLED");
             
             // CRITICAL: Update slot availability immediately when booking is cancelled
             // This uses the new SlotAvailabilityService for proper time-based slot management

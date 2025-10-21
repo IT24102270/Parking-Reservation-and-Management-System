@@ -4,7 +4,6 @@ import com.sliit.parking_reservation_and_management_system.entity.User;
 import com.sliit.parking_reservation_and_management_system.entity.Reservation;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
 import com.sliit.parking_reservation_and_management_system.logging.AdminActionLogger;
-import com.parking.observer.booking.NotificationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,9 +22,6 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
-    
-    @Autowired
-    private NotificationManager notificationManager;
     
     @Autowired
     private AdminActionLogger adminActionLogger;
@@ -315,106 +311,5 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         return "redirect:/admin/dashboard";
     }
-    
-    // ========================================
-    // OBSERVER PATTERN TESTING ENDPOINTS
-    // ========================================
-    
-    /**
-     * Test endpoint to demonstrate Observer pattern functionality
-     * This creates a mock reservation and triggers all notification observers
-     * Check the console to see the Observer pattern in action!
-     */
-    @GetMapping("/test-observer-pattern")
-    @ResponseBody
-    public String testObserverPattern(HttpServletRequest request) {
-        try {
-            // Create a mock reservation for testing
-            Reservation mockReservation = new Reservation();
-            mockReservation.setUserId(1L);
-            mockReservation.setSlotId(101L);
-            mockReservation.setVehicleNumber("ABC-1234");
-            mockReservation.setStatus("CONFIRMED");
-            mockReservation.setStartTime(LocalDateTime.now().plusHours(1));
-            mockReservation.setEndTime(LocalDateTime.now().plusHours(3));
-            mockReservation.setCreatedAt(LocalDateTime.now());
-            
-            // Trigger the Observer pattern
-            System.out.println("\n🚀 ADMIN DASHBOARD: Testing Observer Pattern");
-            System.out.println("================================================");
-            
-            // Test different event types
-            notificationManager.notifyObservers(mockReservation, "CREATED");
-            Thread.sleep(1000); // Small delay to see console output clearly
-            
-            notificationManager.notifyObservers(mockReservation, "UPDATED");
-            Thread.sleep(1000);
-            
-            notificationManager.notifyObservers(mockReservation, "CANCELLED");
-            
-            System.out.println("================================================");
-            System.out.println("✅ Observer Pattern test completed successfully!");
-            System.out.println("📊 Active observers: " + notificationManager.getObserverCount());
-            System.out.println("📋 Observer types: " + notificationManager.getObserverNames());
-            
-            // Log observer pattern test
-            logAdminAction("OBSERVER_PATTERN_TEST", "Tested observer pattern functionality with mock reservation", request);
-            
-            return "<h1>✅ Observer Pattern Test Completed!</h1>" +
-                   "<p><strong>Check your console/logs to see the Observer pattern in action!</strong></p>" +
-                   "<ul>" +
-                   "<li>📧 Email notifications triggered</li>" +
-                   "<li>📱 SMS notifications triggered</li>" +
-                   "<li>🔔 In-app notifications triggered</li>" +
-                   "<li>🖥️ Console notifications logged</li>" +
-                   "</ul>" +
-                   "<p>Active observers: " + notificationManager.getObserverCount() + "</p>" +
-                   "<p>Observer types: " + notificationManager.getObserverNames() + "</p>" +
-                   "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
-                   
-        } catch (Exception e) {
-            System.err.println("❌ Observer Pattern test failed: " + e.getMessage());
-            e.printStackTrace();
-            return "<h1>❌ Observer Pattern Test Failed</h1>" +
-                   "<p>Error: " + e.getMessage() + "</p>" +
-                   "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
-        }
-    }
-    
-    /**
-     * Get Observer pattern statistics
-     */
-    @GetMapping("/observer-stats")
-    @ResponseBody
-    public String getObserverStats(HttpServletRequest request) {
-        // Log observer stats access
-        logAdminAction("OBSERVER_STATS_ACCESS", "Accessed observer pattern statistics", request);
-        return "<h2>📊 Observer Pattern Statistics</h2>" +
-               "<ul>" +
-               "<li><strong>Total Observers:</strong> " + notificationManager.getObserverCount() + "</li>" +
-               "<li><strong>Observer Types:</strong> " + notificationManager.getObserverNames() + "</li>" +
-               "</ul>" +
-               "<p><a href='/admin/test-observer-pattern'>🧪 Test Observer Pattern</a></p>" +
-               "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
-    }
-    
-    /**
-     * Test endpoint to verify admin logging functionality
-     */
-    @GetMapping("/test-logging")
-    @ResponseBody
-    public String testLogging(HttpServletRequest request) {
-        // Log test action
-        logAdminAction("LOGGING_TEST", "Tested admin logging functionality", request);
-        
-        return "<h1>✅ Admin Logging Test Completed!</h1>" +
-               "<p><strong>Check the following to verify logging is working:</strong></p>" +
-               "<ul>" +
-               "<li>📄 <a href='/admin/logs/database' target='_blank'>View Database Logs</a></li>" +
-               "<li>📁 <a href='/admin/logs/file' target='_blank'>View File Logs</a></li>" +
-               "<li>📊 <a href='/admin/logs/admin/" + getCurrentAdminEmail() + "' target='_blank'>View My Actions</a></li>" +
-               "</ul>" +
-               "<p><strong>Log file location:</strong> " + adminActionLogger.getLogFilePath() + "</p>" +
-               "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
-    }
+
 }
