@@ -1,13 +1,17 @@
 package com.sliit.parking_reservation_and_management_system.controller;
 
 import com.sliit.parking_reservation_and_management_system.entity.User;
+import com.sliit.parking_reservation_and_management_system.entity.Reservation;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
+import com.parking.observer.booking.NotificationManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -15,6 +19,9 @@ import java.util.List;
 public class AdminController {
 
     private final UserService userService;
+    
+    @Autowired
+    private NotificationManager notificationManager;
 
     public AdminController(UserService userService) {
         this.userService = userService;
@@ -207,5 +214,82 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("success", "User activated successfully!");
         userService.activateUser(id);
         return "redirect:/admin/dashboard";
+    }
+    
+    // ========================================
+    // OBSERVER PATTERN TESTING ENDPOINTS
+    // ========================================
+    
+    /**
+     * Test endpoint to demonstrate Observer pattern functionality
+     * This creates a mock reservation and triggers all notification observers
+     * Check the console to see the Observer pattern in action!
+     */
+    @GetMapping("/test-observer-pattern")
+    @ResponseBody
+    public String testObserverPattern() {
+        try {
+            // Create a mock reservation for testing
+            Reservation mockReservation = new Reservation();
+            mockReservation.setUserId(1L);
+            mockReservation.setSlotId(101L);
+            mockReservation.setVehicleNumber("ABC-1234");
+            mockReservation.setStatus("CONFIRMED");
+            mockReservation.setStartTime(LocalDateTime.now().plusHours(1));
+            mockReservation.setEndTime(LocalDateTime.now().plusHours(3));
+            mockReservation.setCreatedAt(LocalDateTime.now());
+            
+            // Trigger the Observer pattern
+            System.out.println("\n🚀 ADMIN DASHBOARD: Testing Observer Pattern");
+            System.out.println("================================================");
+            
+            // Test different event types
+            notificationManager.notifyObservers(mockReservation, "CREATED");
+            Thread.sleep(1000); // Small delay to see console output clearly
+            
+            notificationManager.notifyObservers(mockReservation, "UPDATED");
+            Thread.sleep(1000);
+            
+            notificationManager.notifyObservers(mockReservation, "CANCELLED");
+            
+            System.out.println("================================================");
+            System.out.println("✅ Observer Pattern test completed successfully!");
+            System.out.println("📊 Active observers: " + notificationManager.getObserverCount());
+            System.out.println("📋 Observer types: " + notificationManager.getObserverNames());
+            
+            return "<h1>✅ Observer Pattern Test Completed!</h1>" +
+                   "<p><strong>Check your console/logs to see the Observer pattern in action!</strong></p>" +
+                   "<ul>" +
+                   "<li>📧 Email notifications triggered</li>" +
+                   "<li>📱 SMS notifications triggered</li>" +
+                   "<li>🔔 In-app notifications triggered</li>" +
+                   "<li>🖥️ Console notifications logged</li>" +
+                   "</ul>" +
+                   "<p>Active observers: " + notificationManager.getObserverCount() + "</p>" +
+                   "<p>Observer types: " + notificationManager.getObserverNames() + "</p>" +
+                   "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
+                   
+        } catch (Exception e) {
+            System.err.println("❌ Observer Pattern test failed: " + e.getMessage());
+            e.printStackTrace();
+            return "<h1>❌ Observer Pattern Test Failed</h1>" +
+                   "<p>Error: " + e.getMessage() + "</p>" +
+                   "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
+        }
+    }
+    
+    /**
+     * Get Observer pattern statistics
+     */
+    @GetMapping("/observer-stats")
+    @ResponseBody
+    public String getObserverStats() {
+        return "<h2>📊 Observer Pattern Statistics</h2>" +
+               "<ul>" +
+               "<li><strong>Total Observers:</strong> " + notificationManager.getObserverCount() + "</li>" +
+               "<li><strong>Observer Types:</strong> " + notificationManager.getObserverNames() + "</li>" +
+               "</ul>" +
+               "<p><a href='/admin/test-observer-pattern'>🧪 Test Observer Pattern</a></p>" +
+               "<p><a href='/admin/dashboard'>← Back to Admin Dashboard</a></p>";
     }
 }
