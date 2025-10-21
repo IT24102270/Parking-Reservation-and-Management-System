@@ -143,18 +143,12 @@
                     <a href="/admin/logs/file" class="btn btn-primary">
                         <i class="fas fa-sync me-1"></i>Refresh Logs
                     </a>
-                    <a href="/admin/test-logging" class="btn btn-success" target="_blank">
-                        <i class="fas fa-vial me-1"></i>Test Logging
-                    </a>
                     <form th:action="@{/admin/logs/clear}" method="post" class="d-inline">
                         <button type="submit" class="btn btn-outline-danger" 
                                 onclick="return confirm('Are you sure you want to clear all logs? This action cannot be undone!')">
                             <i class="fas fa-trash-alt me-1"></i>Clear All Logs
                         </button>
                     </form>
-                    <a href="/admin/logs/database" class="btn btn-info">
-                        <i class="fas fa-database me-1"></i>Database View
-                    </a>
                 </div>
             </div>
         </div>

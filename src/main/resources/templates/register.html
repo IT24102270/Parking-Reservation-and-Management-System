@@ -143,15 +143,6 @@
             outline: none;
         }
 
-        .form-control.is-valid {
-            border-color: #27ae60;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2327ae60' d='m2.3 6.73.94-.94 2.94 2.94L8.5 6.4l.94.94L6.5 10.27z'/%3e%3c/svg%3e");
-        }
-
-        .form-control.is-invalid {
-            border-color: #e74c3c;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23e74c3c'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.5 5.5 1 1m0-1-1 1'/%3e%3c/svg%3e");
-        }
 
         .password-requirements {
             font-size: 0.8rem;
@@ -159,6 +150,7 @@
             margin-top: 0.5rem;
             line-height: 1.4;
         }
+
 
         .btn-register {
             background: linear-gradient(135deg, var(--color-slate-blue), var(--color-navy-medium));
@@ -287,39 +279,34 @@
         function validatePasswords() {
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirmPassword").value;
-            const passwordField = document.getElementById("password");
-            const confirmField = document.getElementById("confirmPassword");
             
-            // Reset validation classes
-            passwordField.classList.remove('is-valid', 'is-invalid');
-            confirmField.classList.remove('is-valid', 'is-invalid');
+            // Only validate if both fields have content
+            if (password.length === 0 && confirmPassword.length === 0) {
+                return true;
+            }
             
-            if (password !== confirmPassword) {
-                confirmField.classList.add('is-invalid');
-                showAlert("Passwords do not match!", "danger");
-                return false;
-            } else if (password.length > 0) {
-                confirmField.classList.add('is-valid');
+            // Only validate if confirm password has content
+            if (confirmPassword.length > 0) {
+                if (password !== confirmPassword) {
+                    return false;
+                } else {
+                    return true;
+                }
             }
             
             return true;
         }
 
         function validatePassword() {
-            const password = document.getElementById("password").value;
-            const passwordField = document.getElementById("password");
-            const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/;
-            
-            if (pattern.test(password)) {
-                passwordField.classList.remove('is-invalid');
-                passwordField.classList.add('is-valid');
-            } else if (password.length > 0) {
-                passwordField.classList.remove('is-valid');
-                passwordField.classList.add('is-invalid');
-            }
+            // Remove all visual validation - no colors will be shown
+            return;
         }
 
         function showAlert(message, type) {
+            // Remove any existing alerts first
+            const existingAlerts = document.querySelectorAll('.alert');
+            existingAlerts.forEach(alert => alert.remove());
+            
             // Create alert element
             const alertDiv = document.createElement('div');
             alertDiv.className = `alert alert-${type}`;
@@ -335,9 +322,28 @@
             }, 5000);
         }
 
+        function validateForm() {
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,12}$/;
+            
+            // Check password requirements
+            if (!pattern.test(password)) {
+                showAlert("Password must be 8-12 characters with uppercase, lowercase, number & special character", "danger");
+                return false;
+            }
+            
+            // Check password match
+            if (password !== confirmPassword) {
+                showAlert("Passwords do not match!", "danger");
+                return false;
+            }
+            
+            return true;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('password').addEventListener('input', validatePassword);
-            document.getElementById('confirmPassword').addEventListener('input', validatePasswords);
+            // No real-time validation - only validate on form submission
         });
     </script>
 </head>
@@ -372,7 +378,7 @@
         </div>
 
         <!-- Register Form -->
-        <form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return validatePasswords()">
+        <form th:action="@{/register}" method="post" th:object="${user}" onsubmit="return validateForm()">
             <!-- Name Fields Row -->
             <div class="form-row">
                 <div class="form-group">

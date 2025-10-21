@@ -1,7 +1,6 @@
 package com.sliit.parking_reservation_and_management_system.controller;
 
 import com.sliit.parking_reservation_and_management_system.entity.User;
-import com.sliit.parking_reservation_and_management_system.entity.Reservation;
 import com.sliit.parking_reservation_and_management_system.service.UserService;
 import com.sliit.parking_reservation_and_management_system.logging.AdminActionLogger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller

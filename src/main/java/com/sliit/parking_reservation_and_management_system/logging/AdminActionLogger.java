@@ -114,49 +114,49 @@ public class AdminActionLogger {
         writeToFile(logEntry);
     }
     
-    /**
-     * Log admin login
-     * @param adminEmail Admin's email
-     * @param ipAddress IP address (if available)
-     */
-    public void logLogin(String adminEmail, String ipAddress) {
-        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
-        String logEntry = String.format(
-            "[%s] ADMIN: %s | ACTION: LOGIN | IP: %s | DETAILS: Admin logged in successfully",
-            timestamp, adminEmail, ipAddress != null ? ipAddress : "Unknown"
-        );
-        
-        writeToFile(logEntry);
-    }
-    
-    /**
-     * Log admin logout
-     * @param adminEmail Admin's email
-     */
-    public void logLogout(String adminEmail) {
-        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
-        String logEntry = String.format(
-            "[%s] ADMIN: %s | ACTION: LOGOUT | DETAILS: Admin logged out",
-            timestamp, adminEmail
-        );
-        
-        writeToFile(logEntry);
-    }
-    
-    /**
-     * Log dashboard access
-     * @param adminEmail Admin's email
-     * @param dashboardName Name of the dashboard accessed
-     */
-    public void logDashboardAccess(String adminEmail, String dashboardName) {
-        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
-        String logEntry = String.format(
-            "[%s] ADMIN: %s | ACTION: DASHBOARD_ACCESS | TARGET: %s | DETAILS: Accessed dashboard",
-            timestamp, adminEmail, dashboardName
-        );
-        
-        writeToFile(logEntry);
-    }
+//    /**
+//     * Log admin login
+//     * @param adminEmail Admin's email
+//     * @param ipAddress IP address (if available)
+//     */
+//    public void logLogin(String adminEmail, String ipAddress) {
+//        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
+//        String logEntry = String.format(
+//            "[%s] ADMIN: %s | ACTION: LOGIN | IP: %s | DETAILS: Admin logged in successfully",
+//            timestamp, adminEmail, ipAddress != null ? ipAddress : "Unknown"
+//        );
+//
+//        writeToFile(logEntry);
+//    }
+//
+//    /**
+//     * Log admin logout
+//     * @param adminEmail Admin's email
+//     */
+//    public void logLogout(String adminEmail) {
+//        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
+//        String logEntry = String.format(
+//            "[%s] ADMIN: %s | ACTION: LOGOUT | DETAILS: Admin logged out",
+//            timestamp, adminEmail
+//        );
+//
+//        writeToFile(logEntry);
+//    }
+//
+//    /**
+//     * Log dashboard access
+//     * @param adminEmail Admin's email
+//     * @param dashboardName Name of the dashboard accessed
+//     */
+//    public void logDashboardAccess(String adminEmail, String dashboardName) {
+//        String timestamp = LocalDateTime.now().format(DATE_FORMATTER);
+//        String logEntry = String.format(
+//            "[%s] ADMIN: %s | ACTION: DASHBOARD_ACCESS | TARGET: %s | DETAILS: Accessed dashboard",
+//            timestamp, adminEmail, dashboardName
+//        );
+//
+//        writeToFile(logEntry);
+//    }
     
     /**
      * Write log entry to file (thread-safe)

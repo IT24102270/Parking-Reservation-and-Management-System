@@ -9,6 +9,9 @@ import com.sliit.parking_reservation_and_management_system.service.SlotAvailabil
 import com.sliit.parking_reservation_and_management_system.service.UserService;
 import com.sliit.parking_reservation_and_management_system.service.NotificationService;
 import com.sliit.parking_reservation_and_management_system.service.ParkingSlotService;
+import com.sliit.parking_reservation_and_management_system.strategy.PaymentContext;
+import com.sliit.parking_reservation_and_management_system.dto.PaymentRequest;
+import com.sliit.parking_reservation_and_management_system.dto.PaymentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -41,6 +45,9 @@ public class PaymentController {
     
     @Autowired
     private SlotAvailabilityService slotAvailabilityService;
+    
+    @Autowired
+    private PaymentContext paymentContext;
 
     @GetMapping("/payments")
     public String viewPayments(Model model) {
@@ -189,6 +196,13 @@ public class PaymentController {
     @PostMapping("/payment/{id}/complete")
     public String completePayment(@PathVariable Long id, 
                                  @RequestParam String paymentMethod,
+                                 @RequestParam(required = false) String cardNumber,
+                                 @RequestParam(required = false) String cardHolderName,
+                                 @RequestParam(required = false) String expiryDate,
+                                 @RequestParam(required = false) String cvv,
+                                 @RequestParam(required = false) String paypalEmail,
+                                 @RequestParam(required = false) String bankAccountNumber,
+                                 @RequestParam(required = false) String bankRoutingNumber,
                                  RedirectAttributes redirectAttributes) {
         try {
             User currentUser = getCurrentUser();
@@ -208,10 +222,45 @@ public class PaymentController {
                 return "redirect:/customer/bookings";
             }
             
-            // Complete the payment
-            boolean paymentCompleted = paymentService.completePayment(id, paymentMethod);
+            // Create payment request for strategy pattern
+            PaymentRequest paymentRequest = new PaymentRequest();
+            paymentRequest.setPaymentMethod(paymentMethod.toUpperCase());
+            paymentRequest.setAmount(payment.getAmount().doubleValue());
+            paymentRequest.setCurrency("USD");
+            paymentRequest.setDescription("Parking reservation payment for slot " + reservation.getSlotId());
+            paymentRequest.setReservationId(reservation.getId().toString());
+            paymentRequest.setUserId(currentUser.getUserID().toString());
             
-            if (paymentCompleted) {
+            // Set payment method specific details
+            if ("CREDIT_CARD".equalsIgnoreCase(paymentMethod) || "DEBIT_CARD".equalsIgnoreCase(paymentMethod)) {
+                paymentRequest.setCardNumber(cardNumber);
+                paymentRequest.setCardHolderName(cardHolderName);
+                paymentRequest.setExpiryDate(expiryDate);
+                paymentRequest.setCvv(cvv);
+            } else if ("PAYPAL".equalsIgnoreCase(paymentMethod)) {
+                paymentRequest.setPaypalEmail(paypalEmail);
+            } else if ("BANK_TRANSFER".equalsIgnoreCase(paymentMethod)) {
+                paymentRequest.setBankAccountNumber(bankAccountNumber);
+                paymentRequest.setBankRoutingNumber(bankRoutingNumber);
+            } else if ("DIGITAL_WALLET".equalsIgnoreCase(paymentMethod)) {
+                // Digital wallet doesn't need additional details
+                // The wallet is already authenticated through the UI
+            }
+            
+            // Process payment using strategy pattern
+            System.out.println("🔄 Processing payment using Strategy Pattern:");
+            System.out.println("   Payment Method: " + paymentMethod);
+            System.out.println("   Amount: $" + payment.getAmount());
+            
+            PaymentResponse paymentResponse = paymentContext.processPaymentWithAutoStrategy(paymentRequest);
+            
+            if (paymentResponse.isSuccess()) {
+                // Complete the payment using existing service
+                paymentService.completePayment(id, paymentMethod);
+                
+                System.out.println("✅ Payment processed successfully:");
+                System.out.println("   Transaction ID: " + paymentResponse.getTransactionId());
+                System.out.println("   Message: " + paymentResponse.getMessage());
                 // Update reservation status to CONFIRMED
                 reservationService.updateReservationStatus(reservation.getId(), "CONFIRMED");
                 
@@ -246,7 +295,12 @@ public class PaymentController {
                 System.out.println("- Payment Method: " + paymentMethod);
                 
             } else {
-                redirectAttributes.addFlashAttribute("error", "Payment processing failed. Please try again.");
+                System.out.println("❌ Payment processing failed:");
+                System.out.println("   Error Code: " + paymentResponse.getErrorCode());
+                System.out.println("   Error Message: " + paymentResponse.getMessage());
+                
+                redirectAttributes.addFlashAttribute("error", 
+                    "Payment processing failed: " + paymentResponse.getMessage());
             }
             
             return "redirect:/customer/bookings";
@@ -255,6 +309,43 @@ public class PaymentController {
             System.err.println("Error completing payment: " + e.getMessage());
             redirectAttributes.addFlashAttribute("error", "Error processing payment: " + e.getMessage());
             return "redirect:/customer/bookings";
+        }
+    }
+    
+    /**
+     * Get available payment methods and their details
+     */
+    @GetMapping("/payment-methods")
+    @ResponseBody
+    public String getPaymentMethods() {
+        try {
+            Map<String, Object> strategyInfo = paymentContext.getStrategyInfo();
+            
+            StringBuilder response = new StringBuilder();
+            response.append("<h2>💳 Available Payment Methods</h2>");
+            response.append("<div class='payment-methods'>");
+            
+            String[] availableMethods = (String[]) strategyInfo.get("availableMethods");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> methodDetails = (Map<String, Object>) strategyInfo.get("methodDetails");
+            
+            for (String method : availableMethods) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> details = (Map<String, Object>) methodDetails.get(method);
+                response.append("<div class='payment-method'>");
+                response.append("<h3>").append(method.replace("_", " ")).append("</h3>");
+                response.append("<p><strong>Processing Time:</strong> ").append(details.get("processingTime")).append(" minutes</p>");
+                response.append("<p><strong>Processing Fee:</strong> ").append(details.get("processingFeeRate")).append("%</p>");
+                response.append("</div>");
+            }
+            
+            response.append("</div>");
+            response.append("<p><a href='/customer/payments'>← Back to Payments</a></p>");
+            
+            return response.toString();
+            
+        } catch (Exception e) {
+            return "<h2>❌ Error</h2><p>Failed to load payment methods: " + e.getMessage() + "</p>";
         }
     }
     

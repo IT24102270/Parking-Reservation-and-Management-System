@@ -3,20 +3,27 @@ package com.sliit.parking_reservation_and_management_system.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
 
     // Map root URL (/) to index.html or redirect to dashboard if logged in
     @GetMapping("/")
-    public String index() {
+    public String index(@RequestParam(value = "success", required = false) String success, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         
         // If user is authenticated and not anonymous, redirect to dashboard
         if (authentication != null && authentication.isAuthenticated() && 
             !authentication.getName().equals("anonymousUser")) {
             return "redirect:/customer/dashboard";
+        }
+        
+        // Add success message for registration
+        if (success != null) {
+            model.addAttribute("registrationSuccess", true);
         }
         
         return "index"; // looks for src/main/resources/templates/index.html
