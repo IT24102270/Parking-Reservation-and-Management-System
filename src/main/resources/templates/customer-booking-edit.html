@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Booking - City Park Solutions Pvt Ltd</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Global Design System -->
+    <link th:href="@{/css/global-design-system.css}" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,10 +17,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: var(--font-family-primary);
+            background: var(--gradient-background);
             min-height: 100vh;
-            color: #333;
+            color: var(--color-text-primary);
         }
 
         .container {
@@ -27,12 +31,13 @@
 
         /* Header */
         .header {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gradient-header);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+            border: 1px solid var(--color-border-light);
+            box-shadow: var(--shadow-lg);
         }
 
         .header-content {
@@ -44,9 +49,9 @@
         }
 
         .header-title {
-            color: white;
-            font-size: 28px;
-            font-weight: 700;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
         }
 
         .header-actions {
@@ -56,56 +61,96 @@
         }
 
         .btn {
-            padding: 12px 20px;
+            padding: var(--spacing-md) var(--spacing-lg);
             border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
             cursor: pointer;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-sm);
             transition: all 0.3s ease;
         }
 
         .btn-primary {
-            background: #3498db;
-            color: white;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
         }
 
         .btn-primary:hover {
-            background: #2980b9;
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+            color: #ffffff;
             transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:focus {
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-weight: 600;
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:focus {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
         }
 
         .btn-success {
-            background: #27ae60;
-            color: white;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
         }
 
         .btn-success:hover {
-            background: #229954;
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-success:focus {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%);
+            color: #ffffff;
+            box-shadow: 0 0 0 0.2rem rgba(39, 174, 96, 0.25);
+        }
+
+        .btn-success:active {
+            background: linear-gradient(135deg, #1e8449 0%, #229954 100%);
+            color: #ffffff;
         }
 
         /* Form Styles */
         .edit-form-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gradient-card);
             backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            margin-bottom: 30px;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            border: 1px solid var(--color-border-light);
+            margin-bottom: var(--spacing-2xl);
+            box-shadow: var(--shadow-lg);
         }
 
         .form-header {
@@ -114,19 +159,19 @@
         }
 
         .booking-id {
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 10px;
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-md);
         }
 
         .edit-notice {
-            background: rgba(243, 156, 18, 0.1);
-            border: 1px solid rgba(243, 156, 18, 0.3);
-            color: #f39c12;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            background: var(--color-status-warning-bg);
+            border: 1px solid var(--color-status-warning);
+            color: var(--color-status-warning);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-2xl);
             text-align: center;
         }
 
@@ -138,23 +183,24 @@
         }
 
         .info-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--color-surface-elevated);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border-light);
         }
 
         .info-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            margin-bottom: 5px;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--spacing-xs);
             text-transform: uppercase;
             letter-spacing: 1px;
+            font-weight: var(--font-weight-medium);
         }
 
         .info-value {
-            color: white;
-            font-weight: 600;
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-semibold);
         }
 
         .form-section {
@@ -162,13 +208,13 @@
         }
 
         .section-title {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-lg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--spacing-md);
         }
 
         .time-inputs {
@@ -183,57 +229,59 @@
         }
 
         .form-label {
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-sm);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-sm);
         }
 
         .required {
-            color: #e74c3c;
+            color: var(--color-status-error);
         }
 
         .form-input {
-            padding: 12px 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 2px solid var(--color-border-light);
+            border-radius: var(--border-radius-md);
+            background: var(--color-surface-elevated);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #3498db;
-            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--color-interactive-primary);
+            background: var(--color-surface-hover);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
 
         .form-help {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 12px;
-            margin-top: 5px;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            margin-top: var(--spacing-xs);
         }
 
         .cost-summary {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--color-surface-elevated);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-xl);
+            margin: var(--spacing-xl) 0;
+            border: 1px solid var(--color-border-light);
+            box-shadow: var(--shadow-md);
         }
 
         .cost-title {
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-md);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-lg);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: var(--spacing-md);
         }
 
         .cost-details {
@@ -247,42 +295,51 @@
         }
 
         .cost-label {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            margin-bottom: 5px;
+            color: var(--color-text-muted);
+            font-size: var(--font-size-xs);
+            margin-bottom: var(--spacing-xs);
+            font-weight: var(--font-weight-medium);
         }
 
         .cost-value {
-            color: white;
-            font-size: 18px;
-            font-weight: 600;
+            color: var(--color-text-primary);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
         }
 
         .form-actions {
             display: flex;
-            gap: 15px;
+            gap: var(--spacing-lg);
             justify-content: center;
-            margin-top: 30px;
+            margin-top: var(--spacing-2xl);
+            flex-wrap: wrap;
+        }
+
+        .form-actions .btn {
+            min-width: 150px;
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-semibold);
         }
 
         /* Alert Messages */
         .alert {
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-weight: 500;
+            padding: var(--spacing-lg) var(--spacing-xl);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-xl);
+            font-weight: var(--font-weight-medium);
         }
 
         .alert-error {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            border: 1px solid rgba(231, 76, 60, 0.3);
+            background: var(--color-status-error-bg);
+            color: var(--color-status-error);
+            border: 1px solid var(--color-status-error);
         }
 
         .alert-success {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-            border: 1px solid rgba(39, 174, 96, 0.3);
+            background: var(--color-status-success-bg);
+            color: var(--color-status-success);
+            border: 1px solid var(--color-status-success);
         }
 
         /* Responsive Design */
@@ -308,6 +365,135 @@
                 flex-direction: column;
             }
         }
+        
+        /* Dark Mode Toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-button-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+            border: 2px solid var(--color-border-light);
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .dark-mode-toggle i {
+            color: var(--color-text-inverse);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Dark Mode Styles */
+        [data-theme="dark"] .dark-mode-toggle {
+            background: var(--gradient-button-warning);
+        }
+
+        /* Button Override for Better Visibility */
+        .btn-success,
+        .btn-success:visited,
+        .btn-success:link {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            text-decoration: none !important;
+        }
+
+        .btn-success:hover,
+        .btn-success:focus,
+        .btn-success:active {
+            background: linear-gradient(135deg, #229954 0%, #27ae60 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
+            text-decoration: none !important;
+        }
+
+        .btn-primary,
+        .btn-primary:visited,
+        .btn-primary:link {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #2980b9 !important;
+            text-decoration: none !important;
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2) !important;
+        }
+
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background: linear-gradient(135deg, #2980b9 0%, #21618c 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #21618c !important;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(52, 152, 219, 0.4) !important;
+        }
+
+        .btn-secondary,
+        .btn-secondary:visited,
+        .btn-secondary:link {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #5a6268 !important;
+            text-decoration: none !important;
+            box-shadow: 0 2px 10px rgba(108, 117, 125, 0.2) !important;
+        }
+
+        .btn-secondary:hover,
+        .btn-secondary:focus,
+        .btn-secondary:active {
+            background: linear-gradient(135deg, #5a6268 0%, #495057 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #495057 !important;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(108, 117, 125, 0.4) !important;
+        }
+
+        /* Special styling for Cancel button */
+        .btn-cancel,
+        .btn-cancel:visited,
+        .btn-cancel:link {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #c0392b !important;
+            text-decoration: none !important;
+            box-shadow: 0 2px 10px rgba(231, 76, 60, 0.2) !important;
+        }
+
+        .btn-cancel:hover,
+        .btn-cancel:focus,
+        .btn-cancel:active {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%) !important;
+            color: #ffffff !important;
+            border: 2px solid #a93226 !important;
+            text-decoration: none !important;
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4) !important;
+        }
+
+        @media (max-width: 768px) {
+            .dark-mode-toggle {
+                top: 15px;
+                right: 15px;
+                width: 45px;
+                height: 45px;
+            }
+            
+            .dark-mode-toggle i {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -320,7 +506,7 @@
                     Edit Booking
                 </h1>
                 <div class="header-actions">
-                    <a th:href="@{'/customer/booking/' + ${reservation.id} + '/view'}" class="btn btn-secondary">
+                    <a th:href="@{'/customer/booking/' + ${reservation.id} + '/view'}" class="btn btn-primary">
                         <i class="fas fa-arrow-left"></i>
                         Back to View
                     </a>
@@ -459,7 +645,7 @@
                         <i class="fas fa-save"></i>
                         Update Booking
                     </button>
-                    <a th:href="@{'/customer/booking/' + ${reservation.id} + '/view'}" class="btn btn-secondary">
+                    <a th:href="@{'/customer/booking/' + ${reservation.id} + '/view'}" class="btn btn-cancel">
                         <i class="fas fa-times"></i>
                         Cancel
                     </a>
@@ -572,5 +758,15 @@
             });
         });
     </script>
+    
+    <!-- Dark Mode Toggle -->
+    <div class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Dark Mode Support -->
+    <script th:src="@{/js/dark-mode.js}"></script>
 </body>
 </html>
